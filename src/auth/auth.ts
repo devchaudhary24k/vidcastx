@@ -3,6 +3,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/database';
 import * as schema from '@/database/schema';
 import { resend } from '@/mail/resend';
+import { organization } from 'better-auth/plugins';
 
 export const auth = betterAuth({
   /**
@@ -11,6 +12,7 @@ export const auth = betterAuth({
    */
   database: drizzleAdapter(db, {
     provider: 'pg',
+
     schema: {
       ...schema,
     },
@@ -38,6 +40,7 @@ export const auth = betterAuth({
    * Rate limiting configuration.
    * This will enable rate limiting for all requests.
    */
+
   rateLimit: {
     window: 10, // time window in seconds
     max: 100, // max requests in the window
@@ -46,7 +49,7 @@ export const auth = betterAuth({
   },
 
   /**
-   * Session configuration.
+   * Session configuration.z
    * This will enable session management for all requests.
    */
   session: {
@@ -62,7 +65,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
-    sendVerificationEmail: async ({ url, user, token }, request) => {
+    sendVerificationEmail: async ({ url, user }) => {
       await resend.emails.send({
         to: user.email,
         from: 'no-reply@pixelactstudios.com',
@@ -71,4 +74,16 @@ export const auth = betterAuth({
       });
     },
   },
+
+  plugins: [organization()],
+
+  // databaseHooks: {
+  //   session: {
+  //     create: {
+  //       before: async (session) => {
+  //         const org = await db.
+  //       },
+  //     },
+  //   },
+  // },
 });

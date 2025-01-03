@@ -1,4 +1,5 @@
 import { createAuthClient } from 'better-auth/react';
+import { organizationClient } from 'better-auth/client/plugins';
 
 export const authClient = createAuthClient({
   baseURL: 'http://localhost:3000',
@@ -11,6 +12,8 @@ export const authClient = createAuthClient({
       }
     },
   },
+
+  plugins: [organizationClient()],
 });
 
 export const {
@@ -20,4 +23,8 @@ export const {
   useSession,
   resetPassword,
   forgetPassword,
+  useListOrganizations,
+  organization,
+  getSession,
+  useActiveOrganization,
 } = authClient;

@@ -1,27 +1,33 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { signOut, useSession } from '@/auth/client';
-import { useRouter } from 'next/navigation';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useActiveOrganization } from '@/auth/client';
 
 const Dashboard = () => {
-  const router = useRouter();
-  const onclick = async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push(`/auth/login`);
-        },
-      },
-    });
-  };
-
-  const { data } = useSession();
+  const { data: org } = useActiveOrganization();
 
   return (
     <div>
-      {JSON.stringify(data?.user)}
-      <Button onClick={onclick}>Logout</Button>
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink>Menu</BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </header>
+      <main>Welcome to the dashboard</main>
+      <div>{JSON.stringify(org)}</div>
     </div>
   );
 };
