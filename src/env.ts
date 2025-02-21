@@ -8,9 +8,9 @@ export const env = createEnv({
    * Will throw if you access these variables on the client.
    */
   server: {
-    DATABASE_URL: z.string().url(),
-    RESEND_API_KEY: z.string().min(1),
-    ARCJET_KEY: z.string().min(1),
+    DATABASE_URL: z.string().url().min(1),
+    RESEND_API_KEY: z.string().min(1).startsWith('re_'),
+    ARCJET_KEY: z.string().min(1).startsWith('ajkey_'),
     BETTER_AUTH_URL: z.string().min(1),
     BETTER_AUTH_SECRET: z.string().min(1),
   },
