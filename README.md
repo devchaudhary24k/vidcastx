@@ -95,39 +95,39 @@ CREATE TABLE videos (
 
 - [x] Initialize Next.js project with TypeScript
 - [x] Set up Drizzle ORM with PostgreSQL
-- [x] Configure environment variables for AWS services
+- [ ] Configure environment variables for AWS services
 
 ### **Frontend Development**
 
-- [x] Create a user dashboard with a video upload interface
-- [x] Implement a progress indicator for uploads
-- [x] Display a list of uploaded videos with status indicators
-- [x] Implement video playback using an embedded HLS player
+- [ ] Create a user dashboard with a video upload interface
+- [ ] Implement a progress indicator for uploads
+- [ ] Display a list of uploaded videos with status indicators
+- [ ] Implement video playback using an embedded HLS player
 
 ### **Backend Development**
 
-- [x] Implement API for video uploads (Next.js Server Actions)
-- [x] Store uploaded video metadata in PostgreSQL
-- [x] Implement API to check video processing status
-- [x] Implement API to retrieve streaming URLs
+- [ ] Implement API for video uploads (Next.js Server Actions)
+- [ ] Store uploaded video metadata in PostgreSQL
+- [ ] Implement API to check video processing status
+- [ ] Implement API to retrieve streaming URLs
 
 ### **AWS Integration**
 
-- [x] Set up AWS S3 for temporary and processed video storage
-- [x] Configure AWS Elemental MediaConvert for HLS conversion
-- [x] Set up AWS CloudFront for secure video streaming
-- [x] Implement AWS SQS for queue management
+- [ ] Set up AWS S3 for temporary and processed video storage
+- [ ] Configure AWS Elemental MediaConvert for HLS conversion
+- [ ] Set up AWS CloudFront for secure video streaming
+- [ ] Implement AWS SQS for queue management
 
 ### **Queue Processing & Workflow**
 
-- [x] Implement worker to pull jobs from SQS
-- [x] Process videos using AWS MediaConvert
-- [x] Update database with processed video URL
+- [ ] Implement worker to pull jobs from SQS
+- [ ] Process videos using AWS MediaConvert
+- [ ] Update database with processed video URL
 
 ### **Security & Access Control**
 
-- [x] Generate signed CloudFront URLs for secure access
-- [x] Implement authentication for user dashboard
+- [ ] Generate signed CloudFront URLs for secure access
+- [ ] Implement authentication for user dashboard
 - [ ] Restrict access to video URLs based on user authentication
 
 ### **Testing & Optimization**
