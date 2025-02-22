@@ -37,7 +37,6 @@ const DashboardLayout = async ({ children }: DashboardLayoutProps) => {
           {/*<SidebarTrigger />*/}
           {children}
         </main>
-
       </SidebarInset>
     </SidebarProvider>
   );
