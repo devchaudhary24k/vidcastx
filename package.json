@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "bump-deps": "bunx npm-check-updates --deep -u -x react-day-picker && bun install",
+    "bump-deps": "npx npm-check-updates --deep -u -x react-day-picker && bun install",
     "format:fix": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
@@ -86,8 +86,15 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
     "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
     "postcss": "^8.5.3",
     "prettier": "^3.5.2",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
