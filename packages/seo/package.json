@@ -1,0 +1,31 @@
+{
+  "name": "@workspace/seo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./metadata": "./src/metadata.ts",
+    "./json-ld": "./src/json-ld.tsx"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "check-types": "tsc --noEmit --emitDeclarationOnly false",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore"
+  },
+  "prettier": "@workspace/prettier",
+  "devDependencies": {
+    "@types/lodash.merge": "^4.6.9",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/prettier": "workspace:*",
+    "@workspace/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.6.2",
+    "next": "16.0.5",
+    "react": "19.2.0",
+    "schema-dts": "^1.1.5"
+  }
+}
