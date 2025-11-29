@@ -1,0 +1,19 @@
+{
+  "name": "@workspace/{{ name }}",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "check-types": "tsc --noEmit --emitDeclarationOnly false",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "@workspace/prettier": "workspace:*"
+  },
+  "prettier": "@workspace/prettier"
+}

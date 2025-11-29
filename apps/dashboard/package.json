@@ -1,0 +1,36 @@
+{
+  "name": "dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm with-env next dev --port 3000",
+    "build": "pnpm with-env next build",
+    "start": "pnpm with-env next start",
+    "lint": "eslint",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "check-types": "tsc --noEmit",
+    "clean": "git clean -xdf .cache .next .dist .turbo node_modules",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "next": "16.0.5",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.9.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/prettier": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9.38.0",
+    "eslint-config-next": "16.0.5",
+    "tailwindcss": "^4.1.11",
+    "typescript": "5.9.3"
+  },
+  "prettier": "@workspace/prettier"
+}

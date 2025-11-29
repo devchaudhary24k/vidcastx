@@ -2,3 +2,6 @@ packages:
   - apps/*
   - packages/*
   - tooling/*
+
+nodeLinker: hoisted
+linkWorkspacePackages: true
