@@ -60,7 +60,7 @@ export function LoginForm({
                 <Button
                   variant="outline"
                   type="button"
-                  onClick={() => providerSignIn("github")}
+                  onClick={() => providerSignIn("discord")}
                 >
                   <svg
                     viewBox="0 0 24 24"

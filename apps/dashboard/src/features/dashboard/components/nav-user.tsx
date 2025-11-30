@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/auth";
 import {
   BadgeCheck,
@@ -40,6 +41,8 @@ export function NavUser({
     avatar: string;
   };
 }) {
+  const router = useRouter();
+
   const { isMobile } = useSidebar();
 
   return (
@@ -103,7 +106,17 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => auth.signOut()}>
+            <DropdownMenuItem
+              onClick={() =>
+                auth.signOut({
+                  fetchOptions: {
+                    onSuccess(context) {
+                      router.push("/auth/login");
+                    },
+                  },
+                })
+              }
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>
