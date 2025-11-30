@@ -8,15 +8,11 @@ import { auth } from "./auth/auth";
 import { env } from "./env";
 import v1Router from "./modules/v1";
 
-// Initialization
 const server = new Elysia()
   .use(opentelemetry())
-  .use(
-    openapi({
-      references: fromTypes(),
-    }),
-  )
-  .use(v1Router)
+  .use(openapi({ references: fromTypes() }))
+
+  // ----- Bearer plugin & global guard (must come BEFORE any routes -----
   .use(bearer())
   .onBeforeHandle({ as: "global" }, ({ bearer, set, status }) => {
     if (!bearer) {
@@ -31,6 +27,8 @@ const server = new Elysia()
       return status(401, "Invalid Token");
     }
   })
+
+  // ----- CORS (order doesn’t matter for CORS, but keep it after guard)
   .use(
     cors({
       origin: ({ headers }) => {
@@ -46,10 +44,14 @@ const server = new Elysia()
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
       credentials: true,
-      maxAge: 300, // 5 Minutes
+      maxAge: 300,
     }),
   )
-  .mount(auth.handler)
+
+  // ----- Your actual API routes -----
+  .use(v1Router) // all v1 routes are now protected
+  .mount(auth.handler) // user‑auth routes (you can also skip the guard inside if you want)
+
   .listen(3001);
 
 console.log(
