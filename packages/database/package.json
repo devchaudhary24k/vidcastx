@@ -1,0 +1,35 @@
+{
+  "name": "@workspace/database",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts",
+    "./schema/*": "./src/schema/*.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "check-types": "tsc --noEmit --emitDeclarationOnly false",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "prettier": "@workspace/prettier",
+  "devDependencies": {
+    "@types/pg": "^8.15.5",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/prettier": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "dotenv-cli": "^10.0.0",
+    "drizzle-kit": "^0.31.5"
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.8",
+    "drizzle-orm": "^0.44.7",
+    "drizzle-zod": "^0.8.3",
+    "pg": "^8.16.3",
+    "zod": "^4.1.13"
+  }
+}

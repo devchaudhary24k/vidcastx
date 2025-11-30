@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # -----------------------------------------------------------------
+  # 1. DATABASE (PostgreSQL)
+  # -----------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: vidcastx_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-vidcastx}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d vidcastx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vidcastx_net
+
+  # -----------------------------------------------------------------
+  # 2. QUEUE & CACHE (Redis)
+  # -----------------------------------------------------------------
+  redis:
+    image: redis:alpine
+    container_name: vidcastx_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - vidcastx_net
+
+  # -----------------------------------------------------------------
+  # 3. OBJECT STORAGE (MinIO)
+  # -----------------------------------------------------------------
+  minio:
+    image: minio/minio
+    container_name: vidcastx_minio
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-password}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - vidcastx_net
+
+  # -----------------------------------------------------------------
+  # 4. MINIO SETUP (Sidecar)
+  # -----------------------------------------------------------------
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 admin password;
+      /usr/bin/mc mb myminio/vidcastx-bucket;
+      /usr/bin/mc anonymous set public myminio/vidcastx-bucket;
+      exit 0;
+      "
+    networks:
+      - vidcastx_net
+
+networks:
+  vidcastx_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

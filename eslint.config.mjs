@@ -1,22 +1,15 @@
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
+import { config as baseConfig } from "@workspace/eslint-config/base";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+/**
+ * @type {import("eslint").Linter.Config}
+ * */
+export const config = [
+  ...baseConfig,
   {
-    rules: {
-      'no-unused-vars': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn', // Fixes the error rule
+    ignores: ["apps/**", "packages/**", "tooling/**"],
+    parser: "@typescript-eslint/parser",
+    parserOptions: {
+      project: true,
     },
   },
 ];
-
-export default eslintConfig;
