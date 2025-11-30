@@ -1,6 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { authRoutes, protectedRoutes } from "@/constants/route";
+import {
+  authRoutes,
+  DEFAULT_LOGIN_REDIRECT,
+  protectedRoutes,
+} from "@/constants/route";
 import { getSessionCookie } from "better-auth/cookies";
 
 export async function proxy(request: NextRequest) {

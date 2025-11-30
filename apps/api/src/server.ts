@@ -7,7 +7,9 @@ import { Elysia } from "elysia";
 import { auth } from "./auth/auth";
 import v1Router from "./modules/v1";
 
-const server = new Elysia()
+const server = new Elysia({
+  prefix: "/api",
+})
   .use(opentelemetry())
   .use(openapi({ references: fromTypes() }))
   .use(logger())
@@ -30,7 +32,10 @@ const server = new Elysia()
     }),
   )
   .use(v1Router)
-  .mount(auth.handler)
+  // Auth Routes
+  .all("/auth/*", ({ request }) => {
+    return auth.handler(request);
+  })
 
   .listen(3001);
 

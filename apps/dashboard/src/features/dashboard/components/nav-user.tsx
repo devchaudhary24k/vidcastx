@@ -1,5 +1,6 @@
 "use client";
 
+import { auth } from "@/lib/auth";
 import {
   BadgeCheck,
   Bell,
@@ -102,7 +103,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => auth.signOut()}>
               <LogOut />
               Log out
             </DropdownMenuItem>
