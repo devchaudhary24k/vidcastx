@@ -1,6 +1,7 @@
+import { betterAuth } from "@/auth";
 import { Elysia } from "elysia";
 
-// Define routes for the user feature
 export const userController = new Elysia({ prefix: "/users" })
-  .get("/:id", ({ params: { id } }) => `User ${id}`)
+  .use(betterAuth)
+  .get("/:id", ({ params: { id } }) => `User ${id}`, { auth: false })
   .post("/", ({ body }) => body);
