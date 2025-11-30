@@ -3,9 +3,7 @@ import { fromTypes, openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
 import { Elysia } from "elysia";
 
-import { betterAuth } from "./auth";
 import { auth } from "./auth/auth";
-import { env } from "./env";
 import v1Router from "./modules/v1";
 
 const server = new Elysia()
