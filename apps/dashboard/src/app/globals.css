@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "@workspace/ui/globals.css";
 
 :root {
   --background: #ffffff;
