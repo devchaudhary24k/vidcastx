@@ -1,3 +1,4 @@
+import { logger } from "@bogeychan/elysia-logger";
 import { cors } from "@elysiajs/cors";
 import { fromTypes, openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
@@ -9,13 +10,14 @@ import v1Router from "./modules/v1";
 const server = new Elysia()
   .use(opentelemetry())
   .use(openapi({ references: fromTypes() }))
+  .use(logger())
   .use(
     cors({
       origin: ({ headers }) => {
         const allowedOrigins = [
           "https://vidcastx.daymlabs.com",
           ...(process.env.NODE_ENV === "development"
-            ? ["http://localhost:3000", "http://localhost:5173"]
+            ? ["http://localhost:3000", "http://localhost:3001"]
             : []),
         ];
         const origin = headers.get("origin");
