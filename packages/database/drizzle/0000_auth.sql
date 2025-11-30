@@ -65,8 +65,8 @@ CREATE TABLE "user" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"role" text DEFAULT 'user' NOT NULL,
-	"first_name" text NOT NULL,
-	"last_name" text NOT NULL,
+	"first_name" text,
+	"last_name" text,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

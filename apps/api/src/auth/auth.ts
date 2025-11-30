@@ -52,12 +52,12 @@ export const auth = betterAuth({
 
       firstName: {
         type: "string",
-        required: true,
+        required: false,
       },
 
       lastName: {
         type: "string",
-        required: true,
+        required: false,
       },
     },
   },
