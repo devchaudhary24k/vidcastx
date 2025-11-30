@@ -1,7 +1,7 @@
 vidcastx/
 ├── apps/
 │ ├── web/ # [Next.js] Dashboard, Marketing, & TUS Upload Client.
-│ ├── api-server/ # [Hono] The "Brain". Auth, Webhooks, Orchestration.
+│ ├── api-server/ # [Elysia] The "Brain". Auth, Webhooks, Orchestration.
 │ ├── live-server/ # [Node-Media-Server] RTMP Ingest & HLS Generation.
 │ ├── worker-transcode/ # [Node.js + FFmpeg] VOD Encoding.
 │ └── worker-ai/ # [Python/Node] Whisper Transcription & Summarization.
