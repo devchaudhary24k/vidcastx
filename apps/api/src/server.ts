@@ -13,20 +13,20 @@ const server = new Elysia()
   .use(openapi({ references: fromTypes() }))
 
   // ----- Bearer plugin & global guard (must come BEFORE any routes -----
-  .use(bearer())
-  .onBeforeHandle({ as: "global" }, ({ bearer, set, status }) => {
-    if (!bearer) {
-      set.headers["WWW-Authenticate"] =
-        `Bearer realm="api", error="invalid_token"`;
-      return status(401, "Unauthorized");
-    }
-
-    if (bearer !== env.AYYO) {
-      set.headers["WWW-Authenticate"] =
-        `Bearer realm="api", error="invalid_token", error_description="wrong token"`;
-      return status(401, "Invalid Token");
-    }
-  })
+  // .use(bearer())
+  // .onBeforeHandle({ as: "global" }, ({ bearer, set, status, request }) => {
+  //   if (!bearer) {
+  //     set.headers["WWW-Authenticate"] =
+  //       `Bearer realm="api", error="invalid_token"`;
+  //     return status(401, "Unauthorized");
+  //   }
+  //
+  //   if (bearer !== env.AYYO) {
+  //     set.headers["WWW-Authenticate"] =
+  //       `Bearer realm="api", error="invalid_token", error_description="wrong token"`;
+  //     return status(401, "Invalid Token");
+  //   }
+  // })
 
   // ----- CORS (order doesn’t matter for CORS, but keep it after guard)
   .use(
