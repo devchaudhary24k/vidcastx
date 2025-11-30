@@ -40,3 +40,10 @@ npm-debug.log*
 *.pem
 .cache
 .drizzle
+
+**/*.trace
+**/*.zip
+**/*.tar.gz
+**/*.tgz
+**/*.log
+**/*.bun

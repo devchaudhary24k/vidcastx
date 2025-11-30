@@ -5,51 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eda7d6b2-b13e-42d8-b0e0-c9250c8e8e55" name="Changes" comment="yolo">
-      <change afterPath="$PROJECT_DIR$/.husky/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.husky/pre-commit" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.husky/pre-push" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.lintstagedrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.nvmrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/eslint.config.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/next-env.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/next.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/postcss.config.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/public/file.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/public/globe.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/public/next.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/public/vercel.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/public/window.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/src/app/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/src/app/globals.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/src/app/layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/src/app/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/dashboard/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/eslint.config.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/turbo/generators/config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/turbo/generators/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/turbo/generators/templates/eslint.config.mjs.hbs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/turbo/generators/templates/package.json.hbs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/turbo/generators/templates/tsconfig.json.hbs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/auth/auth.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/auth/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/user/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/user/model.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/user/service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prettier.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/0000_auth.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/0001_auth_with_organization_and_role.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/0002_auth_username_update.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/meta/0000_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/meta/0001_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/meta/0002_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/database/drizzle/meta/_journal.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/dashboard/next-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/dashboard/next-env.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-workspace.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-workspace.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tooling/eslint-config/astro.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tooling/eslint-config/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/tooling/eslint-config/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -62,31 +44,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;migration&quot;,
-    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
-    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/devtalan/Code/vidcastx/packages&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;bun&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/home/devtalan/Code/vidcastx/node_modules/prettier&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/home/devtalan/Code/vidcastx/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "migration",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "last_opened_file_path": "/home/devtalan/Code/vidcastx/packages",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "bun",
+    "prettierjs.PrettierConfiguration.Package": "/home/devtalan/Code/vidcastx/node_modules/prettier",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
+    "ts.external.directory.path": "/home/devtalan/Code/vidcastx/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/packages" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/apps/api/src/auth" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -123,7 +109,9 @@
       <workItem from="1764434620229" duration="972000" />
       <workItem from="1764435619753" duration="111000" />
       <workItem from="1764435735546" duration="98000" />
-      <workItem from="1764435896241" duration="1115000" />
+      <workItem from="1764435896241" duration="5825000" />
+      <workItem from="1764441909083" duration="1251000" />
+      <workItem from="1764478800660" duration="5230000" />
     </task>
     <task id="LOCAL-00001" summary="migrated">
       <option name="closed" value="true" />
@@ -142,6 +130,7 @@
   <component name="VcsManagerConfiguration">
     <ignored-roots>
       <path value="$PROJECT_DIR$/apps/dashboard" />
+      <path value="$PROJECT_DIR$/apps/api" />
     </ignored-roots>
     <MESSAGE value="migrated" />
     <MESSAGE value="yolo" />

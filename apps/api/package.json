@@ -1,0 +1,29 @@
+{
+  "name": "api",
+  "version": "1.0.50",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
+    "lint": "eslint",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "check-types": "tsc --noEmit",
+    "clean": "git clean -xdf .cache .next .dist .turbo node_modules",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "@elysiajs/bearer": "^1.4.1",
+    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/cron": "^1.4.1",
+    "@elysiajs/openapi": "^1.4.11",
+    "@elysiajs/opentelemetry": "^1.4.8",
+    "@elysiajs/server-timing": "^1.4.0",
+    "@workspace/database": "workspace:*",
+    "better-auth": "^1.4.3",
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "prettier": "@workspace/prettier",
+  "module": "src/index.js"
+}
