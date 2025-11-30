@@ -6,7 +6,7 @@
     "dev": "bun run with-env -- bun run --watch src/index.ts",
     "build": "bun run with-env -- bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
     "check-types": "bun run with-env -- tsc --noEmit",
-    "lint": "eslint",
+    "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "clean": "git clean -xdf .cache .next .dist .turbo node_modules"
   },
@@ -24,8 +24,10 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@workspace/eslint-config": "workspace:*",
     "bun-types": "latest",
-    "dotenv-cli": "^10.0.0"
+    "dotenv-cli": "^10.0.0",
+    "eslint": "^9.39.1"
   },
   "prettier": "@workspace/prettier",
   "module": "src/index.js"
