@@ -1,0 +1,21 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "db:migrate": {
+      "dependsOn": ["^db:migrate"],
+      "persistent": true
+    },
+    "db:generate": {
+      "dependsOn": ["^db:generate"],
+      "persistent": true
+    },
+    "db:push": {
+      "dependsOn": ["^db:push"],
+      "persistent": true
+    },
+    "db:studio": {
+      "dependsOn": ["^db:studio"],
+      "persistent": true
+    }
+  }
+}

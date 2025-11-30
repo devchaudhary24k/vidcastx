@@ -1,7 +1,7 @@
 import { env } from "@/env";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, organization } from "better-auth/plugins";
 
 import { db } from "@workspace/database/client";
 
@@ -81,5 +81,5 @@ export const auth = betterAuth({
     },
   },
 
-  plugins: [openAPI()],
+  plugins: [openAPI(), organization()],
 });
