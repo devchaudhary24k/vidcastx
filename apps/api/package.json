@@ -17,15 +17,15 @@
     "@elysiajs/openapi": "^1.4.11",
     "@elysiajs/opentelemetry": "^1.4.8",
     "@elysiajs/server-timing": "^1.4.0",
+    "@t3-oss/env-core": "^0.13.8",
     "@workspace/database": "workspace:*",
     "better-auth": "^1.4.3",
-    "dotenv": "^17.2.3",
     "elysia": "latest",
-    "jsonwebtoken": "^9.0.2"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "dotenv-cli": "^10.0.0"
   },
   "prettier": "@workspace/prettier",
   "module": "src/index.js"

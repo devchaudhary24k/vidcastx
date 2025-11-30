@@ -30,6 +30,7 @@
     "@workspace/prettier": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "babel-plugin-react-compiler": "1.0.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.38.0",
     "eslint-config-next": "16.0.5",
     "tailwindcss": "^4.1.11",

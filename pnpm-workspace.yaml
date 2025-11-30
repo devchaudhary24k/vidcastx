@@ -3,9 +3,11 @@ packages:
   - packages/*
   - tooling/*
 
+linkWorkspacePackages: true
+
 overrides:
   "@types/minimatch": 5.1.2
 
-
-nodeLinker: hoisted
-linkWorkspacePackages: true
+publicHoistPattern:
+  - "@ianvs/prettier-plugin-sort-imports"
+  - prettier-plugin-tailwindcss
