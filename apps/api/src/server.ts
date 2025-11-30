@@ -5,6 +5,7 @@ import { opentelemetry } from "@elysiajs/opentelemetry";
 import { Elysia } from "elysia";
 
 import { auth } from "./auth/auth";
+import { env } from "./env";
 import v1Router from "./modules/v1";
 
 // Initialization
@@ -22,6 +23,12 @@ const server = new Elysia()
       set.headers["WWW-Authenticate"] =
         `Bearer realm="api", error="invalid_token"`;
       return status(401, "Unauthorized");
+    }
+
+    if (bearer !== env.AYYO) {
+      set.headers["WWW-Authenticate"] =
+        `Bearer realm="api", error="invalid_token", error_description="wrong token"`;
+      return status(401, "Invalid Token");
     }
   })
   .use(

@@ -4,22 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eda7d6b2-b13e-42d8-b0e0-c9250c8e8e55" name="Changes" comment="yolo">
-      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/auth/auth.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/auth/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/user/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/user/model.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/api/src/modules/v1/user/service.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prettier.xml" afterDir="false" />
+    <list default="true" id="eda7d6b2-b13e-42d8-b0e0-c9250c8e8e55" name="Changes" comment="YOLO">
+      <change afterPath="$PROJECT_DIR$/apps/api/src/env.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/dashboard/next-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/dashboard/next-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/api/src/server.ts" beforeDir="false" afterPath="$PROJECT_DIR$/apps/api/src/server.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/turbo.json" beforeDir="false" afterPath="$PROJECT_DIR$/turbo.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +53,7 @@
     "nodejs_package_manager_path": "bun",
     "prettierjs.PrettierConfiguration.Package": "/home/devtalan/Code/vidcastx/node_modules/prettier",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
+    "settings.editor.selected.configurable": "swagger",
     "ts.external.directory.path": "/home/devtalan/Code/vidcastx/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -111,7 +102,7 @@
       <workItem from="1764435735546" duration="98000" />
       <workItem from="1764435896241" duration="5825000" />
       <workItem from="1764441909083" duration="1251000" />
-      <workItem from="1764478800660" duration="5230000" />
+      <workItem from="1764478800660" duration="7353000" />
     </task>
     <task id="LOCAL-00001" summary="migrated">
       <option name="closed" value="true" />
@@ -121,7 +112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764435811242</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="YOLO">
+      <option name="closed" value="true" />
+      <created>1764484979161</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764484979161</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -134,7 +133,8 @@
     </ignored-roots>
     <MESSAGE value="migrated" />
     <MESSAGE value="yolo" />
-    <option name="LAST_COMMIT_MESSAGE" value="yolo" />
+    <MESSAGE value="YOLO" />
+    <option name="LAST_COMMIT_MESSAGE" value="YOLO" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

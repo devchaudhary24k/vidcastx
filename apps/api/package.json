@@ -2,13 +2,13 @@
   "name": "api",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
+    "with-env": "dotenv -e ../../.env --",
+    "dev": "bun run with-env -- bun run --watch src/index.ts",
+    "build": "bun run with-env -- bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
+    "check-types": "bun run with-env -- tsc --noEmit",
     "lint": "eslint",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "check-types": "tsc --noEmit",
-    "clean": "git clean -xdf .cache .next .dist .turbo node_modules",
-    "with-env": "dotenv -e ../../.env --"
+    "clean": "git clean -xdf .cache .next .dist .turbo node_modules"
   },
   "dependencies": {
     "@elysiajs/bearer": "^1.4.1",
@@ -19,9 +19,12 @@
     "@elysiajs/server-timing": "^1.4.0",
     "@workspace/database": "workspace:*",
     "better-auth": "^1.4.3",
-    "elysia": "latest"
+    "dotenv": "^17.2.3",
+    "elysia": "latest",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "bun-types": "latest"
   },
   "prettier": "@workspace/prettier",
