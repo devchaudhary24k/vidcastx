@@ -1,8 +1,12 @@
 {
-  "name": "@workspace/{{ name }}",
+  "name": "@workspace/redis",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts"
+  },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "check-types": "tsc --noEmit --emitDeclarationOnly false",
@@ -10,11 +14,17 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "with-env": "dotenv -e ../../.env --"
   },
-  "dependencies": {},
+  "prettier": "@workspace/prettier",
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*"
+    "@workspace/typescript-config": "workspace:*",
+    "dotenv-cli": "^10.0.0",
+    "eslint": "^9.39.1"
   },
-  "prettier": "@workspace/prettier"
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.8",
+    "ioredis": "^5.8.2",
+    "zod": "^4.1.13"
+  }
 }

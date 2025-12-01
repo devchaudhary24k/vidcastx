@@ -3,7 +3,9 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    DATABASE_URL: z.url(),
+    REDIS_HOST: z.string(),
+    REDIS_PORT: z.number(),
+    REDIS_PASSWORD: z.string(),
   },
 
   shared: {

@@ -4,29 +4,25 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, organization } from "better-auth/plugins";
 
 import { db } from "@workspace/database/client";
+import { redis } from "@workspace/redis";
 
 export const auth = betterAuth({
   appName: "VidcastX",
+
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
 
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true,
-    minPasswordLength: 8,
-    maxPasswordLength: 32,
-    sendResetPassword: async ({ user, url }) => {
-      console.log("Send password reset email to:", user.email);
-      console.log("Password reset URL:", url);
+  secondaryStorage: {
+    get: async (key) => {
+      return redis.get(key);
     },
-  },
-
-  account: {
-    accountLinking: {
-      enabled: true,
-      trustedProviders: ["google", "github", "discord", "email-password"],
-      allowDifferentEmails: false,
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, "EX", ttl);
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
     },
   },
 
@@ -41,15 +37,37 @@ export const auth = betterAuth({
     },
   },
 
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 32,
+    sendResetPassword: async ({ user, url }) => {
+      console.log("Send password reset email to:", user.email);
+      console.log("Password reset URL:", url);
+    },
+  },
+
+  emailVerification: {
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    expiresIn: 60,
+    sendVerificationEmail: async ({ user, url }) => {
+      console.log("Send verification email to:", user.email);
+      console.log("Verification URL:", url);
+    },
+  },
+
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github", "discord", "email-password"],
+      allowDifferentEmails: false,
+    },
+  },
+
   user: {
     additionalFields: {
-      role: {
-        type: "string",
-        required: true,
-        defaultValue: "user",
-        input: false,
-      },
-
       firstName: {
         type: "string",
         required: false,
@@ -62,14 +80,9 @@ export const auth = betterAuth({
     },
   },
 
-  emailVerification: {
-    sendOnSignUp: true,
-    sendOnSignIn: true,
-    expiresIn: 60,
-    sendVerificationEmail: async ({ user, url }) => {
-      console.log("Send verification email to:", user.email);
-      console.log("Verification URL:", url);
-    },
+  session: {
+    storeSessionInDatabase: true,
+    preserveSessionInDatabase: true,
   },
 
   logger: {

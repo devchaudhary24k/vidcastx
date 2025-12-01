@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/{{ name }}",
+  "name": "@workspace/queue",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,11 +10,12 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "with-env": "dotenv -e ../../.env --"
   },
-  "dependencies": {},
+  "prettier": "@workspace/prettier",
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*"
-  },
-  "prettier": "@workspace/prettier"
+    "@workspace/typescript-config": "workspace:*",
+    "dotenv-cli": "^10.0.0",
+    "eslint": "^9.39.1"
+  }
 }
