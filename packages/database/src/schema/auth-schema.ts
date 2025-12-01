@@ -1,6 +1,11 @@
 import { relations } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
+import { aiJobs } from "./ai-schema";
+import { integrations } from "./distribution-schema";
+import { channels, webhooks } from "./live-schema";
+import { videos } from "./video-schema";
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -150,6 +155,12 @@ export const accountRelations = relations(account, ({ one }) => ({
 export const organizationRelations = relations(organization, ({ many }) => ({
   members: many(member),
   invitations: many(invitation),
+
+  videos: many(videos),
+  channels: many(channels),
+  webhooks: many(webhooks),
+  integrations: many(integrations),
+  aiJobs: many(aiJobs),
 }));
 
 export const memberRelations = relations(member, ({ one }) => ({
