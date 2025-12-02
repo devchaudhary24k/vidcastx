@@ -39,7 +39,7 @@ export const trafficSourceEnum = pgEnum("traffic_source", [
   "unknown",
 ]);
 
-export const playerEventEnum = pgEnum("player_event", [
+export const playerEventEnum = pgEnum("player_event_type", [
   "play",
   "pause",
   "seek",
