@@ -18,7 +18,6 @@ import {
   videoSummaries,
 } from "./transcript-schema";
 
-// Enums
 export const videoStatusEnum = pgEnum("video_status", [
   "waiting_upload",
   "processing",
@@ -42,44 +41,35 @@ export const assetTypeEnum = pgEnum("asset_type", [
   "source_file",
 ]);
 
-// Tables
 export const videos = pgTable(
   "video",
   {
-    id: text("id").primaryKey(), // NanoID
+    id: text("id").primaryKey(), // Unique identifier for the video
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the video
     uploaderId: text("uploader_id").references(() => user.id, {
       onDelete: "set null",
-    }),
-
-    title: text("title").notNull().default("Untitled Video"),
-    description: text("description"),
-    visibility: visibilityEnum("visibility").default("private").notNull(),
-    scheduledAt: timestamp("scheduled_at"),
-    publishedAt: timestamp("published_at"),
-    status: videoStatusEnum("status").default("waiting_upload").notNull(),
-    errorReason: text("error_reason"),
-
-    // Technical Metadata
-    duration: integer("duration"), // in seconds
-    resolution: text("resolution"), // "1920x1080"
-    aspectRatio: text("aspect_ratio"), // "16:9"
-    frameCount: integer("frame_count"),
-
-    // Security
-    masterAccessUrl: text("master_access_url"), // Signed URL for raw file
-
-    // Custom Data
-    metadata: jsonb("metadata").default({}),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    }), // The user who uploaded the video
+    title: text("title").notNull().default("Untitled Video"), // The title of the video
+    description: text("description"), // The description of the video
+    visibility: visibilityEnum("visibility").default("private").notNull(), // The visibility of the video
+    scheduledAt: timestamp("scheduled_at"), // The timestamp when the video is scheduled to be published
+    publishedAt: timestamp("published_at"), // The timestamp when the video was published
+    status: videoStatusEnum("status").default("waiting_upload").notNull(), // The status of the video
+    errorReason: text("error_reason"), // The reason for any errors
+    duration: integer("duration"), // The duration of the video in seconds
+    resolution: text("resolution"), // The resolution of the video
+    aspectRatio: text("aspect_ratio"), // The aspect ratio of the video
+    frameCount: integer("frame_count"), // The frame count of the video
+    masterAccessUrl: text("master_access_url"), // The master access URL for the video
+    metadata: jsonb("metadata").default({}), // Metadata associated with the video
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the video was created
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
-      .notNull(),
-    deletedAt: timestamp("deleted_at"),
+      .notNull(), // The timestamp when the video was last updated
+    deletedAt: timestamp("deleted_at"), // The timestamp when the video was deleted
   },
   (table) => [
     index("video_orgId_idx").on(table.orgId),
@@ -90,32 +80,27 @@ export const videos = pgTable(
 export const assets = pgTable(
   "asset",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // Unique identifier for the asset
     videoId: text("video_id")
       .notNull()
-      .references(() => videos.id, { onDelete: "cascade" }),
-
-    type: assetTypeEnum("type").notNull(),
-    storageKey: text("storage_key").notNull(), // S3 Path
-    playbackUrl: text("playback_url"),
-    byteSize: bigint("byte_size", { mode: "number" }).default(0).notNull(),
-
-    // Globalization Support
-    language: text("language").default("en"),
-    label: text("label"),
-    isOriginal: boolean("is_original").default(false),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the asset
+    type: assetTypeEnum("type").notNull(), // The type of asset
+    storageKey: text("storage_key").notNull(), // The storage key for the asset
+    playbackUrl: text("playback_url"), // The playback URL for the asset
+    byteSize: bigint("byte_size", { mode: "number" }).default(0).notNull(), // The size of the asset in bytes
+    language: text("language").default("en"), // The language of the asset
+    label: text("label"), // The label of the asset
+    isOriginal: boolean("is_original").default(false), // Whether the asset is the original one
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the asset was created
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
-      .notNull(),
-    deletedAt: timestamp("deleted_at"),
+      .notNull(), // The timestamp when the asset was last updated
+    deletedAt: timestamp("deleted_at"), // The timestamp when the asset was deleted
   },
   (table) => [index("asset_videoId_idx").on(table.videoId)],
 );
 
-// Relations
 export const videosRelations = relations(videos, ({ one, many }) => ({
   organization: one(organization, {
     fields: [videos.orgId],

@@ -12,7 +12,6 @@ import {
 
 import { organization } from "./auth-schema";
 
-// Enums
 export const usageTypeEnum = pgEnum("usage_type", [
   "encoding_minutes",
   "storage_gb",
@@ -28,7 +27,7 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "past_due",
   "trialing",
   "paused",
-  "incomplete", // Common Stripe status when payment fails initially
+  "incomplete",
   "incomplete_expired",
 ]);
 
@@ -40,41 +39,22 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
   "uncollectible",
 ]);
 
-// ============================================
-// USAGE TRACKING
-// ============================================
-
-/**
- * Granular usage records for billing calculation
- * Aggregated periodically for invoicing
- * NEVER DELETE THESE.
- */
 export const usageRecords = pgTable(
   "usage_record",
   {
-    id: text("id").primaryKey(), // NanoID
+    id: text("id").primaryKey(), // Unique identifier for the usage record
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-
-    type: usageTypeEnum("type").notNull(),
-    quantity: integer("quantity").notNull(), // Units depend on type
-
-    // Snapshot of cost at the moment of usage (Audit trail)
-    unitCostCents: integer("unit_cost_cents"),
-
-    // Period tracking (e.g., for the 'Oct 2025' invoice)
-    periodStart: timestamp("period_start").notNull(),
-    periodEnd: timestamp("period_end").notNull(),
-
-    // Reference to what generated this usage
-    resourceType: text("resource_type"), // 'video', 'stream', 'ai_job'
-    resourceId: text("resource_id"), // e.g., video_123
-
-    // Metadata for detailed breakdown
-    metadata: jsonb("metadata").default({}), // { videoId: "xxx", resolution: "1080p" }
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the usage record
+    type: usageTypeEnum("type").notNull(), // The type of usage
+    quantity: integer("quantity").notNull(), // The quantity of usage
+    unitCostCents: integer("unit_cost_cents"), // The cost per unit in cents
+    periodStart: timestamp("period_start").notNull(), // The start of the usage period
+    periodEnd: timestamp("period_end").notNull(), // The end of the usage period
+    resourceType: text("resource_type"), // The type of resource used
+    resourceId: text("resource_id"), // The ID of the resource used
+    metadata: jsonb("metadata").default({}), // Metadata associated with the usage record
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the usage record was created
   },
   (table) => [
     index("usage_orgId_period_idx").on(table.orgId, table.periodStart),
@@ -83,94 +63,63 @@ export const usageRecords = pgTable(
   ],
 );
 
-/**
- * Daily aggregated usage for fast dashboard queries
- */
 export const usageSummary = pgTable(
   "usage_summary",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // Unique identifier for the usage summary
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-    date: timestamp("date").notNull(), // Truncated to YYYY-MM-DD
-
-    // Aggregated totals by type
-    encodingMinutes: integer("encoding_minutes").default(0).notNull(),
-    storageGb: integer("storage_gb").default(0).notNull(),
-    aiTokens: integer("ai_tokens").default(0).notNull(),
-    bandwidthGb: integer("bandwidth_gb").default(0).notNull(),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the usage summary
+    date: timestamp("date").notNull(), // The date of the usage summary
+    encodingMinutes: integer("encoding_minutes").default(0).notNull(), // The total encoding minutes
+    storageGb: integer("storage_gb").default(0).notNull(), // The total storage in GB
+    aiTokens: integer("ai_tokens").default(0).notNull(), // The total AI tokens used
+    bandwidthGb: integer("bandwidth_gb").default(0).notNull(), // The total bandwidth in GB
     liveStreamingMinutes: integer("live_streaming_minutes")
       .default(0)
-      .notNull(),
-    apiRequests: integer("api_requests").default(0).notNull(),
-
-    // Cost breakdown (in cents) for fast charts
-    encodingCostCents: integer("encoding_cost_cents").default(0),
-    storageCostCents: integer("storage_cost_cents").default(0),
-    aiCostCents: integer("ai_cost_cents").default(0),
-    bandwidthCostCents: integer("bandwidth_cost_cents").default(0),
-    streamingCostCents: integer("streaming_cost_cents").default(0),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .notNull(), // The total live streaming minutes
+    apiRequests: integer("api_requests").default(0).notNull(), // The total API requests
+    encodingCostCents: integer("encoding_cost_cents").default(0), // The cost of encoding in cents
+    storageCostCents: integer("storage_cost_cents").default(0), // The cost of storage in cents
+    aiCostCents: integer("ai_cost_cents").default(0), // The cost of AI in cents
+    bandwidthCostCents: integer("bandwidth_cost_cents").default(0), // The cost of bandwidth in cents
+    streamingCostCents: integer("streaming_cost_cents").default(0), // The cost of streaming in cents
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the usage summary was created
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
-      .notNull(),
+      .notNull(), // The timestamp when the usage summary was last updated
   },
   (table) => [
     index("usage_summary_orgId_date_idx").on(table.orgId, table.date),
   ],
 );
 
-// ============================================
-// SUBSCRIPTIONS & BILLING
-// ============================================
-
-/**
- * Organization subscription plans
- */
 export const subscriptions = pgTable(
   "subscription",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // Unique identifier for the subscription
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-
-    // Stripe/Payment provider IDs
-    stripeCustomerId: text("stripe_customer_id"),
-    stripeSubscriptionId: text("stripe_subscription_id"),
-    stripePriceId: text("stripe_price_id"),
-
-    // Plan details
-    planName: text("plan_name").notNull(), // 'free', 'starter', 'pro', 'enterprise'
-    status: subscriptionStatusEnum("status").default("active").notNull(),
-
-    // Billing period
-    currentPeriodStart: timestamp("current_period_start").notNull(),
-    currentPeriodEnd: timestamp("current_period_end").notNull(),
-
-    // Trial info
-    trialStart: timestamp("trial_start"),
-    trialEnd: timestamp("trial_end"),
-
-    // Cancellation
-    cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
-    canceledAt: timestamp("canceled_at"),
-
-    // Plan limits & Features (The "Source of Truth" for what they can do)
-    // Example: { "encoding_limit": 1000, "can_use_ai": true }
-    limits: jsonb("limits").default({}).notNull(),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the subscription
+    stripeCustomerId: text("stripe_customer_id"), // The Stripe customer ID
+    stripeSubscriptionId: text("stripe_subscription_id"), // The Stripe subscription ID
+    stripePriceId: text("stripe_price_id"), // The Stripe price ID
+    planName: text("plan_name").notNull(), // The name of the plan
+    status: subscriptionStatusEnum("status").default("active").notNull(), // The status of the subscription
+    currentPeriodStart: timestamp("current_period_start").notNull(), // The start of the current billing period
+    currentPeriodEnd: timestamp("current_period_end").notNull(), // The end of the current billing period
+    trialStart: timestamp("trial_start"), // The start of the trial period
+    trialEnd: timestamp("trial_end"), // The end of the trial period
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false), // Whether the subscription will cancel at the end of the period
+    canceledAt: timestamp("canceled_at"), // The timestamp when the subscription was canceled
+    limits: jsonb("limits").default({}).notNull(), // The limits associated with the subscription
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the subscription was created
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
-      .notNull(),
-
-    // ⚠️ Soft Delete: Keep history of old subscriptions
-    deletedAt: timestamp("deleted_at"),
+      .notNull(), // The timestamp when the subscription was last updated
+    deletedAt: timestamp("deleted_at"), // The timestamp when the subscription was deleted
   },
   (table) => [
     index("subscription_orgId_idx").on(table.orgId),
@@ -178,53 +127,34 @@ export const subscriptions = pgTable(
   ],
 );
 
-/**
- * Invoice history
- */
 export const invoices = pgTable(
   "invoice",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // Unique identifier for the invoice
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-    subscriptionId: text("subscription_id").references(() => subscriptions.id),
-
-    // Stripe IDs
-    stripeInvoiceId: text("stripe_invoice_id"),
-    stripePaymentIntentId: text("stripe_payment_intent_id"),
-
-    // Invoice details
-    status: invoiceStatusEnum("status").default("draft").notNull(),
-    currency: text("currency").default("usd").notNull(),
-
-    // Amounts (in cents)
-    subtotalCents: integer("subtotal_cents").default(0).notNull(),
-    taxCents: integer("tax_cents").default(0),
-    discountCents: integer("discount_cents").default(0),
-    totalCents: integer("total_cents").default(0).notNull(),
-
-    // Period covered
-    periodStart: timestamp("period_start").notNull(),
-    periodEnd: timestamp("period_end").notNull(),
-
-    // Line items breakdown (JSON is safer than a separate table for simple invoices)
-    lineItems: jsonb("line_items").default([]),
-    // Example: [{ description: "Encoding - 500 minutes", amount: 2500, quantity: 500 }]
-
-    // URLs
-    invoicePdfUrl: text("invoice_pdf_url"),
-    hostedInvoiceUrl: text("hosted_invoice_url"),
-
-    // Payment info
-    paidAt: timestamp("paid_at"),
-    dueDate: timestamp("due_date"),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the invoice
+    subscriptionId: text("subscription_id").references(() => subscriptions.id), // The subscription associated with the invoice
+    stripeInvoiceId: text("stripe_invoice_id"), // The Stripe invoice ID
+    stripePaymentIntentId: text("stripe_payment_intent_id"), // The Stripe payment intent ID
+    status: invoiceStatusEnum("status").default("draft").notNull(), // The status of the invoice
+    currency: text("currency").default("usd").notNull(), // The currency of the invoice
+    subtotalCents: integer("subtotal_cents").default(0).notNull(), // The subtotal in cents
+    taxCents: integer("tax_cents").default(0), // The tax in cents
+    discountCents: integer("discount_cents").default(0), // The discount in cents
+    totalCents: integer("total_cents").default(0).notNull(), // The total in cents
+    periodStart: timestamp("period_start").notNull(), // The start of the billing period
+    periodEnd: timestamp("period_end").notNull(), // The end of the billing period
+    lineItems: jsonb("line_items").default([]), // The line items of the invoice
+    invoicePdfUrl: text("invoice_pdf_url"), // The URL of the invoice PDF
+    hostedInvoiceUrl: text("hosted_invoice_url"), // The URL of the hosted invoice
+    paidAt: timestamp("paid_at"), // The timestamp when the invoice was paid
+    dueDate: timestamp("due_date"), // The due date of the invoice
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the invoice was created
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
-      .notNull(),
+      .notNull(), // The timestamp when the invoice was last updated
   },
   (table) => [
     index("invoice_orgId_idx").on(table.orgId),
@@ -233,82 +163,51 @@ export const invoices = pgTable(
   ],
 );
 
-/**
- * Payment methods on file
- */
 export const paymentMethods = pgTable(
   "payment_method",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // Unique identifier for the payment method
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-
-    stripePaymentMethodId: text("stripe_payment_method_id").notNull(),
-
-    // Card details (non-sensitive, for display)
-    type: text("type").notNull(), // 'card', 'bank_account'
-    brand: text("brand"), // 'visa', 'mastercard'
-    last4: text("last4"),
-    expiryMonth: integer("expiry_month"),
-    expiryYear: integer("expiry_year"),
-
-    isDefault: boolean("is_default").default(false).notNull(),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the payment method
+    stripePaymentMethodId: text("stripe_payment_method_id").notNull(), // The Stripe payment method ID
+    type: text("type").notNull(), // The type of payment method
+    brand: text("brand"), // The brand of the payment method
+    last4: text("last4"), // The last 4 digits of the payment method
+    expiryMonth: integer("expiry_month"), // The expiry month of the payment method
+    expiryYear: integer("expiry_year"), // The expiry year of the payment method
+    isDefault: boolean("is_default").default(false).notNull(), // Whether the payment method is the default
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the payment method was created
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
-      .notNull(),
-
-    // Soft delete for cards user removed
-    deletedAt: timestamp("deleted_at"),
+      .notNull(), // The timestamp when the payment method was last updated
+    deletedAt: timestamp("deleted_at"), // The timestamp when the payment method was deleted
   },
   (table) => [index("payment_method_orgId_idx").on(table.orgId)],
 );
 
-// ============================================
-// CREDITS & PROMOTIONAL
-// ============================================
-
-/**
- * Credit balance and transactions
- * Used for "Startup Credits" ($500 free) or Refunds
- */
 export const credits = pgTable(
   "credit",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // Unique identifier for the credit
     orgId: text("org_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-
-    // Transaction type
-    type: text("type").notNull(), // 'grant', 'usage', 'refund', 'expiry'
-    amountCents: integer("amount_cents").notNull(), // Positive for grants, negative for usage
-
-    // Balance after this transaction (Ledger style)
-    balanceAfterCents: integer("balance_after_cents").notNull(),
-
-    // Reference
-    description: text("description"),
-    referenceType: text("reference_type"), // 'promo_code', 'invoice', 'manual'
-    referenceId: text("reference_id"),
-
-    // Expiration for promotional credits
-    expiresAt: timestamp("expires_at"),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+      .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the credit
+    type: text("type").notNull(), // The type of credit transaction
+    amountCents: integer("amount_cents").notNull(), // The amount in cents
+    balanceAfterCents: integer("balance_after_cents").notNull(), // The balance after the transaction in cents
+    description: text("description"), // The description of the credit
+    referenceType: text("reference_type"), // The reference type
+    referenceId: text("reference_id"), // The reference ID
+    expiresAt: timestamp("expires_at"), // The timestamp when the credit expires
+    createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the credit was created
   },
   (table) => [
     index("credit_orgId_idx").on(table.orgId),
     index("credit_orgId_createdAt_idx").on(table.orgId, table.createdAt),
   ],
 );
-
-// ============================================
-// RELATIONS
-// ============================================
 
 export const usageRecordsRelations = relations(usageRecords, ({ one }) => ({
   organization: one(organization, {
