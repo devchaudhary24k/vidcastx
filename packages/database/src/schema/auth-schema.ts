@@ -19,6 +19,7 @@ export const user = pgTable("user", {
     .notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const session = pgTable(
@@ -88,6 +89,7 @@ export const organization = pgTable("organization", {
   logo: text("logo"),
   createdAt: timestamp("created_at").notNull(),
   metadata: text("metadata"),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const member = pgTable(

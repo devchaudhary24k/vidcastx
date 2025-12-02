@@ -3,19 +3,23 @@
   "tasks": {
     "db:migrate": {
       "dependsOn": ["^db:migrate"],
-      "persistent": true
+      "persistent": true,
+      "cache": false
     },
     "db:generate": {
       "dependsOn": ["^db:generate"],
-      "persistent": true
+      "persistent": true,
+      "cache": false
     },
     "db:push": {
       "dependsOn": ["^db:push"],
-      "persistent": true
+      "persistent": true,
+      "cache": false
     },
     "db:studio": {
       "dependsOn": ["^db:studio"],
-      "persistent": true
+      "persistent": true,
+      "cache": false
     }
   }
 }

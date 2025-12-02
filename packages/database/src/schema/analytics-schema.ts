@@ -11,7 +11,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-import { organization } from "./auth-schema";
+import { organization, user } from "./auth-schema";
 import { streams } from "./live-schema";
 import { videos } from "./video-schema";
 
@@ -21,6 +21,8 @@ export const deviceTypeEnum = pgEnum("device_type", [
   "mobile",
   "tablet",
   "tv",
+  "console",
+  "wearable",
   "unknown",
 ]);
 
@@ -33,6 +35,7 @@ export const trafficSourceEnum = pgEnum("traffic_source", [
   "channel_page",
   "embedded",
   "notification",
+  "social",
   "unknown",
 ]);
 
@@ -47,6 +50,9 @@ export const playerEventEnum = pgEnum("player_event", [
   "playback_rate_change",
   "audio_track_change",
   "subtitle_toggle",
+  "error", // Important to track playback errors
+  "buffer_start",
+  "buffer_end",
 ]);
 
 // ============================================
@@ -59,11 +65,11 @@ export const playerEventEnum = pgEnum("player_event", [
 export const videoStats = pgTable(
   "video_stats",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // NanoID
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }),
-    date: timestamp("date").notNull(), // Truncated to day
+    date: timestamp("date").notNull(), // Truncated to YYYY-MM-DD
 
     // Core Metrics
     views: integer("views").default(0).notNull(),
@@ -139,11 +145,15 @@ export const viewSessions = pgTable(
 
     // Viewer identification (anonymous-friendly)
     viewerFingerprint: text("viewer_fingerprint"), // Hashed browser fingerprint
-    userId: text("user_id"), // Optional: logged-in user
+    userId: text("user_id"), // Optional: logged-in user (Not a foreign key to avoid hard crash if user deleted)
 
     // Session Data
     startedAt: timestamp("started_at").defaultNow().notNull(),
     endedAt: timestamp("ended_at"),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date()), // Crucial for identifying "stuck" sessions
+
     watchedSeconds: integer("watched_seconds").default(0),
     percentageWatched: real("percentage_watched").default(0),
 
@@ -160,6 +170,7 @@ export const viewSessions = pgTable(
     deviceType: deviceTypeEnum("device_type").default("unknown"),
     browser: text("browser"),
     os: text("os"),
+    userAgent: text("user_agent"), // Raw string for debugging specific device crashes
     screenResolution: text("screen_resolution"), // "1920x1080"
 
     // Traffic
@@ -190,6 +201,7 @@ export const viewSessions = pgTable(
 
 /**
  * Player events for granular interaction tracking
+ * Note: This table grows massive. Consider partitioning in Postgres directly.
  */
 export const playerEvents = pgTable(
   "player_event",

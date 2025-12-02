@@ -1,9 +1,10 @@
 import { env } from "@/env";
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, organization } from "better-auth/plugins";
 
 import { db } from "@workspace/database/client";
+import { user } from "@workspace/database/schema/auth-schema";
 import { redis } from "@workspace/redis";
 
 export const auth = betterAuth({
@@ -77,6 +78,24 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
+
+      deletedAt: {
+        type: "date",
+        required: false,
+        input: false,
+      },
+    },
+
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async () => {
+        //   TODO: Set user delete time in database to +30 days
+        // await db.update(user).set({});
+
+        throw new APIError("OK", {
+          message: "Account scheduled for deletion in 30 days.",
+        });
+      },
     },
   },
 
@@ -95,5 +114,30 @@ export const auth = betterAuth({
   },
 
   trustedOrigins: ["http://localhost:3000"],
-  plugins: [openAPI(), organization()],
+  plugins: [
+    openAPI(),
+    organization({
+      schema: {
+        organization: {
+          additionalFields: {
+            deletedAt: {
+              type: "date",
+              required: false,
+              input: false,
+            },
+          },
+        },
+      },
+
+      organizationHooks: {
+        beforeDeleteOrganization: async (ctx) => {
+          //   TODO: Set user delete time in database to +30 days
+
+          throw new APIError("OK", {
+            message: "Organization scheduled for deletion in 30 days.",
+          });
+        },
+      },
+    }),
+  ],
 });

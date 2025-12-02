@@ -28,6 +28,8 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "past_due",
   "trialing",
   "paused",
+  "incomplete", // Common Stripe status when payment fails initially
+  "incomplete_expired",
 ]);
 
 export const invoiceStatusEnum = pgEnum("invoice_status", [
@@ -45,26 +47,29 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
 /**
  * Granular usage records for billing calculation
  * Aggregated periodically for invoicing
+ * NEVER DELETE THESE.
  */
 export const usageRecords = pgTable(
   "usage_record",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey(), // NanoID
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
 
     type: usageTypeEnum("type").notNull(),
     quantity: integer("quantity").notNull(), // Units depend on type
-    unitCostCents: integer("unit_cost_cents"), // Cost per unit at time of recording
 
-    // Period tracking
+    // Snapshot of cost at the moment of usage (Audit trail)
+    unitCostCents: integer("unit_cost_cents"),
+
+    // Period tracking (e.g., for the 'Oct 2025' invoice)
     periodStart: timestamp("period_start").notNull(),
     periodEnd: timestamp("period_end").notNull(),
 
     // Reference to what generated this usage
     resourceType: text("resource_type"), // 'video', 'stream', 'ai_job'
-    resourceId: text("resource_id"),
+    resourceId: text("resource_id"), // e.g., video_123
 
     // Metadata for detailed breakdown
     metadata: jsonb("metadata").default({}), // { videoId: "xxx", resolution: "1080p" }
@@ -88,11 +93,11 @@ export const usageSummary = pgTable(
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
-    date: timestamp("date").notNull(),
+    date: timestamp("date").notNull(), // Truncated to YYYY-MM-DD
 
     // Aggregated totals by type
     encodingMinutes: integer("encoding_minutes").default(0).notNull(),
-    storageGb: integer("storage_gb").default(0).notNull(), // Current storage (not additive)
+    storageGb: integer("storage_gb").default(0).notNull(),
     aiTokens: integer("ai_tokens").default(0).notNull(),
     bandwidthGb: integer("bandwidth_gb").default(0).notNull(),
     liveStreamingMinutes: integer("live_streaming_minutes")
@@ -100,7 +105,7 @@ export const usageSummary = pgTable(
       .notNull(),
     apiRequests: integer("api_requests").default(0).notNull(),
 
-    // Cost breakdown (in cents)
+    // Cost breakdown (in cents) for fast charts
     encodingCostCents: integer("encoding_cost_cents").default(0),
     storageCostCents: integer("storage_cost_cents").default(0),
     aiCostCents: integer("ai_cost_cents").default(0),
@@ -154,15 +159,18 @@ export const subscriptions = pgTable(
     cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
     canceledAt: timestamp("canceled_at"),
 
-    // Plan limits (denormalized for fast checks)
+    // Plan limits & Features (The "Source of Truth" for what they can do)
+    // Example: { "encoding_limit": 1000, "can_use_ai": true }
     limits: jsonb("limits").default({}).notNull(),
-    // Example: { encodingMinutes: 1000, storageGb: 100, aiTokens: 50000 }
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+
+    // ⚠️ Soft Delete: Keep history of old subscriptions
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [
     index("subscription_orgId_idx").on(table.orgId),
@@ -200,7 +208,7 @@ export const invoices = pgTable(
     periodStart: timestamp("period_start").notNull(),
     periodEnd: timestamp("period_end").notNull(),
 
-    // Line items breakdown
+    // Line items breakdown (JSON is safer than a separate table for simple invoices)
     lineItems: jsonb("line_items").default([]),
     // Example: [{ description: "Encoding - 500 minutes", amount: 2500, quantity: 500 }]
 
@@ -252,6 +260,9 @@ export const paymentMethods = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+
+    // Soft delete for cards user removed
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [index("payment_method_orgId_idx").on(table.orgId)],
 );
@@ -262,6 +273,7 @@ export const paymentMethods = pgTable(
 
 /**
  * Credit balance and transactions
+ * Used for "Startup Credits" ($500 free) or Refunds
  */
 export const credits = pgTable(
   "credit",
@@ -275,7 +287,7 @@ export const credits = pgTable(
     type: text("type").notNull(), // 'grant', 'usage', 'refund', 'expiry'
     amountCents: integer("amount_cents").notNull(), // Positive for grants, negative for usage
 
-    // Balance after this transaction
+    // Balance after this transaction (Ledger style)
     balanceAfterCents: integer("balance_after_cents").notNull(),
 
     // Reference
