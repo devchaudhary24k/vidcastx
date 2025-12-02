@@ -6,6 +6,12 @@ export const env = createEnv({
     DATABASE_URL: z.url(),
   },
 
+  shared: {
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
+  },
+
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
   skipValidation: true,

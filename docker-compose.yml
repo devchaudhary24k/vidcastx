@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   # -----------------------------------------------------------------
   # 1. DATABASE (PostgreSQL)
   # -----------------------------------------------------------------
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg16
     container_name: vidcastx_db
     environment:
       POSTGRES_USER: ${DB_USER:-admin}

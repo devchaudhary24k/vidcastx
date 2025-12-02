@@ -1,32 +1,29 @@
 import { env } from "@/env";
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { openAPI, organization } from "better-auth/plugins";
 
 import { db } from "@workspace/database/client";
+import { user } from "@workspace/database/schema/auth-schema";
+import { redis } from "@workspace/redis";
 
 export const auth = betterAuth({
   appName: "VidcastX",
+
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
 
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: true,
-    minPasswordLength: 8,
-    maxPasswordLength: 32,
-    sendResetPassword: async ({ user, url }) => {
-      console.log("Send password reset email to:", user.email);
-      console.log("Password reset URL:", url);
+  secondaryStorage: {
+    get: async (key) => {
+      return redis.get(key);
     },
-  },
-
-  account: {
-    accountLinking: {
-      enabled: true,
-      trustedProviders: ["google", "github", "discord", "email-password"],
-      allowDifferentEmails: false,
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, "EX", ttl);
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
     },
   },
 
@@ -41,24 +38,14 @@ export const auth = betterAuth({
     },
   },
 
-  user: {
-    additionalFields: {
-      role: {
-        type: "string",
-        required: true,
-        defaultValue: "user",
-        input: false,
-      },
-
-      firstName: {
-        type: "string",
-        required: true,
-      },
-
-      lastName: {
-        type: "string",
-        required: true,
-      },
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 32,
+    sendResetPassword: async ({ user, url }) => {
+      console.log("Send password reset email to:", user.email);
+      console.log("Password reset URL:", url);
     },
   },
 
@@ -72,6 +59,51 @@ export const auth = betterAuth({
     },
   },
 
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github", "discord", "email-password"],
+      allowDifferentEmails: false,
+    },
+  },
+
+  user: {
+    additionalFields: {
+      firstName: {
+        type: "string",
+        required: false,
+      },
+
+      lastName: {
+        type: "string",
+        required: false,
+      },
+
+      deletedAt: {
+        type: "date",
+        required: false,
+        input: false,
+      },
+    },
+
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async () => {
+        //   TODO: Set user delete time in database to +30 days
+        // await db.update(user).set({});
+
+        throw new APIError("OK", {
+          message: "Account scheduled for deletion in 30 days.",
+        });
+      },
+    },
+  },
+
+  session: {
+    storeSessionInDatabase: true,
+    preserveSessionInDatabase: true,
+  },
+
   logger: {
     disabled: true,
     disableColors: false,
@@ -81,5 +113,31 @@ export const auth = betterAuth({
     },
   },
 
-  plugins: [openAPI()],
+  trustedOrigins: ["http://localhost:3000"],
+  plugins: [
+    openAPI(),
+    organization({
+      schema: {
+        organization: {
+          additionalFields: {
+            deletedAt: {
+              type: "date",
+              required: false,
+              input: false,
+            },
+          },
+        },
+      },
+
+      organizationHooks: {
+        beforeDeleteOrganization: async (ctx) => {
+          //   TODO: Set user delete time in database to +30 days
+
+          throw new APIError("OK", {
+            message: "Organization scheduled for deletion in 30 days.",
+          });
+        },
+      },
+    }),
+  ],
 });

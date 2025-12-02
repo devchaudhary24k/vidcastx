@@ -9,7 +9,6 @@
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "check-types": "tsc --noEmit --emitDeclarationOnly false",
-    "lint": "eslint  --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "dependencies": {

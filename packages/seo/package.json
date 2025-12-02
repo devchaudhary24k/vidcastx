@@ -20,7 +20,8 @@
     "@types/react-dom": "^19.2.2",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*"
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "^9.39.1"
   },
   "dependencies": {
     "lodash.merge": "^4.6.2",

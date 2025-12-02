@@ -1,0 +1,15 @@
+{
+  "name": "studio",
+  "version": "1.0.0",
+  "scripts": {
+    "db:migrate": "cd ../../packages/database && pnpm with-env drizzle-kit migrate",
+    "db:generate": "cd ../../packages/database && pnpm with-env drizzle-kit generate",
+    "db:push": "cd ../../packages/database && pnpm with-env drizzle-kit push",
+    "db:studio": "cd ../../packages/database && pnpm with-env drizzle-kit studio",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^10.0.0",
+    "drizzle-kit": "^0.31.5"
+  }
+}
