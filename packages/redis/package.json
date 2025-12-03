@@ -16,6 +16,7 @@
   },
   "prettier": "@workspace/prettier",
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
     "@workspace/typescript-config": "workspace:*",

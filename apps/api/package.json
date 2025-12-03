@@ -26,6 +26,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@workspace/eslint-config": "workspace:*",
     "bun-types": "latest",
     "dotenv-cli": "^10.0.0",
