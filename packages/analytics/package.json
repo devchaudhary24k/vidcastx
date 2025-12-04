@@ -19,7 +19,7 @@
     "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "devDependencies": {
-    "@types/node": "^24.9.1",
+    "@types/node": "^24.10.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@workspace/eslint-config": "workspace:*",

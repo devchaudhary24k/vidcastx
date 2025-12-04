@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 import { videos } from "./video-schema";
 
@@ -19,7 +20,9 @@ export const distributionStatusEnum = pgEnum("distribution_status", [
 ]);
 
 export const integrations = pgTable("integration", {
-  id: text("id").primaryKey(), // Unique identifier for the integration
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateId("int")), // Unique identifier for the integration
   orgId: text("org_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the integration
@@ -35,7 +38,9 @@ export const integrations = pgTable("integration", {
 });
 
 export const distributionLogs = pgTable("distribution_log", {
-  id: text("id").primaryKey(), // Unique identifier for the distribution log
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateId("dlog")), // Unique identifier for the distribution log
   videoId: text("video_id")
     .notNull()
     .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the log

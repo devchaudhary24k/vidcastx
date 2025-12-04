@@ -11,6 +11,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization, user } from "./auth-schema";
 import {
   transcripts,
@@ -44,7 +45,9 @@ export const assetTypeEnum = pgEnum("asset_type", [
 export const videos = pgTable(
   "video",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vid")), // Unique identifier for the video
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the video
@@ -80,7 +83,9 @@ export const videos = pgTable(
 export const assets = pgTable(
   "asset",
   {
-    id: text("id").primaryKey(), // Unique identifier for the asset
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("ast")), // Unique identifier for the asset
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the asset

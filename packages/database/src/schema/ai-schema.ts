@@ -8,6 +8,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 import { assets, videos } from "./video-schema";
 
@@ -27,7 +28,9 @@ export const jobStatusEnum = pgEnum("ai_job_status", [
 ]);
 
 export const aiJobs = pgTable("ai_job", {
-  id: text("id").primaryKey(), // Unique identifier for the AI job
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => generateId("job")), // Unique identifier for the AI job
   orgId: text("org_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the job

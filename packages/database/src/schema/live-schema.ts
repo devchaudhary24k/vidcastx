@@ -9,13 +9,16 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 import { videos } from "./video-schema";
 
 export const channels = pgTable(
   "channel",
   {
-    id: text("id").primaryKey(), // Unique identifier for the channel
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("chn")), // Unique identifier for the channel
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the channel
@@ -40,7 +43,9 @@ export const channels = pgTable(
 export const streams = pgTable(
   "stream",
   {
-    id: text("id").primaryKey(), // Unique identifier for the stream
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("str")), // Unique identifier for the stream
     channelId: text("channel_id")
       .notNull()
       .references(() => channels.id, { onDelete: "cascade" }), // The channel associated with the stream
@@ -58,7 +63,9 @@ export const streams = pgTable(
 export const webhooks = pgTable(
   "webhook",
   {
-    id: text("id").primaryKey(), // Unique identifier for the webhook
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("wh")), // Unique identifier for the webhook
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the webhook

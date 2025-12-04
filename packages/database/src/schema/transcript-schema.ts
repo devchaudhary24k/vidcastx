@@ -11,6 +11,7 @@ import {
   vector,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { videos } from "./video-schema";
 
 export const transcriptStatusEnum = pgEnum("transcript_status", [
@@ -23,7 +24,9 @@ export const transcriptStatusEnum = pgEnum("transcript_status", [
 export const transcripts = pgTable(
   "transcript",
   {
-    id: text("id").primaryKey(), // Unique identifier for the transcript
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("trn")), // Unique identifier for the transcript
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the transcript
@@ -54,7 +57,9 @@ export const transcripts = pgTable(
 export const transcriptEmbeddings = pgTable(
   "transcript_embedding",
   {
-    id: text("id").primaryKey(), // Unique identifier for the transcript embedding
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("te")), // Unique identifier for the transcript embedding
     transcriptId: text("transcript_id")
       .notNull()
       .references(() => transcripts.id, { onDelete: "cascade" }), // The transcript associated with the embedding
@@ -77,7 +82,9 @@ export const transcriptEmbeddings = pgTable(
 export const videoChapters = pgTable(
   "video_chapter",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video chapter
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("chp")), // Unique identifier for the video chapter
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the chapter
@@ -105,7 +112,9 @@ export const videoChapters = pgTable(
 export const videoSummaries = pgTable(
   "video_summary",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video summary
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vsu")), // Unique identifier for the video summary
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the summary
