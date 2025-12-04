@@ -1,7 +1,10 @@
 import fs from "fs";
-import path from "path";
 import { pipeline } from "stream/promises";
+import type { CompletedPart } from "@aws-sdk/client-s3";
 import {
+  AbortMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
+  CreateMultipartUploadCommand,
   DeleteObjectCommand,
   DeleteObjectsCommand,
   GetObjectCommand,
@@ -9,13 +12,13 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
+  UploadPartCommand,
 } from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-storage"; // ⚠️ You need to install this package
+import { Upload } from "@aws-sdk/lib-storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { env } from "./env";
 
-// 1. Configuration
 export const s3Client = new S3Client({
   region: env.S3_REGION,
   endpoint: env.S3_ENDPOINT,
@@ -23,63 +26,73 @@ export const s3Client = new S3Client({
     accessKeyId: env.S3_ACCESS_KEY_ID!,
     secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
   },
-  forcePathStyle: env.S3_FORCE_PATH_STYLE === "true",
+  forcePathStyle: env.S3_FORCE_PATH_STYLE === true,
 });
 
 export const BUCKET_NAME = env.S3_BUCKET_NAME!;
 
-// ==================================================================
-// 🌐 FRONTEND HELPERS (Presigned URLs)
-// ==================================================================
+/**
+ * Helper to generate a presigned URL for a given command.
+ * Expiration is set to 1 hour.
+ */
+async function generatePresignedUrl(command: any) {
+  return getSignedUrl(s3Client, command, { expiresIn: 3600 });
+}
 
 /**
- * Generate a Presigned URL for direct uploads (Browser -> S3)
+ * Generates a presigned URL for uploading a file directly to S3.
+ * @param key - The S3 key (file path).
+ * @param contentType - The MIME type of the file.
+ * @returns A promise that resolves to the signed upload URL.
  */
 export async function getUploadUrl(key: string, contentType: string) {
-  const command = new PutObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-    ContentType: contentType,
-  });
-  return getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  return generatePresignedUrl(
+    new PutObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      ContentType: contentType,
+    }),
+  );
 }
 
 /**
- * Get a secure URL to view the file (Browser <- S3)
+ * Generates a presigned URL for downloading/viewing a file from S3.
+ * @param key - The S3 key (file path).
+ * @returns A promise that resolves to the signed download URL.
  */
 export async function getDownloadUrl(key: string) {
-  const command = new GetObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-  });
-  return getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  return generatePresignedUrl(
+    new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    }),
+  );
 }
 
-// ==================================================================
-// ⚙️ WORKER HELPERS (Server-Side IO)
-// ==================================================================
-
 /**
- * Download a file from S3 to the local disk.
- * Critical for FFmpeg which needs a physical file to process efficiently.
+ * Downloads a file from S3 and saves it to a local path.
+ * @param key - The S3 key (file path).
+ * @param localPath - The local file system path to save the file.
  */
 export async function downloadToPath(key: string, localPath: string) {
-  const command = new GetObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-  });
-
-  const { Body } = await s3Client.send(command);
+  const { Body } = await s3Client.send(
+    new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    }),
+  );
 
   if (!Body) throw new Error("File not found in bucket");
 
-  // Stream the S3 data directly to a file (Memory efficient for 10GB files)
-  await pipeline(Body as any, fs.createWriteStream(localPath));
+  // @ts-expect-error - AWS SDK stream types are tricky with Node streams, but this works
+  await pipeline(Body, fs.createWriteStream(localPath));
 }
 
 /**
- * Upload a local file (stream) to S3.
- * Uses @aws-sdk/lib-storage for automatic multipart uploads (faster/safer).
+ * Uploads a local file stream to S3 using multipart upload if necessary.
+ * @param key - The S3 key (destination path).
+ * @param fileStream - The read stream of the local file.
+ * @param contentType - Optional MIME type.
  */
 export async function uploadFile(
   key: string,
@@ -100,16 +113,17 @@ export async function uploadFile(
 }
 
 /**
- * Get File Metadata (Size, ContentType) without downloading it.
- * Essential for BILLING (Storage GB usage).
+ * Retrieves metadata for a file in S3 without downloading the content.
+ * @param key - The S3 key (file path).
+ * @returns File size, content type, and last modified date.
  */
 export async function getFileMetadata(key: string) {
-  const command = new HeadObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-  });
-
-  const response = await s3Client.send(command);
+  const response = await s3Client.send(
+    new HeadObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    }),
+  );
   return {
     size: response.ContentLength || 0,
     contentType: response.ContentType,
@@ -117,27 +131,102 @@ export async function getFileMetadata(key: string) {
   };
 }
 
-// ==================================================================
-// 🧹 MANAGEMENT & CLEANUP
-// ==================================================================
-
 /**
- * Delete a single file
+ * Initiates a multipart upload.
+ * @param key - The S3 key for the file.
+ * @param contentType - The MIME type of the file.
+ * @returns The UploadId for the multipart session.
  */
-export async function deleteFile(key: string) {
-  const command = new DeleteObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-  });
-  return s3Client.send(command);
+export async function initMultipartUpload(key: string, contentType: string) {
+  const { UploadId } = await s3Client.send(
+    new CreateMultipartUploadCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      ContentType: contentType,
+    }),
+  );
+
+  if (!UploadId) throw new Error("Failed to initialize multipart upload");
+  return UploadId;
 }
 
 /**
- * Delete a "Folder" (Prefix).
- * Essential for deleting an HLS video which contains 100+ .ts segments.
+ * Generates a presigned URL for uploading a specific part of a multipart upload.
+ * @param key - The S3 key.
+ * @param uploadId - The multipart upload session ID.
+ * @param partNumber - The part number (index).
+ * @returns A promise that resolves to the signed URL for the part.
+ */
+export async function signMultipartPart(
+  key: string,
+  uploadId: string,
+  partNumber: number,
+) {
+  return generatePresignedUrl(
+    new UploadPartCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      UploadId: uploadId,
+      PartNumber: partNumber,
+    }),
+  );
+}
+
+/**
+ * Completes a multipart upload by stitching all parts together.
+ * @param key - The S3 key.
+ * @param uploadId - The multipart upload session ID.
+ * @param parts - Array of completed parts with ETags.
+ */
+export async function completeMultipartUpload(
+  key: string,
+  uploadId: string,
+  parts: CompletedPart[],
+) {
+  return s3Client.send(
+    new CompleteMultipartUploadCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      UploadId: uploadId,
+      MultipartUpload: { Parts: parts },
+    }),
+  );
+}
+
+/**
+ * Aborts a multipart upload, cleaning up any uploaded parts.
+ * @param key - The S3 key.
+ * @param uploadId - The multipart upload session ID.
+ */
+export async function abortMultipartUpload(key: string, uploadId: string) {
+  return s3Client.send(
+    new AbortMultipartUploadCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      UploadId: uploadId,
+    }),
+  );
+}
+
+/**
+ * Deletes a single file from S3.
+ * @param key - The S3 key.
+ */
+export async function deleteFile(key: string) {
+  return s3Client.send(
+    new DeleteObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    }),
+  );
+}
+
+/**
+ * Deletes a "folder" (all objects with a given prefix) from S3.
+ * Handles pagination for folders with more than 1000 files.
+ * @param prefix - The folder prefix (e.g., "videos/123/").
  */
 export async function deleteFolder(prefix: string) {
-  // 1. List all objects with this prefix
   const listCommand = new ListObjectsV2Command({
     Bucket: BUCKET_NAME,
     Prefix: prefix,
@@ -147,17 +236,13 @@ export async function deleteFolder(prefix: string) {
 
   if (!listedObjects.Contents || listedObjects.Contents.length === 0) return;
 
-  // 2. Create delete objects array
   const deleteParams = {
     Bucket: BUCKET_NAME,
     Delete: { Objects: listedObjects.Contents.map(({ Key }) => ({ Key })) },
   };
 
-  // 3. Delete them all in one request
-  const deleteCommand = new DeleteObjectsCommand(deleteParams);
-  await s3Client.send(deleteCommand);
+  await s3Client.send(new DeleteObjectsCommand(deleteParams));
 
-  // 4. Recursion: If truncated (more than 1000 files), run again
   if (listedObjects.IsTruncated) {
     await deleteFolder(prefix);
   }
