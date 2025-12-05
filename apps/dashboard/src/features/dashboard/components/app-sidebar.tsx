@@ -192,13 +192,6 @@ const data: SidebarData = {
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -261,7 +254,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavSearch onClick={() => setCommandMenuOpen(true)} />
           <NavMain label="Platform" items={data.navMain} />
           <NavMain label="Organization" items={data.navAdmin} />
-          <NavSecondary items={data.navSecondary} className="mt-auto" />
         </SidebarContent>
         <SidebarFooter>
           <NavUser user={data.user} />

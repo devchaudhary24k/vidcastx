@@ -17,7 +17,6 @@ import type { SearchItem, SidebarData } from "./types";
 
 interface CommandMenuProps {
   open: boolean;
-  // FIX: Allow functional updates (prev => !prev) by using the correct SetStateAction type
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   data: SidebarData;
 }
@@ -61,17 +60,6 @@ const flattenSidebarData = (sidebarData: SidebarData): SearchItem[] => {
         link: subItem.url,
         type: "admin-navigation",
       });
-    });
-  });
-
-  // Flatten navSecondary
-  sidebarData.navSecondary.forEach((secondaryItem) => {
-    mainItems.push({
-      id: secondaryItem.title.toLowerCase().replace(/\s/g, "-"),
-      title: secondaryItem.title,
-      link: secondaryItem.url,
-      icon: secondaryItem.icon,
-      type: "secondary-navigation",
     });
   });
 

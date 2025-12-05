@@ -19,17 +19,10 @@ export type NavItem = {
   }[];
 };
 
-export type SecondaryNavItem = {
-  title: string;
-  url: string;
-  icon: LucideIcon;
-};
-
 export type SidebarData = {
   user: UserData;
   navMain: NavItem[];
   navAdmin: NavItem[];
-  navSecondary: SecondaryNavItem[];
 };
 
 export type SearchItem = {
