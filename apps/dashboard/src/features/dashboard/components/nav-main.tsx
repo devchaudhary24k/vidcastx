@@ -1,7 +1,9 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import {
   Collapsible,
@@ -9,20 +11,19 @@ import {
   CollapsibleTrigger,
 } from "@workspace/ui/components/collapsible";
 import {
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 
 export function NavMain({
   items,
-  label = "Platform",
+  label,
 }: {
   items: {
     title: string;
@@ -38,62 +39,111 @@ export function NavMain({
   }[];
   label?: string;
 }) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+  const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
+
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                tooltip={item.title}
-                isActive={item.isActive}
+    <SidebarMenu>
+      {label && !isCollapsed && (
+        <div className="text-muted-foreground mb-2 px-2 text-xs font-medium">
+          {label}
+        </div>
+      )}
+      {items.map((item) => {
+        const isOpen = !isCollapsed && openCollapsible === item.title;
+        const hasSubRoutes = !!item.items?.length;
+
+        return (
+          <SidebarMenuItem key={item.title}>
+            {hasSubRoutes ? (
+              <Collapsible
+                open={isOpen}
+                onOpenChange={(open) =>
+                  setOpenCollapsible(open ? item.title : null)
+                }
+                className="w-full"
               >
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-              {item.items?.length ? (
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className="data-[state=open]:rotate-90">
-                      <ChevronRight />
-                      <span className="sr-only">Toggle</span>
-                    </SidebarMenuAction>
-                  </CollapsibleTrigger>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    className={cn(
+                      "flex w-full items-center rounded-lg px-2 transition-colors",
+                      isOpen
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                      isCollapsed && "justify-center",
+                    )}
+                  >
+                    <item.icon className="size-4" />
+                    {!isCollapsed && (
+                      <span className="ml-2 flex-1 text-sm font-medium">
+                        {item.title}
+                      </span>
+                    )}
+                    {!isCollapsed && (
+                      <span className="ml-auto">
+                        {isOpen ? (
+                          <ChevronUp className="size-4" />
+                        ) : (
+                          <ChevronDown className="size-4" />
+                        )}
+                      </span>
+                    )}
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+
+                {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenuSub>
+                    <SidebarMenuSub className="my-1 ml-3.5">
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            asChild
-                            className={
-                              subItem.disabled
-                                ? "pointer-events-none opacity-50"
-                                : ""
-                            }
-                          >
-                            <a href={subItem.url}>
+                          <SidebarMenuSubButton asChild>
+                            <Link
+                              href={subItem.url}
+                              className={cn(
+                                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-md px-4 py-1.5 text-sm font-medium",
+                                subItem.disabled &&
+                                  "pointer-events-none opacity-50",
+                              )}
+                            >
                               <span>{subItem.title}</span>
                               {subItem.badge && (
                                 <span className="text-muted-foreground ml-auto text-xs">
                                   {subItem.badge}
                                 </span>
                               )}
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
-                </>
-              ) : null}
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+                )}
+              </Collapsible>
+            ) : (
+              <SidebarMenuButton
+                tooltip={item.title}
+                asChild
+                isActive={item.isActive}
+                className={cn(
+                  "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-lg px-2 transition-colors",
+                  isCollapsed && "justify-center",
+                )}
+              >
+                <Link href={item.url}>
+                  <item.icon className="size-4" />
+                  {!isCollapsed && (
+                    <span className="ml-2 text-sm font-medium">
+                      {item.title}
+                    </span>
+                  )}
+                </Link>
+              </SidebarMenuButton>
+            )}
+          </SidebarMenuItem>
+        );
+      })}
+    </SidebarMenu>
   );
 }

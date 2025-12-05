@@ -1,6 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import {
   BarChart2,
   Clapperboard,
@@ -22,11 +25,40 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 
+import { Logo } from "./logo";
 import { NavMain } from "./nav-main";
+import { NotificationsPopover } from "./nav-notifications";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
+
+const sampleNotifications = [
+  {
+    id: "1",
+    avatar: "/avatars/01.png",
+    fallback: "OM",
+    text: "New order received.",
+    time: "10m ago",
+  },
+  {
+    id: "2",
+    avatar: "/avatars/02.png",
+    fallback: "JL",
+    text: "Server upgrade completed.",
+    time: "1h ago",
+  },
+  {
+    id: "3",
+    avatar: "/avatars/03.png",
+    fallback: "HH",
+    text: "New user signed up.",
+    time: "2h ago",
+  },
+];
 
 const data = {
   user: {
@@ -168,27 +200,56 @@ const data = {
     },
   ],
 };
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.fromTo(
+      headerRef.current,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.8 },
+    );
+  }, [isCollapsed]);
+
   return (
-    <Sidebar variant="inset" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Clapperboard className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">VidCastX</span>
-                  <span className="truncate text-xs">Studio</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+    <Sidebar variant="floating" collapsible="icon" {...props}>
+      <SidebarHeader
+        className={cn(
+          "flex md:pt-3.5",
+          isCollapsed
+            ? "flex-row items-center justify-between gap-y-4 md:flex-col md:items-start md:justify-start"
+            : "flex-row items-center justify-between",
+        )}
+      >
+        <a href="#" className="flex items-center gap-2">
+          <Logo className="h-8 w-8" />
+          {!isCollapsed && (
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold text-black dark:text-white">
+                VidCastX
+              </span>
+              <span className="text-muted-foreground truncate text-xs">
+                Studio
+              </span>
+            </div>
+          )}
+        </a>
+
+        <div
+          ref={headerRef}
+          className={cn(
+            "flex items-center gap-2",
+            isCollapsed ? "flex-row md:flex-col-reverse" : "flex-row",
+          )}
+        >
+          <NotificationsPopover notifications={sampleNotifications} />
+          <SidebarTrigger />
+        </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="gap-4 px-2 py-4">
         <NavMain label="Platform" items={data.navMain} />
         <NavMain label="Organization" items={data.navAdmin} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
