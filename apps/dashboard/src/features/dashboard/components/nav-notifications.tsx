@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import { cn } from "@workspace/ui/lib/utils";
 
 type Notification = {
   id: string;
@@ -27,8 +28,10 @@ type Notification = {
 
 export function NotificationsPopover({
   notifications,
+  className,
 }: {
   notifications: Notification[];
+  className?: string;
 }) {
   return (
     <DropdownMenu>
@@ -36,7 +39,7 @@ export function NotificationsPopover({
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full"
+          className={cn("rounded-full", className)}
           aria-label="Open notifications"
         >
           <BellIcon className="size-5" />

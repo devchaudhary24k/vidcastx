@@ -22,9 +22,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarTrigger,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
@@ -218,7 +215,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar variant="floating" collapsible="icon" {...props}>
       <SidebarHeader
         className={cn(
-          "flex md:pt-3.5",
+          "flex w-full md:pt-3.5",
           isCollapsed
             ? "flex-row items-center justify-between gap-y-4 md:flex-col md:items-start md:justify-start"
             : "flex-row items-center justify-between",
@@ -242,17 +239,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ref={headerRef}
           className={cn(
             "flex items-center gap-2",
-            isCollapsed ? "flex-row md:flex-col-reverse" : "flex-row",
+            isCollapsed
+              ? "flex-row md:flex-col-reverse md:items-start"
+              : "flex-row",
           )}
         >
-          <NotificationsPopover notifications={sampleNotifications} />
-          <SidebarTrigger />
+          <NotificationsPopover
+            notifications={sampleNotifications}
+            className="size-8 rounded-full"
+          />
+          <SidebarTrigger className="size-8" />
         </div>
       </SidebarHeader>
       <SidebarContent className="gap-4 px-2 py-4">
         <NavMain label="Platform" items={data.navMain} />
         <NavMain label="Organization" items={data.navAdmin} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
