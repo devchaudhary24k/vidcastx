@@ -1,8 +1,8 @@
-import { betterAuth } from "@/auth";
-import { VideoService } from "@/modules/v1/videos/service";
+import { betterAuth } from "@server/auth";
 import { Elysia } from "elysia";
 
 import { VideoModel } from "./model";
+import { VideoService } from "./service";
 
 export const videoController = new Elysia({ prefix: "/videos" })
   .use(betterAuth)
