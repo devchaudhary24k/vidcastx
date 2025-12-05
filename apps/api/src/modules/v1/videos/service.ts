@@ -3,7 +3,6 @@ import { db } from "@workspace/database/client";
 import { videos } from "@workspace/database/schema/video-schema";
 import { generateId } from "@workspace/database/utils/id";
 import {
-  abortMultipartUpload,
   completeMultipartUpload,
   initMultipartUpload,
   signMultipartPart,
@@ -16,7 +15,7 @@ export class VideoService {
   static async createDraft(
     userId: string,
     orgId: string,
-    data: { filename: string; title?: string },
+    data: { filename: string; title?: string; folderId?: string | null },
   ) {
     const videoId = generateId("vid");
     const extension = data.filename.split(".").pop();
@@ -31,6 +30,7 @@ export class VideoService {
         title: data.title || data.filename,
         status: "waiting_upload",
         masterAccessUrl: s3Key,
+        folderId: data.folderId || null,
       })
       .returning();
 
