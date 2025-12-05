@@ -1,4 +1,4 @@
-import { AuthHeader, SignupForm } from "@/features/auth";
+import { AuthHeader, SignupForm } from "@dashboard/features/auth";
 
 export default function SignupPage() {
   return (

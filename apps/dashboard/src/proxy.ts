@@ -4,7 +4,7 @@ import {
   authRoutes,
   DEFAULT_LOGIN_REDIRECT,
   protectedRoutes,
-} from "@/constants/route";
+} from "@dashboard/constants/route";
 import { getSessionCookie } from "better-auth/cookies";
 
 export async function proxy(request: NextRequest) {

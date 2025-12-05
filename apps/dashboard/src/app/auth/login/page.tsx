@@ -1,4 +1,4 @@
-import { AuthHeader, LoginForm } from "@/features/auth";
+import { AuthHeader, LoginForm } from "@dashboard/features/auth";
 
 export default function LoginPage() {
   return (

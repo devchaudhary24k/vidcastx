@@ -1,6 +1,6 @@
 "use client";
 
-import { providerSignIn } from "@/utils/provider-signin";
+import { providerSignIn } from "@dashboard/utils/provider-signin";
 import { DiscordFreeIcons, GithubIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 

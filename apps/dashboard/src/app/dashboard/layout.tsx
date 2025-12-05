@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/features/dashboard";
+import { AppSidebar } from "@dashboard/features/dashboard";
 
 import {
   Breadcrumb,
