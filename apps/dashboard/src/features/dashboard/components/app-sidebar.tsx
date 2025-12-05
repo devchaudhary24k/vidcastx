@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import {
@@ -27,9 +27,12 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { cn } from "@workspace/ui/lib/utils";
 
+import type { SidebarData } from "./types";
+import { CommandMenu } from "./command-menu";
 import { Logo } from "./logo";
 import { NavMain } from "./nav-main";
 import { NotificationsPopover } from "./nav-notifications";
+import { NavSearch } from "./nav-search";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
 
@@ -57,7 +60,7 @@ const sampleNotifications = [
   },
 ];
 
-const data = {
+const data: SidebarData = {
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -203,6 +206,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isCollapsed = state === "collapsed";
   const headerRef = useRef<HTMLDivElement>(null);
 
+  const [commandMenuOpen, setCommandMenuOpen] = useState(false);
+
   useGSAP(() => {
     gsap.fromTo(
       headerRef.current,
@@ -212,52 +217,62 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [isCollapsed]);
 
   return (
-    <Sidebar variant="floating" collapsible="icon" {...props}>
-      <SidebarHeader
-        className={cn(
-          "flex w-full md:pt-3.5",
-          isCollapsed
-            ? "flex-row items-center justify-between gap-y-4 md:flex-col md:items-start md:justify-start"
-            : "flex-row items-center justify-between",
-        )}
-      >
-        <a href="#" className="flex items-center gap-2">
-          <Logo className="h-8 w-8" />
-          {!isCollapsed && (
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold text-black dark:text-white">
-                VidCastX
-              </span>
-              <span className="text-muted-foreground truncate text-xs">
-                Studio
-              </span>
-            </div>
-          )}
-        </a>
-
-        <div
-          ref={headerRef}
+    <>
+      <Sidebar variant="floating" collapsible="icon" {...props}>
+        <SidebarHeader
           className={cn(
-            "flex items-center gap-2",
+            "flex w-full md:pt-3.5",
             isCollapsed
-              ? "flex-row md:flex-col-reverse md:items-start"
-              : "flex-row",
+              ? "flex-row items-center justify-between gap-y-4 md:flex-col md:items-start md:justify-start"
+              : "flex-row items-center justify-between",
           )}
         >
-          <NotificationsPopover
-            notifications={sampleNotifications}
-            className="size-8 rounded-full"
-          />
-          <SidebarTrigger className="size-8" />
-        </div>
-      </SidebarHeader>
-      <SidebarContent className="gap-4 px-2 py-4">
-        <NavMain label="Platform" items={data.navMain} />
-        <NavMain label="Organization" items={data.navAdmin} />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
+          <a href="#" className="flex items-center gap-2">
+            <Logo className="h-8 w-8" />
+            {!isCollapsed && (
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold text-black dark:text-white">
+                  VidCastX
+                </span>
+                <span className="text-muted-foreground truncate text-xs">
+                  Studio
+                </span>
+              </div>
+            )}
+          </a>
+
+          <div
+            ref={headerRef}
+            className={cn(
+              "flex items-center gap-2",
+              isCollapsed
+                ? "flex-row md:flex-col-reverse md:items-start"
+                : "flex-row",
+            )}
+          >
+            <NotificationsPopover
+              notifications={sampleNotifications}
+              className="size-8 rounded-full"
+            />
+            <SidebarTrigger className="size-8" />
+          </div>
+        </SidebarHeader>
+        <SidebarContent className="gap-4 px-2 py-4">
+          <NavSearch onClick={() => setCommandMenuOpen(true)} />
+          <NavMain label="Platform" items={data.navMain} />
+          <NavMain label="Organization" items={data.navAdmin} />
+          <NavSecondary items={data.navSecondary} className="mt-auto" />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser user={data.user} />
+        </SidebarFooter>
+      </Sidebar>
+
+      <CommandMenu
+        open={commandMenuOpen}
+        setOpen={setCommandMenuOpen}
+        data={data}
+      />
+    </>
   );
 }

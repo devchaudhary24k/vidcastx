@@ -2,39 +2,43 @@ import * as React from "react";
 import { type LucideIcon } from "lucide-react";
 
 import {
-  SidebarGroup,
-  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
 
 export function NavSecondary({
   items,
-  ...props
+  className,
 }: {
   items: {
     title: string;
     url: string;
     icon: LucideIcon;
   }[];
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  className?: string;
+}) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
   return (
-    <SidebarGroup {...props}>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+    <SidebarMenu className={className}>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton
+            asChild
+            size="sm"
+            className={cn(isCollapsed && "justify-center")}
+          >
+            <a href={item.url}>
+              <item.icon className="size-4" />
+              <span>{item.title}</span>
+            </a>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
   );
 }
