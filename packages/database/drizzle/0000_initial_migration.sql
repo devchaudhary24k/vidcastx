@@ -113,6 +113,7 @@ CREATE TABLE "video" (
 	"id" text PRIMARY KEY NOT NULL,
 	"org_id" text NOT NULL,
 	"uploader_id" text,
+	"folder_id" text,
 	"title" text DEFAULT 'Untitled Video' NOT NULL,
 	"description" text,
 	"visibility" "visibility" DEFAULT 'private' NOT NULL,
@@ -541,6 +542,16 @@ CREATE TABLE "view_session" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "folder" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"parent_id" text,
+	"org_id" text NOT NULL,
+	"created_by_id" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviter_id_user_id_fk" FOREIGN KEY ("inviter_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -550,6 +561,7 @@ ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("
 ALTER TABLE "asset" ADD CONSTRAINT "asset_video_id_video_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "video" ADD CONSTRAINT "video_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "video" ADD CONSTRAINT "video_uploader_id_user_id_fk" FOREIGN KEY ("uploader_id") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "video" ADD CONSTRAINT "video_folder_id_folder_id_fk" FOREIGN KEY ("folder_id") REFERENCES "public"."folder"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ai_job" ADD CONSTRAINT "ai_job_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ai_job" ADD CONSTRAINT "ai_job_video_id_video_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ai_job" ADD CONSTRAINT "ai_job_output_asset_id_asset_id_fk" FOREIGN KEY ("output_asset_id") REFERENCES "public"."asset"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
@@ -585,6 +597,9 @@ ALTER TABLE "video_heatmap" ADD CONSTRAINT "video_heatmap_video_id_video_id_fk" 
 ALTER TABLE "video_stats" ADD CONSTRAINT "video_stats_video_id_video_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "video_stats_by_dimension" ADD CONSTRAINT "video_stats_by_dimension_video_id_video_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "view_session" ADD CONSTRAINT "view_session_video_id_video_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "folder" ADD CONSTRAINT "folder_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "folder" ADD CONSTRAINT "folder_created_by_id_user_id_fk" FOREIGN KEY ("created_by_id") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "folder" ADD CONSTRAINT "folders_parent_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."folder"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "account_userId_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "invitation_organizationId_idx" ON "invitation" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "invitation_email_idx" ON "invitation" USING btree ("email");--> statement-breakpoint
@@ -595,6 +610,7 @@ CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("ident
 CREATE INDEX "asset_videoId_idx" ON "asset" USING btree ("video_id");--> statement-breakpoint
 CREATE INDEX "video_orgId_idx" ON "video" USING btree ("org_id");--> statement-breakpoint
 CREATE INDEX "video_status_idx" ON "video" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "video_folderId_idx" ON "video" USING btree ("folder_id");--> statement-breakpoint
 CREATE INDEX "channel_orgId_idx" ON "channel" USING btree ("org_id");--> statement-breakpoint
 CREATE INDEX "channel_streamKey_idx" ON "channel" USING btree ("stream_key");--> statement-breakpoint
 CREATE INDEX "stream_channelId_idx" ON "stream" USING btree ("channel_id");--> statement-breakpoint
@@ -636,4 +652,6 @@ CREATE INDEX "video_stats_date_idx" ON "video_stats" USING btree ("date");--> st
 CREATE INDEX "stats_dimension_video_date_idx" ON "video_stats_by_dimension" USING btree ("video_id","date","dimension");--> statement-breakpoint
 CREATE INDEX "view_session_videoId_idx" ON "view_session" USING btree ("video_id");--> statement-breakpoint
 CREATE INDEX "view_session_startedAt_idx" ON "view_session" USING btree ("started_at");--> statement-breakpoint
-CREATE INDEX "view_session_fingerprint_idx" ON "view_session" USING btree ("viewer_fingerprint");
+CREATE INDEX "view_session_fingerprint_idx" ON "view_session" USING btree ("viewer_fingerprint");--> statement-breakpoint
+CREATE INDEX "folder_parentId_idx" ON "folder" USING btree ("parent_id");--> statement-breakpoint
+CREATE INDEX "folder_orgId_idx" ON "folder" USING btree ("org_id");

@@ -6,3 +6,4 @@ export * from "./live-schema";
 export * from "./billing-schema";
 export * from "./transcript-schema";
 export * from "./analytics-schema";
+export * from "./folder-schema";
