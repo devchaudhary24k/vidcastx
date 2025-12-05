@@ -20,7 +20,7 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "dotenv-cli": "^10.0.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1"
   },
   "dependencies": {

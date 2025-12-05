@@ -20,16 +20,16 @@
   "prettier": "@workspace/prettier",
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@types/pg": "^8.15.5",
+    "@types/pg": "^8.15.6",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "dotenv-cli": "^10.0.0",
-    "drizzle-kit": "^0.31.5"
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.8"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",
-    "drizzle-orm": "^0.44.7",
+    "drizzle-orm": "^0.45.0",
     "drizzle-zod": "^0.8.3",
     "nanoid": "^5.1.6",
     "pg": "^8.16.3",

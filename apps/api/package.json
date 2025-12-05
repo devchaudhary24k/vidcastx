@@ -22,7 +22,7 @@
     "@workspace/database": "workspace:*",
     "@workspace/redis": "workspace:^",
     "@workspace/storage": "workspace:^",
-    "better-auth": "^1.4.3",
+    "better-auth": "^1.4.5",
     "elysia": "latest",
     "zod": "^4.1.13"
   },
@@ -30,7 +30,7 @@
     "@types/node": "^24.10.1",
     "@workspace/eslint-config": "workspace:*",
     "bun-types": "latest",
-    "dotenv-cli": "^10.0.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1"
   },
   "prettier": "@workspace/prettier",
