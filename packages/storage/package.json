@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts"
+  },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "check-types": "tsc --noEmit --emitDeclarationOnly false",
@@ -12,6 +16,7 @@
   },
   "prettier": "@workspace/prettier",
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/prettier": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
@@ -19,6 +24,10 @@
     "eslint": "^9.39.1"
   },
   "dependencies": {
-    "@t3-oss/env-core": "^0.13.8"
+    "@aws-sdk/client-s3": "^3.943.0",
+    "@aws-sdk/lib-storage": "^3.943.0",
+    "@aws-sdk/s3-request-presigner": "^3.943.0",
+    "@t3-oss/env-core": "^0.13.8",
+    "zod": "^4.1.13"
   }
 }

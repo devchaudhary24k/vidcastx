@@ -1,11 +1,11 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
-import { env as databaseEnv } from "@workspace/database/env";
+import { env as databaseEnv, env as storageEnv } from "@workspace/database/env";
 import { env as redisEnv } from "@workspace/redis/env";
 
 export const env = createEnv({
-  extends: [databaseEnv, redisEnv],
+  extends: [databaseEnv, redisEnv, storageEnv],
 
   server: {
     AYYO: z.string().min(1),

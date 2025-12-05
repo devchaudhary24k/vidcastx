@@ -1,10 +1,9 @@
-import { env } from "@/env";
+import { env } from "@server/env";
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI, organization } from "better-auth/plugins";
 
 import { db } from "@workspace/database/client";
-import { user } from "@workspace/database/schema/auth-schema";
 import { redis } from "@workspace/redis";
 
 export const auth = betterAuth({

@@ -2,16 +2,16 @@
 
 import * as React from "react";
 import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
+  BarChart2,
+  Clapperboard,
+  Code,
+  CreditCard,
+  Folder,
+  LayoutDashboard,
+  Library,
   LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
+  Link2,
+  Users,
 } from "lucide-react";
 
 import {
@@ -25,7 +25,6 @@ import {
 } from "@workspace/ui/components/sidebar";
 
 import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-projects";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
 
@@ -37,86 +36,125 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
+      title: "Dashboard",
       url: "#",
-      icon: SquareTerminal,
+      icon: LayoutDashboard,
       isActive: true,
+    },
+    {
+      title: "Projects",
+      url: "#",
+      icon: Folder,
+    },
+    {
+      title: "Studio",
+      url: "#",
+      icon: Clapperboard,
       items: [
         {
-          title: "History",
+          title: "Create New",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Video Editor",
+          url: "#",
+          disabled: true,
+          badge: "Soon",
+        },
+      ],
+    },
+    {
+      title: "Assets",
+      url: "#",
+      icon: Library,
+      items: [
+        {
+          title: "Media Library",
           url: "#",
         },
         {
-          title: "Settings",
+          title: "Exports",
+          url: "#",
+        },
+        {
+          title: "Trash",
           url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "Analytics",
       url: "#",
-      icon: Bot,
+      icon: BarChart2,
       items: [
         {
-          title: "Genesis",
+          title: "Overview",
           url: "#",
         },
         {
-          title: "Explorer",
+          title: "Content Reports",
+          url: "#",
+        },
+      ],
+    },
+  ],
+  navAdmin: [
+    {
+      title: "Team",
+      url: "#",
+      icon: Users,
+      items: [
+        {
+          title: "Members",
           url: "#",
         },
         {
-          title: "Quantum",
+          title: "Roles & Permissions",
           url: "#",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "Integrations",
       url: "#",
-      icon: BookOpen,
+      icon: Link2,
       items: [
         {
-          title: "Introduction",
+          title: "Connected Apps",
           url: "#",
         },
         {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
+          title: "Webhooks",
           url: "#",
         },
       ],
     },
     {
-      title: "Settings",
+      title: "Billing",
       url: "#",
-      icon: Settings2,
+      icon: CreditCard,
       items: [
         {
-          title: "General",
+          title: "Subscription",
           url: "#",
         },
         {
-          title: "Team",
+          title: "Invoices",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Developers",
+      url: "#",
+      icon: Code,
+      items: [
+        {
+          title: "API Keys",
           url: "#",
         },
         {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
+          title: "Documentation",
           url: "#",
         },
       ],
@@ -128,31 +166,8 @@ const data = {
       url: "#",
       icon: LifeBuoy,
     },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
   ],
 };
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props}>
@@ -162,11 +177,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+                  <Clapperboard className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-medium">VidCastX</span>
+                  <span className="truncate text-xs">Studio</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -174,8 +189,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain label="Platform" items={data.navMain} />
+        <NavMain label="Organization" items={data.navAdmin} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

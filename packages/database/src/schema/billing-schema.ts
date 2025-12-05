@@ -10,6 +10,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 
 export const usageTypeEnum = pgEnum("usage_type", [
@@ -42,7 +43,9 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
 export const usageRecords = pgTable(
   "usage_record",
   {
-    id: text("id").primaryKey(), // Unique identifier for the usage record
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("ur")), // Unique identifier for the usage record
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the usage record
@@ -66,7 +69,9 @@ export const usageRecords = pgTable(
 export const usageSummary = pgTable(
   "usage_summary",
   {
-    id: text("id").primaryKey(), // Unique identifier for the usage summary
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("usum")), // Unique identifier for the usage summary
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the usage summary
@@ -98,7 +103,9 @@ export const usageSummary = pgTable(
 export const subscriptions = pgTable(
   "subscription",
   {
-    id: text("id").primaryKey(), // Unique identifier for the subscription
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("sub")), // Unique identifier for the subscription
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the subscription
@@ -130,7 +137,9 @@ export const subscriptions = pgTable(
 export const invoices = pgTable(
   "invoice",
   {
-    id: text("id").primaryKey(), // Unique identifier for the invoice
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("inv")), // Unique identifier for the invoice
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the invoice
@@ -166,7 +175,9 @@ export const invoices = pgTable(
 export const paymentMethods = pgTable(
   "payment_method",
   {
-    id: text("id").primaryKey(), // Unique identifier for the payment method
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("pm")), // Unique identifier for the payment method
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the payment method
@@ -190,7 +201,9 @@ export const paymentMethods = pgTable(
 export const credits = pgTable(
   "credit",
   {
-    id: text("id").primaryKey(), // Unique identifier for the credit
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("cr")), // Unique identifier for the credit
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the credit

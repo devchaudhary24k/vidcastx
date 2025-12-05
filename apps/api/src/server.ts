@@ -42,3 +42,5 @@ const server = new Elysia({
 console.log(
   `🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`,
 );
+
+export type App = typeof server;

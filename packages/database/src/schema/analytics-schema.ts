@@ -11,6 +11,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 import { streams } from "./live-schema";
 import { videos } from "./video-schema";
@@ -57,7 +58,9 @@ export const playerEventEnum = pgEnum("player_event_type", [
 export const videoStats = pgTable(
   "video_stats",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video stats
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vst")), // Unique identifier for the video stats
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the stats
@@ -90,7 +93,9 @@ export const videoStats = pgTable(
 export const videoHeatmap = pgTable(
   "video_heatmap",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video heatmap
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vhp")), // Unique identifier for the video heatmap
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the heatmap
@@ -108,7 +113,9 @@ export const videoHeatmap = pgTable(
 export const viewSessions = pgTable(
   "view_session",
   {
-    id: text("id").primaryKey(), // Unique identifier for the view session
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vs")), // Unique identifier for the view session
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the session
@@ -154,7 +161,9 @@ export const viewSessions = pgTable(
 export const playerEvents = pgTable(
   "player_event",
   {
-    id: text("id").primaryKey(), // Unique identifier for the player event
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("pev")), // Unique identifier for the player event
     sessionId: text("session_id")
       .notNull()
       .references(() => viewSessions.id, { onDelete: "cascade" }), // The session associated with the event
@@ -175,7 +184,9 @@ export const playerEvents = pgTable(
 export const videoStatsByDimension = pgTable(
   "video_stats_by_dimension",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video stats by dimension
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vsd")), // Unique identifier for the video stats by dimension
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the stats
@@ -200,7 +211,9 @@ export const videoStatsByDimension = pgTable(
 export const streamStats = pgTable(
   "stream_stats",
   {
-    id: text("id").primaryKey(), // Unique identifier for the stream stats
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("sst")), // Unique identifier for the stream stats
     streamId: text("stream_id")
       .notNull()
       .references(() => streams.id, { onDelete: "cascade" }), // The stream associated with the stats
@@ -222,7 +235,9 @@ export const streamStats = pgTable(
 export const orgStats = pgTable(
   "org_stats",
   {
-    id: text("id").primaryKey(), // Unique identifier for the organization stats
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("ost")), // Unique identifier for the organization stats
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the stats
@@ -247,7 +262,9 @@ export const orgStats = pgTable(
 export const channelSubscribers = pgTable(
   "channel_subscriber",
   {
-    id: text("id").primaryKey(), // Unique identifier for the channel subscriber
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("csub")), // Unique identifier for the channel subscriber
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the subscriber
@@ -268,7 +285,9 @@ export const channelSubscribers = pgTable(
 export const searchQueries = pgTable(
   "search_query",
   {
-    id: text("id").primaryKey(), // Unique identifier for the search query
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("sq")), // Unique identifier for the search query
     orgId: text("org_id").references(() => organization.id, {
       onDelete: "cascade",
     }), // The organization associated with the query
@@ -289,7 +308,9 @@ export const searchQueries = pgTable(
 export const embedStats = pgTable(
   "embed_stats",
   {
-    id: text("id").primaryKey(), // Unique identifier for the embed stats
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("emb")), // Unique identifier for the embed stats
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the stats
@@ -309,7 +330,9 @@ export const embedStats = pgTable(
 export const realtimeMetrics = pgTable(
   "realtime_metrics",
   {
-    id: text("id").primaryKey(), // Unique identifier for the realtime metrics
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("rm")), // Unique identifier for the realtime metrics
     entityType: text("entity_type").notNull(), // The type of entity
     entityId: text("entity_id").notNull(), // The ID of the entity
     currentViewers: integer("current_viewers").default(0), // The current number of viewers

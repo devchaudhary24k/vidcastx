@@ -9,6 +9,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "dotenv-cli": "^10.0.0",
     "drizzle-kit": "^0.31.5"
   }

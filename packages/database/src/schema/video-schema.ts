@@ -11,7 +11,9 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+import { generateId } from "../utils/id";
 import { organization, user } from "./auth-schema";
+import { folders } from "./folder-schema";
 import {
   transcripts,
   videoChapters,
@@ -44,13 +46,18 @@ export const assetTypeEnum = pgEnum("asset_type", [
 export const videos = pgTable(
   "video",
   {
-    id: text("id").primaryKey(), // Unique identifier for the video
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("vid")), // Unique identifier for the video
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }), // The organization associated with the video
     uploaderId: text("uploader_id").references(() => user.id, {
       onDelete: "set null",
     }), // The user who uploaded the video
+    folderId: text("folder_id").references(() => folders.id, {
+      onDelete: "set null",
+    }),
     title: text("title").notNull().default("Untitled Video"), // The title of the video
     description: text("description"), // The description of the video
     visibility: visibilityEnum("visibility").default("private").notNull(), // The visibility of the video
@@ -74,13 +81,16 @@ export const videos = pgTable(
   (table) => [
     index("video_orgId_idx").on(table.orgId),
     index("video_status_idx").on(table.status),
+    index("video_folderId_idx").on(table.folderId),
   ],
 );
 
 export const assets = pgTable(
   "asset",
   {
-    id: text("id").primaryKey(), // Unique identifier for the asset
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => generateId("ast")), // Unique identifier for the asset
     videoId: text("video_id")
       .notNull()
       .references(() => videos.id, { onDelete: "cascade" }), // The video associated with the asset
@@ -109,6 +119,10 @@ export const videosRelations = relations(videos, ({ one, many }) => ({
   uploader: one(user, {
     fields: [videos.uploaderId],
     references: [user.id],
+  }),
+  folder: one(folders, {
+    fields: [videos.folderId],
+    references: [folders.id],
   }),
   assets: many(assets),
 
