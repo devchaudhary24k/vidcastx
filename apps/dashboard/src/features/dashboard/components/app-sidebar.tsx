@@ -35,6 +35,7 @@ import { NotificationsPopover } from "./nav-notifications";
 import { NavSearch } from "./nav-search";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 
 const sampleNotifications = [
   {
@@ -58,6 +59,12 @@ const sampleNotifications = [
     text: "New user signed up.",
     time: "2h ago",
   },
+];
+
+const teams = [
+  { id: "1", name: "VidcastX", logo: Logo, plan: "Enterprise" },
+  { id: "2", name: "Pixelact Studios", logo: Logo, plan: "Startup" },
+  { id: "3", name: "Evil Corp.", logo: Logo, plan: "Free" },
 ];
 
 const data: SidebarData = {
@@ -220,19 +227,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               : "flex-row items-center justify-between",
           )}
         >
-          <a href="#" className="flex items-center gap-2">
-            <Logo className="h-8 w-8" />
-            {!isCollapsed && (
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold text-black dark:text-white">
-                  VidCastX
-                </span>
-                <span className="text-muted-foreground truncate text-xs">
-                  Studio
-                </span>
-              </div>
-            )}
-          </a>
+          <TeamSwitcher teams={teams} />
 
           <div
             ref={headerRef}
