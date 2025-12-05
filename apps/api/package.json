@@ -2,15 +2,16 @@
   "name": "api",
   "version": "1.0.50",
   "scripts": {
-    "with-env": "dotenv -e ../../.env --",
     "dev": "bun run with-env -- bun run --watch src/index.ts",
     "build": "bun run with-env -- bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
     "check-types": "bun run with-env -- tsc --noEmit",
-    "lint": "eslint",
+    "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "clean": "git clean -xdf .cache .next .dist .turbo node_modules"
+    "clean": "git clean -xdf .cache .next .dist .turbo node_modules",
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/bearer": "^1.4.1",
     "@elysiajs/cors": "^1.4.0",
     "@elysiajs/cron": "^1.4.1",
@@ -19,13 +20,18 @@
     "@elysiajs/server-timing": "^1.4.0",
     "@t3-oss/env-core": "^0.13.8",
     "@workspace/database": "workspace:*",
-    "better-auth": "^1.4.3",
+    "@workspace/redis": "workspace:^",
+    "@workspace/storage": "workspace:^",
+    "better-auth": "^1.4.5",
     "elysia": "latest",
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@workspace/eslint-config": "workspace:*",
     "bun-types": "latest",
-    "dotenv-cli": "^10.0.0"
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^9.39.1"
   },
   "prettier": "@workspace/prettier",
   "module": "src/index.js"

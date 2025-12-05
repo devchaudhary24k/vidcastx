@@ -1,4 +1,4 @@
-import { betterAuth } from "@/auth";
+import { betterAuth } from "@server/auth";
 import { Elysia } from "elysia";
 
 export const userController = new Elysia({ prefix: "/users" })

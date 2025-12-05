@@ -39,5 +39,11 @@
       "cache": false
     }
   },
-  "globalEnv": ["ENVIRONMENT", "PRODUCTION_URL", "DATABASE_URL", "AYYO"]
+  "globalEnv": [
+    "ENVIRONMENT",
+    "PRODUCTION_URL",
+    "DATABASE_URL",
+    "AYYO",
+    "NODE_ENV"
+  ]
 }
