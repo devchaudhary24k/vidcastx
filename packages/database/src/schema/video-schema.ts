@@ -13,6 +13,7 @@ import {
 
 import { generateId } from "../utils/id";
 import { organization, user } from "./auth-schema";
+import { folders } from "./folder-schema";
 import {
   transcripts,
   videoChapters,
@@ -54,6 +55,9 @@ export const videos = pgTable(
     uploaderId: text("uploader_id").references(() => user.id, {
       onDelete: "set null",
     }), // The user who uploaded the video
+    folderId: text("folder_id").references(() => folders.id, {
+      onDelete: "set null",
+    }),
     title: text("title").notNull().default("Untitled Video"), // The title of the video
     description: text("description"), // The description of the video
     visibility: visibilityEnum("visibility").default("private").notNull(), // The visibility of the video
@@ -77,6 +81,7 @@ export const videos = pgTable(
   (table) => [
     index("video_orgId_idx").on(table.orgId),
     index("video_status_idx").on(table.status),
+    index("video_folderId_idx").on(table.folderId),
   ],
 );
 
@@ -114,6 +119,10 @@ export const videosRelations = relations(videos, ({ one, many }) => ({
   uploader: one(user, {
     fields: [videos.uploaderId],
     references: [user.id],
+  }),
+  folder: one(folders, {
+    fields: [videos.folderId],
+    references: [folders.id],
   }),
   assets: many(assets),
 
