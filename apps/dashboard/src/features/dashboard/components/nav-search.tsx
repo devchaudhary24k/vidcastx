@@ -21,10 +21,7 @@ export function NavSearch({ onClick }: { onClick: () => void }) {
         <SidebarMenuButton
           tooltip="Search"
           onClick={onClick}
-          className={cn(
-            "text-muted-foreground pr-2",
-            isCollapsed && "justify-center",
-          )}
+          className={cn("text-muted-foreground")}
         >
           <Search className="size-4" />
           {!isCollapsed && (
