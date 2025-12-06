@@ -4,6 +4,7 @@ import AwsS3 from "@uppy/aws-s3";
 import Uppy from "@uppy/core";
 
 export const useVideoUpload = () => {
+  const [isUploading, setIsUploading] = useState(false);
   const [uppy] = useState(
     () =>
       new Uppy({
@@ -15,11 +16,20 @@ export const useVideoUpload = () => {
       }),
   );
 
-  const startUploadProcess = async (file: File) => {
+  const startUploadProcess = async (
+    file: File,
+    metadata: {
+      title: string;
+      description?: string;
+      visibility: string;
+    },
+  ) => {
+    setIsUploading(true);
     try {
       const { data: draftResponse } = await client.api.v1.videos.post({
-        filename: "",
-        description: "",
+        filename: metadata.title,
+        description: metadata.description || "",
+        // visibility: metadata.visibility as "public" | "private" | "unlisted",
         contentType: file.type,
       });
 
@@ -91,7 +101,9 @@ export const useVideoUpload = () => {
       });
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsUploading(false);
     }
   };
-  return { uppy, startUploadProcess };
+  return { uppy, startUploadProcess, isUploading };
 };

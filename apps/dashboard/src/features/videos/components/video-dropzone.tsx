@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CloudUpload, X } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@workspace/ui/components/button";
@@ -16,17 +16,15 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
 
-import {
-  ACCEPTED_VIDEO_TYPES,
-  MAX_FILE_SIZE,
-  VideoUploadFormValues,
-} from "../schemas";
+import type { VideoUploadFormValues } from "../schemas";
+import { ACCEPTED_VIDEO_TYPES, MAX_FILE_SIZE } from "../schemas";
 
 interface VideoDropzoneProps {
   form: UseFormReturn<VideoUploadFormValues>;
   previewUrl: string | null;
   setPreviewUrl: (url: string | null) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
+  onFileSelect?: (file: File) => void;
 }
 
 export function VideoDropzone({
@@ -34,6 +32,7 @@ export function VideoDropzone({
   previewUrl,
   setPreviewUrl,
   fileInputRef,
+  onFileSelect,
 }: VideoDropzoneProps) {
   const [isDragging, setIsDragging] = React.useState(false);
 
@@ -55,6 +54,10 @@ export function VideoDropzone({
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
     form.setValue("file", dataTransfer.files);
+
+    if (onFileSelect) {
+      onFileSelect(file);
+    }
   };
 
   const onDragOver = (e: React.DragEvent) => {
