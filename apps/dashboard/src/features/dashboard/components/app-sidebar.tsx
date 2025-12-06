@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRef, useState } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
+import { useState } from "react";
 import {
   BarChart2,
   Clapperboard,
@@ -12,7 +10,6 @@ import {
   Folder,
   LayoutDashboard,
   Library,
-  LifeBuoy,
   Link2,
   Users,
 } from "lucide-react";
@@ -22,7 +19,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarTrigger,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
 import { cn } from "@workspace/ui/lib/utils";
@@ -31,35 +27,9 @@ import type { SidebarData } from "./types";
 import { CommandMenu } from "./command-menu";
 import { Logo } from "./logo";
 import { NavMain } from "./nav-main";
-import { NotificationsPopover } from "./nav-notifications";
 import { NavSearch } from "./nav-search";
-import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
-
-const sampleNotifications = [
-  {
-    id: "1",
-    avatar: "/avatars/01.png",
-    fallback: "OM",
-    text: "New order received.",
-    time: "10m ago",
-  },
-  {
-    id: "2",
-    avatar: "/avatars/02.png",
-    fallback: "JL",
-    text: "Server upgrade completed.",
-    time: "1h ago",
-  },
-  {
-    id: "3",
-    avatar: "/avatars/03.png",
-    fallback: "HH",
-    text: "New user signed up.",
-    time: "2h ago",
-  },
-];
 
 const teams = [
   { id: "1", name: "VidcastX", logo: Logo, plan: "Enterprise" },
@@ -204,17 +174,8 @@ const data: SidebarData = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const headerRef = useRef<HTMLDivElement>(null);
 
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
-
-  useGSAP(() => {
-    gsap.fromTo(
-      headerRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.8 },
-    );
-  }, [isCollapsed]);
 
   return (
     <>
@@ -228,22 +189,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           )}
         >
           <TeamSwitcher teams={teams} />
-
-          <div
-            ref={headerRef}
-            className={cn(
-              "flex items-center gap-2",
-              isCollapsed
-                ? "flex-row md:flex-col-reverse md:items-start"
-                : "flex-row",
-            )}
-          >
-            <NotificationsPopover
-              notifications={sampleNotifications}
-              className="size-8 rounded-full"
-            />
-            <SidebarTrigger className="size-8" />
-          </div>
         </SidebarHeader>
         <SidebarContent className="gap-4 px-2 py-4">
           <NavSearch onClick={() => setCommandMenuOpen(true)} />
