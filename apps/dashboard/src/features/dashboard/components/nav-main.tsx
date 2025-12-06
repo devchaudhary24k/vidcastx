@@ -1,8 +1,9 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import {
@@ -40,8 +41,24 @@ export function NavMain({
   label?: string;
 }) {
   const { state } = useSidebar();
+  const pathname = usePathname();
   const isCollapsed = state === "collapsed";
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
+
+  useEffect(() => {
+    const activeItem = items.find(
+      (item) =>
+        item.items?.some(
+          (sub) => pathname === sub.url || pathname.startsWith(`${sub.url}/`),
+        ) ||
+        pathname === item.url ||
+        (pathname.startsWith(`${item.url}/`) && item.url !== "/dashboard"),
+    );
+
+    if (activeItem) {
+      setOpenCollapsible(activeItem.title);
+    }
+  }, [pathname, items]);
 
   return (
     <SidebarMenu>
@@ -53,6 +70,10 @@ export function NavMain({
       {items.map((item) => {
         const isOpen = !isCollapsed && openCollapsible === item.title;
         const hasSubRoutes = !!item.items?.length;
+        const isActive =
+          !hasSubRoutes &&
+          (pathname === item.url ||
+            (pathname.startsWith(`${item.url}/`) && item.url !== "/dashboard"));
 
         return (
           <SidebarMenuItem key={item.title}>
@@ -67,11 +88,9 @@ export function NavMain({
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
                     tooltip={item.title}
+                    isActive={isOpen}
                     className={cn(
                       "flex w-full items-center rounded-lg px-2 transition-colors",
-                      isOpen
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                       isCollapsed && "justify-center",
                     )}
                   >
@@ -96,27 +115,35 @@ export function NavMain({
                 {!isCollapsed && (
                   <CollapsibleContent>
                     <SidebarMenuSub className="my-1 ml-3.5">
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <Link
-                              href={subItem.url}
-                              className={cn(
-                                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-md px-4 py-1.5 text-sm font-medium",
-                                subItem.disabled &&
-                                  "pointer-events-none opacity-50",
-                              )}
+                      {item.items?.map((subItem) => {
+                        const isSubActive =
+                          pathname === subItem.url ||
+                          pathname.startsWith(`${subItem.url}/`);
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={isSubActive}
                             >
-                              <span>{subItem.title}</span>
-                              {subItem.badge && (
-                                <span className="text-muted-foreground ml-auto text-xs">
-                                  {subItem.badge}
-                                </span>
-                              )}
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                              <Link
+                                href={subItem.url}
+                                className={cn(
+                                  "flex items-center rounded-md px-4 py-1.5 text-sm font-medium",
+                                  subItem.disabled &&
+                                    "pointer-events-none opacity-50",
+                                )}
+                              >
+                                <span>{subItem.title}</span>
+                                {subItem.badge && (
+                                  <span className="text-muted-foreground ml-auto text-xs">
+                                    {subItem.badge}
+                                  </span>
+                                )}
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 )}
@@ -125,7 +152,7 @@ export function NavMain({
               <SidebarMenuButton
                 tooltip={item.title}
                 asChild
-                isActive={item.isActive}
+                isActive={isActive}
                 className={cn(
                   "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-lg px-2 transition-colors",
                   isCollapsed && "justify-center",

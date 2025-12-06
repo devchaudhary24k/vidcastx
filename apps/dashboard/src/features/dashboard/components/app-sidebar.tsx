@@ -46,27 +46,27 @@ const data: SidebarData = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboard,
       isActive: true,
     },
     {
       title: "Projects",
-      url: "#",
+      url: "/dashboard/projects",
       icon: Folder,
     },
     {
       title: "Studio",
-      url: "#",
+      url: "/dashboard/studio",
       icon: Clapperboard,
       items: [
         {
           title: "Create New",
-          url: "#",
+          url: "/dashboard/studio/new",
         },
         {
           title: "Video Editor",
-          url: "#",
+          url: "/dashboard/studio/editor",
           disabled: true,
           badge: "Soon",
         },
@@ -74,35 +74,35 @@ const data: SidebarData = {
     },
     {
       title: "Assets",
-      url: "#",
+      url: "/dashboard/assets",
       icon: Library,
       items: [
         {
           title: "Media Library",
-          url: "#",
+          url: "/dashboard/assets",
         },
         {
           title: "Exports",
-          url: "#",
+          url: "/dashboard/assets/exports",
         },
         {
           title: "Trash",
-          url: "#",
+          url: "/dashboard/assets/trash",
         },
       ],
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/dashboard/analytics",
       icon: BarChart2,
       items: [
         {
           title: "Overview",
-          url: "#",
+          url: "/dashboard/analytics",
         },
         {
           title: "Content Reports",
-          url: "#",
+          url: "/dashboard/analytics/reports",
         },
       ],
     },
@@ -110,61 +110,61 @@ const data: SidebarData = {
   navAdmin: [
     {
       title: "Team",
-      url: "#",
+      url: "/dashboard/team",
       icon: Users,
       items: [
         {
           title: "Members",
-          url: "#",
+          url: "/dashboard/team/members",
         },
         {
           title: "Roles & Permissions",
-          url: "#",
+          url: "/dashboard/team/roles",
         },
       ],
     },
     {
       title: "Integrations",
-      url: "#",
+      url: "/dashboard/integrations",
       icon: Link2,
       items: [
         {
           title: "Connected Apps",
-          url: "#",
+          url: "/dashboard/integrations/apps",
         },
         {
           title: "Webhooks",
-          url: "#",
+          url: "/dashboard/integrations/webhooks",
         },
       ],
     },
     {
       title: "Billing",
-      url: "#",
+      url: "/dashboard/billing",
       icon: CreditCard,
       items: [
         {
           title: "Subscription",
-          url: "#",
+          url: "/dashboard/billing/subscription",
         },
         {
           title: "Invoices",
-          url: "#",
+          url: "/dashboard/billing/invoices",
         },
       ],
     },
     {
       title: "Developers",
-      url: "#",
+      url: "/dashboard/developers",
       icon: Code,
       items: [
         {
           title: "API Keys",
-          url: "#",
+          url: "/dashboard/developers/api-keys",
         },
         {
           title: "Documentation",
-          url: "#",
+          url: "/dashboard/developers/docs",
         },
       ],
     },
