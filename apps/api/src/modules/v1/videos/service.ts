@@ -60,7 +60,7 @@ export class VideoService {
       contentType,
     );
 
-    return { uploadId, key: video.masterAccessUrl };
+    return { uploadId, key: video.masterAccessUrl! };
   }
 
   /**

@@ -61,7 +61,7 @@ export const videoController = new Elysia({ prefix: "/videos" })
             return { status: "deleted", id: video.id };
           }) // Soft delete a video (moves to trash).
           .post("/:id/restore", ({ params: { id } }) => `Video ${id}`) // Restore a video from trash.
-          .group("/multipart", (uploadScope) =>
+          .group("/:id/multipart", (uploadScope) =>
             uploadScope
               .post(
                 "/init",

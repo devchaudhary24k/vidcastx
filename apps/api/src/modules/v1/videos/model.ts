@@ -21,7 +21,7 @@ export const VideoModel = {
   // 3. Create Draft
   create: z.object({
     title: z.string().min(3).max(100).optional(),
-    folderId: nanoIdValidation,
+    folderId: nanoIdValidation.optional(),
     filename: z.string().min(1),
     contentType: z.string().regex(/^video\//, "Must be a video file"),
     description: z.string().optional(),
