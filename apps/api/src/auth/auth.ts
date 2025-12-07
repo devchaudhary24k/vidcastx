@@ -5,7 +5,11 @@ import { customSession, openAPI, organization } from "better-auth/plugins";
 
 import { eq } from "@workspace/database";
 import { db } from "@workspace/database/client";
-import { member } from "@workspace/database/schema/auth-schema";
+import {
+  member,
+  session as sessionTable,
+  user as userTable,
+} from "@workspace/database/schema/auth-schema";
 import { redis } from "@workspace/redis";
 
 export const auth = betterAuth({
@@ -89,10 +93,22 @@ export const auth = betterAuth({
 
     deleteUser: {
       enabled: true,
-      beforeDelete: async () => {
-        //   TODO: Set user delete time in database to +30 days
-        // await db.update(user).set({});
+      beforeDelete: async (user) => {
+        const scheduledDate = new Date();
+        scheduledDate.setDate(scheduledDate.getDate() + 30);
 
+        // Schedule Delete Date
+        await db
+          .update(userTable)
+          .set({
+            deletedAt: scheduledDate,
+          })
+          .where(eq(userTable.id, user.id));
+
+        // Delete All User Sessions
+        await db.delete(sessionTable).where(eq(sessionTable.userId, user.id));
+
+        // Stop the actual hard delete
         throw new APIError("OK", {
           message: "Account scheduled for deletion in 30 days.",
         });
@@ -111,6 +127,28 @@ export const auth = betterAuth({
     level: "warn",
     log: (level, message, ...args) => {
       console.log(`[${level}] ${message}`, ...args);
+    },
+  },
+
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const [userData] = await db
+            .select()
+            .from(userTable)
+            .where(eq(userTable.id, session.userId))
+            .limit(1);
+
+          if (userData.deletedAt) {
+            throw new APIError("FORBIDDEN", {
+              message: "Account is disabled or scheduled for deletion",
+            });
+          }
+
+          return { data: session };
+        },
+      },
     },
   },
 
