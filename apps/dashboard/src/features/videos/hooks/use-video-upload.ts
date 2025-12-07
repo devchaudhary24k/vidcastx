@@ -41,6 +41,7 @@ export const useVideoUpload = () => {
       if (existingPlugin) uppy.removePlugin(existingPlugin);
 
       uppy.use(AwsS3, {
+        id: "AwsS3",
         shouldUseMultipart: true,
         limit: 4,
 
@@ -99,6 +100,26 @@ export const useVideoUpload = () => {
           return [];
         },
       });
+
+      // Clear any previous files to avoid duplicates
+      uppy.cancelAll();
+
+      // 1. Add the file to Uppy's queue
+      uppy.addFile({
+        name: file.name,
+        type: file.type,
+        data: file,
+      });
+
+      // 2. Now call upload. Uppy sees the file and starts the S3 process.
+      const result = await uppy.upload();
+
+      if (result.failed.length > 0) {
+        throw new Error("Upload failed");
+      }
+
+      console.log("Upload Success!");
+      return videoId;
     } catch (err) {
       console.error(err);
     } finally {
