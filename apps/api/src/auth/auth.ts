@@ -159,6 +159,7 @@ const authOptions = {
       },
       organizationHooks: {
         beforeDeleteOrganization: async () => {
+          // TODO: Soft Delete Organization Here
           throw new APIError("OK", {
             message: "Organization scheduled for deletion in 30 days.",
           });
