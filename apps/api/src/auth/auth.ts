@@ -1,9 +1,11 @@
 import { env } from "@server/env";
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI, organization } from "better-auth/plugins";
+import { customSession, openAPI, organization } from "better-auth/plugins";
 
+import { eq } from "@workspace/database";
 import { db } from "@workspace/database/client";
+import { member } from "@workspace/database/schema/auth-schema";
 import { redis } from "@workspace/redis";
 
 export const auth = betterAuth({
@@ -137,6 +139,22 @@ export const auth = betterAuth({
           });
         },
       },
+    }),
+
+    customSession(async ({ user, session }) => {
+      const [membership] = await db
+        .select({ id: member.id })
+        .from(member)
+        .where(eq(member.userId, user.id))
+        .limit(1);
+
+      return {
+        user: {
+          ...user,
+          hasOrganization: !!membership,
+        },
+        session,
+      };
     }),
   ],
 });
