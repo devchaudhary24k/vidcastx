@@ -189,6 +189,35 @@ const authOptions = {
             },
           };
         },
+
+        after: async (session) => {
+          const typedSession = session as typeof session & {
+            activeOrganizationId?: string | null;
+          };
+
+          if (typedSession.activeOrganizationId) {
+            const [user] = await db
+              .select({
+                lastActiveOrganizationId: userTable.lastActiveOrganizationId,
+              })
+              .from(userTable)
+              .where(eq(userTable.id, session.userId))
+              .limit(1);
+
+            if (
+              user &&
+              user.lastActiveOrganizationId !==
+                typedSession.activeOrganizationId
+            ) {
+              await db
+                .update(userTable)
+                .set({
+                  lastActiveOrganizationId: typedSession.activeOrganizationId,
+                })
+                .where(eq(userTable.id, session.userId));
+            }
+          }
+        },
       },
 
       update: {
