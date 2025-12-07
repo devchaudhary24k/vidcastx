@@ -26,10 +26,10 @@ export const s3Client = new S3Client({
     accessKeyId: env.S3_ACCESS_KEY_ID!,
     secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
   },
-  forcePathStyle: env.S3_FORCE_PATH_STYLE === true,
+  forcePathStyle: env.S3_FORCE_PATH_STYLE,
 });
 
-export const BUCKET_NAME = env.S3_BUCKET_NAME!;
+export const BUCKET_NAME = env.S3_BUCKET_NAME;
 
 /**
  * Helper to generate a presigned URL for a given command.
