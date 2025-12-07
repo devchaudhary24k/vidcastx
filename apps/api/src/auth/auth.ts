@@ -4,10 +4,11 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession, openAPI, organization } from "better-auth/plugins";
 
-import { eq } from "@workspace/database";
+import { and, eq, isNull } from "@workspace/database";
 import { db } from "@workspace/database/client";
 import {
   member,
+  member as memberTable,
   organization as organizationTable,
   session as sessionTable,
   user as userTable,
@@ -79,6 +80,16 @@ const authOptions = {
       firstName: { type: "string", required: false },
       lastName: { type: "string", required: false },
       deletedAt: { type: "date", required: false, input: false },
+      lastActiveOrganizationId: {
+        type: "string",
+        required: false,
+        input: false,
+        references: {
+          model: "organization",
+          field: "id",
+          onDelete: "set null",
+        },
+      },
     },
 
     deleteUser: {
@@ -106,20 +117,6 @@ const authOptions = {
     },
   },
 
-  session: {
-    storeSessionInDatabase: true,
-    preserveSessionInDatabase: true,
-  },
-
-  logger: {
-    disabled: true,
-    disableColors: false,
-    level: "warn",
-    log: (level, message, ...args) => {
-      console.log(`[${level}] ${message}`, ...args);
-    },
-  },
-
   databaseHooks: {
     session: {
       create: {
@@ -136,31 +133,61 @@ const authOptions = {
             });
           }
 
-          const typedSession = session as typeof session & {
-            activeOrganizationId?: string;
-          };
+          let activeOrganizationId = userData.lastActiveOrganizationId;
 
-          if (typedSession.activeOrganizationId) {
-            const [orgData] = await db
-              .select()
+          // Check if the last active organization is valid and not deleted
+          if (activeOrganizationId) {
+            const [isValidOrg] = await db
+              .select({ id: organizationTable.id })
               .from(organizationTable)
               .where(
-                eq(organizationTable.id, typedSession.activeOrganizationId),
+                and(
+                  eq(organizationTable.id, activeOrganizationId),
+                  isNull(organizationTable.deletedAt),
+                ),
               )
               .limit(1);
 
-            // If organization is soft-deleted, remove it from the session being created
-            if (orgData.deletedAt) {
-              return {
-                data: {
-                  ...session,
-                  activeOrganizationId: null,
-                },
-              };
+            if (!isValidOrg) {
+              activeOrganizationId = null;
             }
           }
 
-          return { data: session };
+          // If no active organization found (or it was deleted), find a fallback
+          if (!activeOrganizationId) {
+            const [fallbackOrganization] = await db
+              .select({ id: organizationTable.id })
+              .from(organizationTable)
+              .innerJoin(
+                memberTable,
+                eq(memberTable.organizationId, organizationTable.id),
+              )
+              .where(
+                and(
+                  eq(memberTable.userId, session.userId),
+                  isNull(organizationTable.deletedAt),
+                ),
+              )
+              .orderBy(organizationTable.createdAt)
+              .limit(1);
+
+            if (!fallbackOrganization) {
+              // Throw error if no valid organization is available
+              throw new APIError("FORBIDDEN", {
+                message:
+                  "No Active Organization, Please create new organization",
+              });
+            }
+
+            activeOrganizationId = fallbackOrganization.id;
+          }
+
+          return {
+            data: {
+              ...session,
+              activeOrganizationId,
+            },
+          };
         },
       },
 
@@ -204,6 +231,20 @@ const authOptions = {
           return { data: session };
         },
       },
+    },
+  },
+
+  session: {
+    storeSessionInDatabase: true,
+    preserveSessionInDatabase: true,
+  },
+
+  logger: {
+    disabled: true,
+    disableColors: false,
+    level: "warn",
+    log: (level, message, ...args) => {
+      console.log(`[${level}] ${message}`, ...args);
     },
   },
 
@@ -254,3 +295,8 @@ export const auth = betterAuth({
     }, authOptions),
   ],
 });
+
+// DONE: Setup a field in user table of last active organization.
+// TODO: When session update -> before you check if current org is deleted or not
+// TODO: When session update -> after you update the current org in user last used org field
+// TODO: When session create -> before you check if user table have last used org -> check if it is deleted or not -> fall back to first org in database -> after session create you set this new organization in last used
