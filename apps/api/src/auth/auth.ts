@@ -8,6 +8,7 @@ import { eq } from "@workspace/database";
 import { db } from "@workspace/database/client";
 import {
   member,
+  organization as organizationTable,
   session as sessionTable,
   user as userTable,
 } from "@workspace/database/schema/auth-schema";
@@ -135,12 +136,73 @@ const authOptions = {
             });
           }
 
+          const typedSession = session as typeof session & {
+            activeOrganizationId?: string;
+          };
+
+          if (typedSession.activeOrganizationId) {
+            const [orgData] = await db
+              .select()
+              .from(organizationTable)
+              .where(
+                eq(organizationTable.id, typedSession.activeOrganizationId),
+              )
+              .limit(1);
+
+            // If organization is soft-deleted, remove it from the session being created
+            if (orgData.deletedAt) {
+              return {
+                data: {
+                  ...session,
+                  activeOrganizationId: null,
+                },
+              };
+            }
+          }
+
           return { data: session };
         },
       },
 
       update: {
-        before: async () => {},
+        before: async (session, ctx) => {
+          const typedSession = session as typeof session & {
+            activeOrganizationId?: string | null;
+          };
+
+          if (typedSession.activeOrganizationId) {
+            const [orgData] = await db
+              .select()
+              .from(organizationTable)
+              .where(
+                eq(organizationTable.id, typedSession.activeOrganizationId),
+              )
+              .limit(1);
+
+            if (orgData && orgData.deletedAt) {
+              throw new APIError("FORBIDDEN", {
+                message:
+                  "Cannot switch to an organization scheduled for deletion",
+              });
+            }
+          }
+
+          if (ctx?.context.session) {
+            const [userData] = await db
+              .select()
+              .from(userTable)
+              .where(eq(userTable.id, ctx.context.session.user.id))
+              .limit(1);
+
+            if (userData && userData.deletedAt) {
+              throw new APIError("FORBIDDEN", {
+                message: "Account disabled",
+              });
+            }
+          }
+
+          return { data: session };
+        },
       },
     },
   },
