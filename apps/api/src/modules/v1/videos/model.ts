@@ -1,15 +1,10 @@
 import { z } from "zod";
 
 // Default NanoID is 21 characters
-const nanoIdValidation = z
-  .string()
-  .length(21, "ID must be a valid NanoID (21 chars)")
-  .regex(/^[A-Za-z0-9_-]+$/, "ID contains invalid characters");
-
 export const VideoModel = {
   // 1. Common Params (Client sends ID in URL)
   params: z.object({
-    id: nanoIdValidation,
+    id: z.string(),
   }),
 
   // 2. Pagination Query
@@ -21,7 +16,7 @@ export const VideoModel = {
   // 3. Create Draft
   create: z.object({
     title: z.string().min(3).max(100).optional(),
-    folderId: nanoIdValidation.optional(),
+    folderId: z.string().optional(),
     filename: z.string().min(1),
     contentType: z.string().regex(/^video\//, "Must be a video file"),
     description: z.string().optional(),
