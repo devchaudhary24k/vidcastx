@@ -221,21 +221,21 @@ const authOptions = {
       },
 
       update: {
-        before: async (session, ctx) => {
-          const typedSession = session as typeof session & {
+        before: async (updates, ctx) => {
+          const typedUpdates = updates as typeof updates & {
             activeOrganizationId?: string | null;
           };
 
-          if (typedSession.activeOrganizationId) {
+          if (typedUpdates.activeOrganizationId) {
             const [orgData] = await db
-              .select()
+              .select({ deletedAt: organizationTable.deletedAt })
               .from(organizationTable)
               .where(
-                eq(organizationTable.id, typedSession.activeOrganizationId),
+                eq(organizationTable.id, typedUpdates.activeOrganizationId),
               )
               .limit(1);
 
-            if (orgData && orgData.deletedAt) {
+            if (orgData?.deletedAt) {
               throw new APIError("FORBIDDEN", {
                 message:
                   "Cannot switch to an organization scheduled for deletion",
@@ -243,21 +243,35 @@ const authOptions = {
             }
           }
 
-          if (ctx?.context.session) {
+          if (ctx?.context?.session?.user.id) {
             const [userData] = await db
-              .select()
+              .select({ deletedAt: userTable.deletedAt })
               .from(userTable)
               .where(eq(userTable.id, ctx.context.session.user.id))
               .limit(1);
 
-            if (userData && userData.deletedAt) {
+            if (userData?.deletedAt) {
               throw new APIError("FORBIDDEN", {
                 message: "Account disabled",
               });
             }
           }
 
-          return { data: session };
+          return { data: updates };
+        },
+        after: async (session) => {
+          const typedSession = session as typeof session & {
+            activeOrganizationId?: string | null;
+          };
+
+          if (typedSession.activeOrganizationId) {
+            await db
+              .update(userTable)
+              .set({
+                lastActiveOrganizationId: typedSession.activeOrganizationId,
+              })
+              .where(eq(userTable.id, session.userId));
+          }
         },
       },
     },
@@ -324,8 +338,3 @@ export const auth = betterAuth({
     }, authOptions),
   ],
 });
-
-// DONE: Setup a field in user table of last active organization.
-// TODO: When session update -> before you check if current org is deleted or not
-// TODO: When session update -> after you update the current org in user last used org field
-// TODO: When session create -> before you check if user table have last used org -> check if it is deleted or not -> fall back to first org in database -> after session create you set this new organization in last used
