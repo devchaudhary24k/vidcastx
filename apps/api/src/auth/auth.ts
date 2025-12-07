@@ -1,3 +1,4 @@
+import type { BetterAuthOptions } from "better-auth";
 import { env } from "@server/env";
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -12,7 +13,7 @@ import {
 } from "@workspace/database/schema/auth-schema";
 import { redis } from "@workspace/redis";
 
-export const auth = betterAuth({
+const authOptions = {
   appName: "VidcastX",
 
   database: drizzleAdapter(db, {
@@ -74,21 +75,9 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      firstName: {
-        type: "string",
-        required: false,
-      },
-
-      lastName: {
-        type: "string",
-        required: false,
-      },
-
-      deletedAt: {
-        type: "date",
-        required: false,
-        input: false,
-      },
+      firstName: { type: "string", required: false },
+      lastName: { type: "string", required: false },
+      deletedAt: { type: "date", required: false, input: false },
     },
 
     deleteUser: {
@@ -142,42 +131,48 @@ export const auth = betterAuth({
 
           if (userData.deletedAt) {
             throw new APIError("FORBIDDEN", {
-              message: "Account is disabled or scheduled for deletion",
+              message: "Account disabled or scheduled for deletion",
             });
           }
 
           return { data: session };
         },
       },
+
+      update: {
+        before: async () => {},
+      },
     },
   },
 
   trustedOrigins: ["http://localhost:3000"],
+
   plugins: [
     openAPI(),
     organization({
       schema: {
         organization: {
           additionalFields: {
-            deletedAt: {
-              type: "date",
-              required: false,
-              input: false,
-            },
+            deletedAt: { type: "date", required: false, input: false },
           },
         },
       },
-
       organizationHooks: {
-        beforeDeleteOrganization: async (ctx) => {
-          //   TODO: Set user delete time in database to +30 days
-
+        beforeDeleteOrganization: async () => {
           throw new APIError("OK", {
             message: "Organization scheduled for deletion in 30 days.",
           });
         },
       },
     }),
+  ],
+} satisfies BetterAuthOptions;
+
+export const auth = betterAuth({
+  ...authOptions,
+
+  plugins: [
+    ...(authOptions.plugins ?? []),
 
     customSession(async ({ user, session }) => {
       const [membership] = await db
@@ -193,6 +188,6 @@ export const auth = betterAuth({
         },
         session,
       };
-    }),
+    }, authOptions),
   ],
 });
