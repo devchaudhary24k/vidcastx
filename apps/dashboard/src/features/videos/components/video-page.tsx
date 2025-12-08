@@ -4,8 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { LayoutGrid, List as ListIcon, Plus, Search } from "lucide-react";
 
-import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
+import { Button } from "@vidcastx/ui/components/button";
+import { Input } from "@vidcastx/ui/components/input";
 
 export function VideoList() {
   const [view, setView] = React.useState<"grid" | "list">("grid");

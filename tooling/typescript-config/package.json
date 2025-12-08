@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/typescript-config",
+  "name": "@vidcastx/typescript-config",
   "exports": {
     "./base.json": "./base.json",
     "./nextjs.json": "./nextjs.json",

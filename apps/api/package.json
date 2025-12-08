@@ -19,20 +19,20 @@
     "@elysiajs/opentelemetry": "^1.4.8",
     "@elysiajs/server-timing": "^1.4.0",
     "@t3-oss/env-core": "^0.13.8",
-    "@workspace/database": "workspace:*",
-    "@workspace/redis": "workspace:^",
-    "@workspace/storage": "workspace:^",
+    "@vidcastx/database": "workspace:*",
+    "@vidcastx/redis": "workspace:^",
+    "@vidcastx/storage": "workspace:^",
     "better-auth": "^1.4.5",
     "elysia": "latest",
     "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@workspace/eslint-config": "workspace:*",
+    "@vidcastx/eslint-config": "workspace:*",
     "bun-types": "latest",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1"
   },
-  "prettier": "@workspace/prettier",
+  "prettier": "@vidcastx/prettier",
   "module": "src/index.js"
 }

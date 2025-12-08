@@ -23,9 +23,9 @@
     "@tanstack/react-query-devtools": "^5.91.1",
     "@uppy/aws-s3": "^5.1.0",
     "@uppy/core": "^5.2.0",
-    "@workspace/database": "workspace:^",
-    "@workspace/seo": "workspace:^",
-    "@workspace/ui": "workspace:*",
+    "@vidcastx/database": "workspace:^",
+    "@vidcastx/seo": "workspace:^",
+    "@vidcastx/ui": "workspace:*",
     "better-auth": "^1.4.5",
     "date-fns": "^4.1.0",
     "gsap": "^3.13.0",
@@ -42,9 +42,9 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
     "babel-plugin-react-compiler": "1.0.0",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1",
@@ -52,5 +52,5 @@
     "tailwindcss": "^4.1.17",
     "typescript": "5.9.3"
   },
-  "prettier": "@workspace/prettier"
+  "prettier": "@vidcastx/prettier"
 }

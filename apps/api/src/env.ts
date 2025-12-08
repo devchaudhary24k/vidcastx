@@ -1,8 +1,8 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
-import { env as databaseEnv, env as storageEnv } from "@workspace/database/env";
-import { env as redisEnv } from "@workspace/redis/env";
+import { env as databaseEnv, env as storageEnv } from "@vidcastx/database/env";
+import { env as redisEnv } from "@vidcastx/redis/env";
 
 export const env = createEnv({
   extends: [databaseEnv, redisEnv, storageEnv],

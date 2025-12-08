@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/prettier",
+  "name": "@vidcastx/prettier",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
-    "@workspace/typescript-config": "workspace:*"
+    "@vidcastx/typescript-config": "workspace:*"
   },
-  "prettier": "@workspace/prettier"
+  "prettier": "@vidcastx/prettier"
 }

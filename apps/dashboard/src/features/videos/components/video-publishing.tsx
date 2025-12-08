@@ -4,15 +4,15 @@ import { format } from "date-fns";
 import { CalendarIcon, Globe, Lock, Upload } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
-import { Button } from "@workspace/ui/components/button";
-import { Calendar } from "@workspace/ui/components/calendar";
+import { Button } from "@vidcastx/ui/components/button";
+import { Calendar } from "@vidcastx/ui/components/calendar";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card";
+} from "@vidcastx/ui/components/card";
 import {
   FormControl,
   FormDescription,
@@ -20,20 +20,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@workspace/ui/components/form";
+} from "@vidcastx/ui/components/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@workspace/ui/components/popover";
+} from "@vidcastx/ui/components/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@workspace/ui/components/select";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/select";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 import { VideoUploadFormValues } from "../schemas";
 

@@ -6,8 +6,8 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@workspace/ui/components/avatar";
-import { Button } from "@workspace/ui/components/button";
+} from "@vidcastx/ui/components/avatar";
+import { Button } from "@vidcastx/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,8 +15,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/dropdown-menu";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 type Notification = {
   id: string;

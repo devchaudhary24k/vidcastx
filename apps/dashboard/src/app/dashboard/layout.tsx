@@ -1,9 +1,6 @@
 import { AppSidebar, Header } from "@dashboard/features/dashboard";
 
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@workspace/ui/components/sidebar";
+import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
 
 export default function DashboardLayout({
   children,

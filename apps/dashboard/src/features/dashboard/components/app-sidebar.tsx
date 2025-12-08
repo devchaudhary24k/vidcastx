@@ -20,8 +20,8 @@ import {
   SidebarFooter,
   SidebarHeader,
   useSidebar,
-} from "@workspace/ui/components/sidebar";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/sidebar";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 import type { SidebarData } from "./types";
 import { CommandMenu } from "./command-menu";

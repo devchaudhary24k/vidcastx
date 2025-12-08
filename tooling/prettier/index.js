@@ -27,7 +27,7 @@ const config = {
     // Type imports from internal workspace packages.
     "<TYPES>^@workspace",
     // Normal internal workspace imports.
-    "^@workspace/(.*)$",
+    "^@vidcastx/(.*)$",
     "",
     // Type imports using local/relative pathing.
     "<TYPES>^[.|..|~]",

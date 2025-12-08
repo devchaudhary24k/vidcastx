@@ -1,19 +1,19 @@
-import { Button } from "@workspace/ui/components/button";
+import { Button } from "@vidcastx/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card";
+} from "@vidcastx/ui/components/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@workspace/ui/components/field";
-import { Input } from "@workspace/ui/components/input";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/field";
+import { Input } from "@vidcastx/ui/components/input";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 export function SignupForm({
   className,

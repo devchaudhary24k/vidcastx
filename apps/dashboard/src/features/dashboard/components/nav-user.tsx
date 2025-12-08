@@ -15,7 +15,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@workspace/ui/components/avatar";
+} from "@vidcastx/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,13 +24,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu";
+} from "@vidcastx/ui/components/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@workspace/ui/components/sidebar";
+} from "@vidcastx/ui/components/sidebar";
 
 export function NavUser({
   user,

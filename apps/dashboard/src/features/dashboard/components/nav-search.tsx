@@ -8,8 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@workspace/ui/components/sidebar";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/sidebar";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 export function NavSearch({ onClick }: { onClick: () => void }) {
   const { state } = useSidebar();

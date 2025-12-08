@@ -5,16 +5,16 @@ import { CloudUpload, X } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { Button } from "@vidcastx/ui/components/button";
+import { Card, CardContent } from "@vidcastx/ui/components/card";
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@workspace/ui/components/form";
-import { Input } from "@workspace/ui/components/input";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/form";
+import { Input } from "@vidcastx/ui/components/input";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 import type { VideoUploadFormValues } from "../schemas";
 import { ACCEPTED_VIDEO_TYPES, MAX_FILE_SIZE } from "../schemas";

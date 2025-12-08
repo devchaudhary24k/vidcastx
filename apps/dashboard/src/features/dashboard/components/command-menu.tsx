@@ -11,7 +11,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@workspace/ui/components/command";
+} from "@vidcastx/ui/components/command";
 
 import type { SearchItem, SidebarData } from "./types";
 

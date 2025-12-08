@@ -9,16 +9,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card";
+} from "@vidcastx/ui/components/card";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@workspace/ui/components/form";
-import { Input } from "@workspace/ui/components/input";
-import { Textarea } from "@workspace/ui/components/textarea";
+} from "@vidcastx/ui/components/form";
+import { Input } from "@vidcastx/ui/components/input";
+import { Textarea } from "@vidcastx/ui/components/textarea";
 
 import { VideoUploadFormValues } from "../schemas";
 

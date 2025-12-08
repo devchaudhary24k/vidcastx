@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/seo",
+  "name": "@vidcastx/seo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,15 +13,15 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore"
   },
-  "prettier": "@workspace/prettier",
+  "prettier": "@vidcastx/prettier",
   "devDependencies": {
     "@types/lodash.merge": "^4.6.9",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
     "eslint": "^9.39.1"
   },
   "dependencies": {

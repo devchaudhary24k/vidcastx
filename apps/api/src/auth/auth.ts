@@ -4,16 +4,16 @@ import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession, openAPI, organization } from "better-auth/plugins";
 
-import { and, eq, isNull } from "@workspace/database";
-import { db } from "@workspace/database/client";
+import { and, eq, isNull } from "@vidcastx/database";
+import { db } from "@vidcastx/database/client";
 import {
   member,
   member as memberTable,
   organization as organizationTable,
   session as sessionTable,
   user as userTable,
-} from "@workspace/database/schema/auth-schema";
-import { redis } from "@workspace/redis";
+} from "@vidcastx/database/schema/auth-schema";
+import { redis } from "@vidcastx/redis";
 
 const authOptions = {
   appName: "VidcastX",

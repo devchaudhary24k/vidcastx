@@ -1,9 +1,9 @@
 {
-  "extends": "@workspace/typescript-config/nextjs.json",
+  "extends": "@vidcastx/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@workspace/database/*": ["./src/*"]
+      "@vidcastx/database/*": ["./src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

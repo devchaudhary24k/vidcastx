@@ -1,12 +1,12 @@
-import { and, eq } from "@workspace/database";
-import { db } from "@workspace/database/client";
-import { videos } from "@workspace/database/schema/video-schema";
-import { generateId } from "@workspace/database/utils/id";
+import { and, eq } from "@vidcastx/database";
+import { db } from "@vidcastx/database/client";
+import { videos } from "@vidcastx/database/schema/video-schema";
+import { generateId } from "@vidcastx/database/utils/id";
 import {
   completeMultipartUpload,
   initMultipartUpload,
   signMultipartPart,
-} from "@workspace/storage";
+} from "@vidcastx/storage";
 
 export class VideoService {
   /**

@@ -5,9 +5,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@workspace/ui/components/breadcrumb";
-import { Separator } from "@workspace/ui/components/separator";
-import { SidebarTrigger } from "@workspace/ui/components/sidebar";
+} from "@vidcastx/ui/components/breadcrumb";
+import { Separator } from "@vidcastx/ui/components/separator";
+import { SidebarTrigger } from "@vidcastx/ui/components/sidebar";
 
 import { NotificationsPopover } from "./nav-notifications";
 

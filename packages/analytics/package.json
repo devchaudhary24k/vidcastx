@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/analytics",
+  "name": "@vidcastx/analytics",
   "private": true,
   "version": "0.0.0",
   "exports": {
@@ -22,9 +22,9 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*"
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*"
   },
   "dependencies": {
     "@next/third-parties": "^16.0.7",
@@ -36,5 +36,5 @@
     "server-only": "^0.0.1",
     "zod": "^4.1.13"
   },
-  "prettier": "@workspace/prettier"
+  "prettier": "@vidcastx/prettier"
 }

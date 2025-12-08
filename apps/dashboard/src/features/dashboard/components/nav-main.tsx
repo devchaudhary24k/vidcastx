@@ -10,7 +10,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@workspace/ui/components/collapsible";
+} from "@vidcastx/ui/components/collapsible";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -19,8 +19,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from "@workspace/ui/components/sidebar";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/sidebar";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 export function NavMain({
   items,

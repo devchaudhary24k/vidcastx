@@ -8,8 +8,8 @@ import { ChevronLeft, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Button } from "@workspace/ui/components/button";
-import { Form } from "@workspace/ui/components/form";
+import { Button } from "@vidcastx/ui/components/button";
+import { Form } from "@vidcastx/ui/components/form";
 
 import type { VideoUploadFormValues } from "../schemas";
 // Import the hook

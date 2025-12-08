@@ -36,7 +36,7 @@
       "groupName": "react monorepo"
     },
     {
-      "matchPackagePatterns": ["^@workspace/", "^@vidcastx/"],
+      "matchPackagePatterns": ["^@vidcastx/", "^@vidcastx/"],
       "enabled": false
     },
     {
