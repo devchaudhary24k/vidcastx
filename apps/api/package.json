@@ -19,6 +19,7 @@
     "@elysiajs/opentelemetry": "^1.4.8",
     "@elysiajs/server-timing": "^1.4.0",
     "@t3-oss/env-core": "^0.13.8",
+    "@vidcastx/auth": "workspace:^",
     "@vidcastx/database": "workspace:*",
     "@vidcastx/redis": "workspace:^",
     "@vidcastx/storage": "workspace:^",

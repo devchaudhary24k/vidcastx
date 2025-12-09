@@ -4,7 +4,8 @@ import { fromTypes, openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
 import { Elysia } from "elysia";
 
-import { auth } from "./auth/auth";
+import { auth } from "@vidcastx/auth";
+
 import v1Router from "./modules/v1";
 
 const server = new Elysia({

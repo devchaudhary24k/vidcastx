@@ -23,6 +23,7 @@
     "@tanstack/react-query-devtools": "^5.91.1",
     "@uppy/aws-s3": "^5.1.0",
     "@uppy/core": "^5.2.0",
+    "@vidcastx/auth": "workspace:^",
     "@vidcastx/database": "workspace:^",
     "@vidcastx/seo": "workspace:^",
     "@vidcastx/ui": "workspace:*",

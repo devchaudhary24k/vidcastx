@@ -1,5 +1,4 @@
 import type { BetterAuthOptions } from "better-auth";
-import { env } from "@server/env";
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { customSession, openAPI, organization } from "better-auth/plugins";
@@ -7,13 +6,14 @@ import { customSession, openAPI, organization } from "better-auth/plugins";
 import { and, eq, isNull } from "@vidcastx/database";
 import { db } from "@vidcastx/database/client";
 import {
-  member,
   member as memberTable,
   organization as organizationTable,
   session as sessionTable,
   user as userTable,
 } from "@vidcastx/database/schema/auth-schema";
 import { redis } from "@vidcastx/redis";
+
+import { env } from "./env";
 
 const authOptions = {
   appName: "VidcastX",
@@ -126,6 +126,12 @@ const authOptions = {
             .from(userTable)
             .where(eq(userTable.id, session.userId))
             .limit(1);
+
+          if (!userData) {
+            throw new APIError("UNAUTHORIZED", {
+              message: "User not found",
+            });
+          }
 
           if (userData.deletedAt) {
             throw new APIError("FORBIDDEN", {
@@ -323,9 +329,9 @@ export const auth = betterAuth({
 
     customSession(async ({ user, session }) => {
       const [membership] = await db
-        .select({ id: member.id })
-        .from(member)
-        .where(eq(member.userId, user.id))
+        .select({ id: memberTable.id })
+        .from(memberTable)
+        .where(eq(memberTable.userId, user.id))
         .limit(1);
 
       return {
