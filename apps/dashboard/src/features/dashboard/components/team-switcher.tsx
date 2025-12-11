@@ -1,7 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
+import { auth } from "@dashboard/lib/auth";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   DropdownMenu,
@@ -20,6 +23,7 @@ import {
 } from "@vidcastx/ui/components/sidebar";
 
 import type { Organization } from "./types";
+import { CreateOrganizationDialog } from "./create-organization-dialog";
 import { Logo } from "./logo";
 
 export function TeamSwitcher({
@@ -30,10 +34,25 @@ export function TeamSwitcher({
   activeOrganizationId: string;
 }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
   const [activeOrganization, setActiveOrganization] = React.useState(
     organizations.find((org) => org.id === activeOrganizationId) ||
       organizations[0],
   );
+
+  const handleSwitchOrganization = async (org: Organization) => {
+    try {
+      await auth.organization.setActive({
+        organizationId: org.id,
+      });
+      setActiveOrganization(org);
+      router.refresh();
+      toast.success(`Switched to ${org.name}`);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to switch organization");
+    }
+  };
 
   if (!activeOrganization) return null;
 
@@ -77,7 +96,7 @@ export function TeamSwitcher({
             {organizations.map((org, index) => (
               <DropdownMenuItem
                 key={org.id}
-                onClick={() => setActiveOrganization(org)}
+                onClick={() => handleSwitchOrganization(org)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
@@ -96,14 +115,19 @@ export function TeamSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="bg-background flex size-6 items-center justify-center rounded-md border">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">
-                Add organization
-              </div>
-            </DropdownMenuItem>
+            <CreateOrganizationDialog>
+              <DropdownMenuItem
+                className="gap-2 p-2"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <div className="bg-background flex size-6 items-center justify-center rounded-md border">
+                  <Plus className="size-4" />
+                </div>
+                <div className="text-muted-foreground font-medium">
+                  Add organization
+                </div>
+              </DropdownMenuItem>
+            </CreateOrganizationDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
