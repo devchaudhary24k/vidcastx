@@ -23,19 +23,12 @@ import {
 } from "@vidcastx/ui/components/sidebar";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import type { SidebarData } from "./types";
+import type { Organization, SidebarData, UserData } from "./types";
 import { CommandMenu } from "./command-menu";
-import { Logo } from "./logo";
 import { NavMain } from "./nav-main";
 import { NavSearch } from "./nav-search";
 import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
-
-const teams = [
-  { id: "1", name: "VidcastX", logo: Logo, plan: "Enterprise" },
-  { id: "2", name: "Pixelact Studios", logo: Logo, plan: "Startup" },
-  { id: "3", name: "Evil Corp.", logo: Logo, plan: "Free" },
-];
 
 const data: SidebarData = {
   user: {
@@ -171,7 +164,16 @@ const data: SidebarData = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  organizations,
+  user,
+  activeOrganizationId,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  organizations: Organization[];
+  user: UserData;
+  activeOrganizationId: string;
+}) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -188,7 +190,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               : "flex-row items-center justify-between",
           )}
         >
-          <TeamSwitcher teams={teams} />
+          <TeamSwitcher
+            organizations={organizations}
+            activeOrganizationId={activeOrganizationId}
+          />
         </SidebarHeader>
         <SidebarContent className="gap-4 px-2 py-4">
           <NavSearch onClick={() => setCommandMenuOpen(true)} />
@@ -196,7 +201,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain label="Organization" items={data.navAdmin} />
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={data.user} />
+          <NavUser user={user} />
         </SidebarFooter>
       </Sidebar>
 

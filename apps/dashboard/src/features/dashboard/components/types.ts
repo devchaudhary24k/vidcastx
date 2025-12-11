@@ -1,4 +1,7 @@
+import type { Organization } from "@vidcastx/auth/types";
 import type { LucideIcon } from "lucide-react";
+
+export type { Organization };
 
 export type UserData = {
   name: string;

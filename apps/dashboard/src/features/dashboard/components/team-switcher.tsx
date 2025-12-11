@@ -19,19 +19,23 @@ import {
   useSidebar,
 } from "@vidcastx/ui/components/sidebar";
 
-type Team = {
-  name: string;
-  logo: React.ElementType;
-  plan: string;
-};
+import type { Organization } from "./types";
+import { Logo } from "./logo";
 
-export function TeamSwitcher({ teams }: { teams: Team[] }) {
+export function TeamSwitcher({
+  organizations,
+  activeOrganizationId,
+}: {
+  organizations: Organization[];
+  activeOrganizationId: string;
+}) {
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const [activeOrganization, setActiveOrganization] = React.useState(
+    organizations.find((org) => org.id === activeOrganizationId) ||
+      organizations[0],
+  );
 
-  if (!activeTeam) return null;
-
-  const Logo = activeTeam.logo;
+  if (!activeOrganization) return null;
 
   return (
     <SidebarMenu>
@@ -43,13 +47,21 @@ export function TeamSwitcher({ teams }: { teams: Team[] }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-background text-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <Logo className="size-4" />
+                {activeOrganization.logo ? (
+                  <img
+                    src={activeOrganization.logo}
+                    alt={activeOrganization.name}
+                    className="size-4"
+                  />
+                ) : (
+                  <Logo className="size-4" />
+                )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeTeam.name}
+                  {activeOrganization.name}
                 </span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate text-xs">Organization</span>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -60,18 +72,26 @@ export function TeamSwitcher({ teams }: { teams: Team[] }) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
+              Organizations
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {organizations.map((org, index) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
+                key={org.id}
+                onClick={() => setActiveOrganization(org)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <team.logo className="size-4 shrink-0" />
+                  {org.logo ? (
+                    <img
+                      src={org.logo}
+                      alt={org.name}
+                      className="size-4 shrink-0"
+                    />
+                  ) : (
+                    <Logo className="size-4 shrink-0" />
+                  )}
                 </div>
-                {team.name}
+                {org.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
@@ -80,7 +100,9 @@ export function TeamSwitcher({ teams }: { teams: Team[] }) {
               <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
+              <div className="text-muted-foreground font-medium">
+                Add organization
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
