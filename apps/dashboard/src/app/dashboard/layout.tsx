@@ -1,4 +1,6 @@
+import { type ReactNode } from "react";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { AppSidebar, Header } from "@dashboard/features/dashboard";
 
 import { auth } from "@vidcastx/auth";
@@ -7,12 +9,20 @@ import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
 export default async function DashboardLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   const h = await headers();
   const sessionData = await auth.api.getSession({
     headers: h,
   });
+
+  if (!sessionData) {
+    redirect("/auth/login");
+  }
+
+  if (!sessionData.user.hasOrganization) {
+    redirect("/onboarding");
+  }
 
   const organizationsList = await auth.api.listOrganizations({
     headers: h,
@@ -21,10 +31,6 @@ export default async function DashboardLayout({
   const filteredOrganizations = organizationsList.filter(
     (org) => org.deletedAt === null,
   );
-
-  if (!sessionData) {
-    return null;
-  }
 
   const activeOrgId = sessionData.session.activeOrganizationId;
 
