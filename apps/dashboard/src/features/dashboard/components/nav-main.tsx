@@ -154,7 +154,7 @@ export function NavMain({
                 asChild
                 isActive={isActive}
                 className={cn(
-                  "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-lg px-2 transition-colors",
+                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-lg px-2 transition-colors",
                   isCollapsed && "justify-center",
                 )}
               >
