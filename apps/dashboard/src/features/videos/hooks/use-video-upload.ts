@@ -1,20 +1,9 @@
 import { useState } from "react";
 import client from "@dashboard/lib/api";
-import AwsS3 from "@uppy/aws-s3";
-import Uppy from "@uppy/core";
+import { uppy } from "@dashboard/lib/uppy-client";
 
 export const useVideoUpload = () => {
-  const [isUploading, setIsUploading] = useState(false);
-  const [uppy] = useState(
-    () =>
-      new Uppy({
-        autoProceed: true,
-        restrictions: {
-          maxNumberOfFiles: 1,
-          allowedFileTypes: ["video/*"],
-        },
-      }),
-  );
+  const [isCreatingDraft, setIsCreatingDraft] = useState(false);
 
   const startUploadProcess = async (
     file: File,
@@ -24,107 +13,40 @@ export const useVideoUpload = () => {
       visibility: string;
     },
   ) => {
-    setIsUploading(true);
+    setIsCreatingDraft(true);
     try {
+      // 1. Create DB Entry
       const { data: draftResponse } = await client.api.v1.videos.post({
         filename: metadata.title,
         description: metadata.description || "",
-        // visibility: metadata.visibility as "public" | "private" | "unlisted",
         contentType: file.type,
       });
 
-      if (!draftResponse || !draftResponse.data)
-        return new Error("Failed API Call");
+      if (!draftResponse || !draftResponse.data) {
+        throw new Error("Failed to create video draft");
+      }
+
       const videoId = draftResponse.data.id;
 
-      const existingPlugin = uppy.getPlugin("AwsS3");
-      if (existingPlugin) uppy.removePlugin(existingPlugin);
-
-      uppy.use(AwsS3, {
-        id: "AwsS3",
-        shouldUseMultipart: true,
-        limit: 4,
-
-        createMultipartUpload: async (file) => {
-          const { data: multipartInit } = await client.api.v1
-            .videos({ id: videoId })
-            .multipart.init.post({
-              contentType: file.type,
-            });
-
-          if (!multipartInit) throw new Error("Failed API Call");
-          return {
-            uploadId: multipartInit.uploadId,
-            key: multipartInit.key,
-          };
-        },
-
-        signPart: async (file, partData) => {
-          const { uploadId, partNumber } = partData;
-
-          const { data: url } = await client.api.v1
-            .videos({ id: videoId })
-            .multipart["sign-part"].get({
-              query: {
-                uploadId,
-                partNumber: partNumber,
-              },
-            });
-
-          if (!url) throw new Error("Failed to sign part");
-          return { url };
-        },
-
-        completeMultipartUpload: async (file, { uploadId, parts }) => {
-          const formattedPart = parts.map((part) => ({
-            PartNumber: part.PartNumber!,
-            ETag: part.ETag!,
-          }));
-
-          const { data } = await client.api.v1
-            .videos({ id: videoId })
-            .multipart.complete.post({
-              uploadId,
-              parts: formattedPart,
-            });
-
-          return { location: "" };
-        },
-
-        abortMultipartUpload: async (file, { uploadId, key }) => {
-          console.log("Abort requested for", uploadId);
-          return;
-        },
-
-        listParts: async (file, { uploadId, key }) => {
-          return [];
-        },
-      });
-
-      // Clear any previous files to avoid duplicates
-      uppy.cancelAll();
-
-      // 1. Add the file to Uppy's queue
+      // 2. Add to Singleton Uppy (Starts automatically due to autoProceed: true)
       uppy.addFile({
         name: file.name,
         type: file.type,
         data: file,
+        meta: {
+          videoId,
+          ...metadata,
+        },
       });
 
-      // 2. Now call upload. Uppy sees the file and starts the S3 process.
-      const result = await uppy.upload();
-
-      if (result.failed.length > 0) {
-        throw new Error("Upload failed");
-      }
-
-      console.log("Upload Success!");
       return videoId;
     } catch (err) {
       console.error(err);
+      throw err;
     } finally {
-      setIsUploading(false);
+      setIsCreatingDraft(false);
     }
   };
-  return { uppy, startUploadProcess, isUploading };
+
+  return { startUploadProcess, isCreatingDraft };
 };

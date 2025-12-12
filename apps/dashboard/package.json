@@ -21,6 +21,7 @@
     "@hugeicons/react": "^1.1.1",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-query-devtools": "^5.91.1",
+    "@tanstack/react-store": "^0.8.0",
     "@uppy/aws-s3": "^5.1.0",
     "@uppy/core": "^5.2.0",
     "@vidcastx/auth": "workspace:^",

@@ -1,5 +1,4 @@
 import { type ReactNode } from "react";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   AppSidebar,
@@ -7,6 +6,7 @@ import {
   getSessionAction,
   Header,
 } from "@dashboard/features/dashboard";
+import { GlobalUploadIndicator } from "@dashboard/features/videos/components/global-upload-indicator";
 import {
   dehydrate,
   HydrationBoundary,
@@ -59,6 +59,7 @@ export default async function DashboardLayout({
         <SidebarInset>
           <Header />
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+          <GlobalUploadIndicator />
         </SidebarInset>
       </SidebarProvider>
     </HydrationBoundary>
