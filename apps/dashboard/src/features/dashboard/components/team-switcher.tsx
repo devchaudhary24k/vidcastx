@@ -36,40 +36,32 @@ export function TeamSwitcher({
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  // 1. Fetch data (Hydrated from server, so it's instant)
   const { data: organizations = [] } = useQuery({
     queryKey: ["organizations"],
     queryFn: getOrganizationsAction,
   });
 
-  // 2. DERIVED STATE (No useState needed)
-  // We calculate the active org based on the ID passed from the Server Layout.
-  // When router.refresh() happens, 'activeOrganizationId' updates, and this recalculates automatically.
   const activeOrganization =
     organizations.find((org) => org.id === activeOrganizationId) ||
     organizations[0];
 
   const handleSwitchOrganization = async (org: Organization) => {
-    // Prevent switching if already active
     if (org.id === activeOrganizationId) return;
 
-    try {
-      await auth.organization.setActive({
-        organizationId: org.id,
-      });
-
-      toast.success(`Switching to ${org.name}...`);
-
-      // 2. Refresh Server Components
-      // This re-runs DashboardLayout -> fetches new Session -> passes new activeOrganizationId prop
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to switch organization");
-    }
+    await auth.organization.setActive({
+      organizationId: org.id,
+      fetchOptions: {
+        onSuccess() {
+          toast.success(`Switching to ${org.name}...`);
+          router.refresh();
+        },
+        onError() {
+          toast.error("Failed to switch organization");
+        },
+      },
+    });
   };
 
-  // Guard clause for safety
   if (!activeOrganization) return null;
 
   return (
