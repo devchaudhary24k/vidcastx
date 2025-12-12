@@ -165,12 +165,10 @@ const data: SidebarData = {
 };
 
 export function AppSidebar({
-  organizations,
   user,
   activeOrganizationId,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  organizations: Organization[];
   user: UserData;
   activeOrganizationId: string;
 }) {
@@ -190,10 +188,7 @@ export function AppSidebar({
               : "flex-row items-center justify-between",
           )}
         >
-          <TeamSwitcher
-            organizations={organizations}
-            activeOrganizationId={activeOrganizationId}
-          />
+          <TeamSwitcher activeOrganizationId={activeOrganizationId} />
         </SidebarHeader>
         <SidebarContent className="gap-4 px-2 py-4">
           <NavSearch onClick={() => setCommandMenuOpen(true)} />

@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { getOrganizationsAction } from "@dashboard/features/dashboard";
 import { auth } from "@dashboard/lib/auth";
+import { useQuery } from "@tanstack/react-query"; // No need for useQueryClient
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,33 +29,47 @@ import { CreateOrganizationDialog } from "./create-organization-dialog";
 import { Logo } from "./logo";
 
 export function TeamSwitcher({
-  organizations,
   activeOrganizationId,
 }: {
-  organizations: Organization[];
   activeOrganizationId: string;
 }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
-  const [activeOrganization, setActiveOrganization] = React.useState(
+
+  // 1. Fetch data (Hydrated from server, so it's instant)
+  const { data: organizations = [] } = useQuery({
+    queryKey: ["organizations"],
+    queryFn: getOrganizationsAction,
+  });
+
+  // 2. DERIVED STATE (No useState needed)
+  // We calculate the active org based on the ID passed from the Server Layout.
+  // When router.refresh() happens, 'activeOrganizationId' updates, and this recalculates automatically.
+  const activeOrganization =
     organizations.find((org) => org.id === activeOrganizationId) ||
-      organizations[0],
-  );
+    organizations[0];
 
   const handleSwitchOrganization = async (org: Organization) => {
+    // Prevent switching if already active
+    if (org.id === activeOrganizationId) return;
+
     try {
       await auth.organization.setActive({
         organizationId: org.id,
       });
-      setActiveOrganization(org);
+
+      toast.success(`Switching to ${org.name}...`);
+
+      // 2. Refresh Server Components
+      // This re-runs DashboardLayout -> fetches new Session -> passes new activeOrganizationId prop
       router.refresh();
-      toast.success(`Switched to ${org.name}`);
     } catch (error) {
       console.error(error);
       toast.error("Failed to switch organization");
     }
   };
 
+  // Guard clause for safety
   if (!activeOrganization) return null;
 
   return (

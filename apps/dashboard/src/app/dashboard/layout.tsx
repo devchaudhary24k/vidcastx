@@ -1,9 +1,18 @@
 import { type ReactNode } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { AppSidebar, Header } from "@dashboard/features/dashboard";
+import {
+  AppSidebar,
+  getOrganizationsAction,
+  getSessionAction,
+  Header,
+} from "@dashboard/features/dashboard";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
-import { auth } from "@vidcastx/auth";
 import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
 
 export default async function DashboardLayout({
@@ -11,9 +20,11 @@ export default async function DashboardLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const h = await headers();
-  const sessionData = await auth.api.getSession({
-    headers: h,
+  const queryClient = new QueryClient();
+
+  const sessionData = await queryClient.fetchQuery({
+    queryKey: ["session"],
+    queryFn: getSessionAction,
   });
 
   if (!sessionData) {
@@ -24,13 +35,10 @@ export default async function DashboardLayout({
     redirect("/onboarding");
   }
 
-  const organizationsList = await auth.api.listOrganizations({
-    headers: h,
+  await queryClient.prefetchQuery({
+    queryKey: ["organizations"],
+    queryFn: getOrganizationsAction,
   });
-
-  const filteredOrganizations = organizationsList.filter(
-    (org) => org.deletedAt === null,
-  );
 
   const activeOrgId = sessionData.session.activeOrganizationId;
 
@@ -45,16 +53,14 @@ export default async function DashboardLayout({
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar
-        organizations={filteredOrganizations}
-        user={user}
-        activeOrganizationId={activeOrgId}
-      />
-      <SidebarInset>
-        <Header />
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <SidebarProvider>
+        <AppSidebar user={user} activeOrganizationId={activeOrgId} />
+        <SidebarInset>
+          <Header />
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </HydrationBoundary>
   );
 }
