@@ -178,11 +178,12 @@ const authOptions = {
               .limit(1);
 
             if (!fallbackOrganization) {
-              // Throw error if no valid organization is available
-              throw new APIError("FORBIDDEN", {
-                message:
-                  "No Active Organization, Please create new organization",
-              });
+              // Only return the session without active org id, so the user is redirected to onboarding page.
+              return {
+                data: {
+                  ...session,
+                },
+              };
             }
 
             activeOrganizationId = fallbackOrganization.id;
@@ -331,7 +332,16 @@ export const auth = betterAuth({
       const [membership] = await db
         .select({ id: memberTable.id })
         .from(memberTable)
-        .where(eq(memberTable.userId, user.id))
+        .innerJoin(
+          organizationTable,
+          eq(memberTable.organizationId, organizationTable.id),
+        )
+        .where(
+          and(
+            eq(memberTable.userId, user.id),
+            isNull(organizationTable.deletedAt),
+          ),
+        )
         .limit(1);
 
       return {
