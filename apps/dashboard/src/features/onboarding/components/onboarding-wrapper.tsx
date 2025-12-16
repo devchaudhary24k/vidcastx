@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 import { Step1BasicInfo } from "./basic-information";
 import { Step4Billing } from "./billing";
@@ -12,17 +14,46 @@ import { Step3PlanSelection } from "./plan-selection";
 export const OnboardingWrapper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const { contextSafe } = useGSAP({ scope: containerRef });
+
+  const animateStepChange = contextSafe((callback: () => void) => {
+    if (!contentRef.current) return;
+
+    gsap.to(contentRef.current, {
+      opacity: 0,
+      y: -10,
+      filter: "blur(5px)",
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => {
+        callback();
+        gsap.fromTo(
+          contentRef.current,
+          { opacity: 0, y: 10, filter: "blur(5px)" },
+          {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.4,
+            ease: "power2.out",
+          },
+        );
+      },
+    });
+  });
 
   const handleNext = () => {
-    // Mark current step as complete
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps((prev) => [...prev, currentStep]);
     }
-    // Move to next step (Max 5)
+
     if (currentStep < 5) {
-      setCurrentStep((prev) => prev + 1);
+      animateStepChange(() => setCurrentStep((prev) => prev + 1));
     } else {
-      // Handle final submission redirect or success state here
+      // Handle final submission
       alert("Onboarding Complete! Redirecting...");
     }
   };
@@ -45,17 +76,26 @@ export const OnboardingWrapper: React.FC = () => {
   };
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
-      <div className="bg-card flex min-h-[600px] w-full max-w-5xl flex-col overflow-hidden rounded-xl border shadow-lg md:flex-row">
-        {/* LEFT SIDEBAR */}
+    <div
+      className="bg-background text-foreground relative flex min-h-screen flex-col"
+      ref={containerRef}
+    >
+      {/* Absolute Sidebar - Desktop */}
+      <div className="fixed top-1/2 left-12 z-50 hidden -translate-y-1/2 xl:block">
         <OnboardingSidebar
           currentStep={currentStep}
           completedSteps={completedSteps}
         />
+      </div>
 
-        {/* RIGHT CONTENT AREA */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-12">
-          <div className="mx-auto max-w-xl">{renderStepComponent()}</div>
+      {/* Mobile/Tablet Step Indicator could go here if needed, keeping it simple for now */}
+
+      {/* Main Content Area */}
+      <div className="flex w-full flex-1 items-start justify-center pt-20">
+        <div className="w-full max-w-4xl px-6 py-12 md:px-12">
+          <div ref={contentRef} className="w-full">
+            {renderStepComponent()}
+          </div>
         </div>
       </div>
     </div>

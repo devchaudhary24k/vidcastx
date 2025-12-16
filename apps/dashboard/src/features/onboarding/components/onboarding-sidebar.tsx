@@ -6,9 +6,9 @@ import { cn } from "@vidcastx/ui/lib/utils";
 const STEPS = [
   { id: 1, title: "Basic Info", icon: User },
   { id: 2, title: "Organization", icon: Building },
-  { id: 3, title: "Select Plan", icon: Layout },
+  { id: 3, title: "Plan", icon: Layout },
   { id: 4, title: "Billing", icon: CreditCard },
-  { id: 5, title: "Invite Members", icon: Users },
+  { id: 5, title: "Invite", icon: Users },
 ];
 
 interface OnboardingSidebarProps {
@@ -21,53 +21,62 @@ export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({
   completedSteps,
 }) => {
   return (
-    <div className="bg-muted/30 border-border w-full border-r p-6 md:w-64">
-      <div className="mb-8">
-        <h1 className="text-xl font-bold">VidCast</h1>
-        <p className="text-muted-foreground text-sm">Setup your account</p>
-      </div>
+    <nav className="flex w-fit flex-col gap-6">
+      {STEPS.map((step) => {
+        const isCompleted = completedSteps.includes(step.id);
+        const isCurrent = currentStep === step.id;
+        const Icon = step.icon;
 
-      <nav className="relative space-y-1">
-        {/* Vertical Line Connector */}
-        <div className="bg-border absolute top-4 bottom-4 left-[15px] -z-10 w-0.5" />
-
-        {STEPS.map((step) => {
-          const isCompleted = completedSteps.includes(step.id);
-          const isCurrent = currentStep === step.id;
-
-          return (
+        return (
+          <div
+            key={step.id}
+            className={cn(
+              "group flex items-center gap-4 transition-all duration-300",
+              isCurrent ? "opacity-100" : "opacity-40 hover:opacity-70",
+            )}
+          >
             <div
-              key={step.id}
               className={cn(
-                "bg-background flex items-center gap-4 rounded-lg p-2 transition-colors md:bg-transparent",
-                isCurrent
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground",
+                "relative flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-300",
+                isCompleted
+                  ? "border-primary bg-primary text-primary-foreground scale-90"
+                  : isCurrent
+                    ? "border-primary text-primary bg-background shadow-primary/20 scale-110 shadow-lg"
+                    : "border-muted-foreground text-muted-foreground scale-90 bg-transparent",
               )}
             >
-              <div
-                className={cn(
-                  "bg-background z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all",
-                  isCompleted
-                    ? "text-primary-foreground border-green-500 bg-green-500"
-                    : isCurrent
-                      ? "border-primary text-primary"
-                      : "border-muted-foreground/30 text-muted-foreground/30",
-                )}
-              >
-                {isCompleted ? (
-                  <Check className="h-4 w-4" />
-                ) : isCurrent ? (
-                  <span className="text-sm font-bold">{step.id}</span>
-                ) : (
-                  <span className="text-sm">{step.id}</span>
-                )}
-              </div>
-              <span className="text-sm">{step.title}</span>
+              {isCompleted ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Icon className="h-3.5 w-3.5" />
+              )}
+
+              {/* Connector Line */}
+              {step.id !== STEPS.length && (
+                <div
+                  className={cn(
+                    "absolute top-full left-1/2 -z-10 -ml-px h-6 w-0.5",
+                    completedSteps.includes(step.id)
+                      ? "bg-primary"
+                      : "bg-border",
+                  )}
+                />
+              )}
             </div>
-          );
-        })}
-      </nav>
-    </div>
+
+            <div
+              className={cn(
+                "origin-left whitespace-nowrap transition-all duration-300",
+                isCurrent
+                  ? "translate-x-0 text-sm font-semibold"
+                  : "hidden -translate-x-2 text-xs font-medium opacity-0 group-hover:translate-x-0 group-hover:opacity-100 lg:block",
+              )}
+            >
+              {step.title}
+            </div>
+          </div>
+        );
+      })}
+    </nav>
   );
 };
