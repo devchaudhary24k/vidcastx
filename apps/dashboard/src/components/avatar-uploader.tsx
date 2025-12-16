@@ -29,8 +29,8 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (file) {
       const imageDataUrl = await readFile(file);
       setImageSrc(imageDataUrl);
       setIsDialogOpen(true);

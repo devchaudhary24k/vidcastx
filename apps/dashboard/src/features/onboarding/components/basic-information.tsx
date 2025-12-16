@@ -47,7 +47,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
         {(field) => (
           <div className="flex justify-center py-4">
             <AvatarUploader
-              value={field.state.value}
+              value={field.state.value || ""}
               onChange={field.handleChange}
               fallbackInitials="ME"
             />

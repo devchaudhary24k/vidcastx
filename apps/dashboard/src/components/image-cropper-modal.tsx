@@ -68,7 +68,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
             min={1}
             max={3}
             step={0.1}
-            onValueChange={(val) => setZoom(val[0])}
+            onValueChange={(val) => setZoom(val[0] ?? 1)}
             className="flex-1"
           />
           <ZoomIn className="text-muted-foreground h-4 w-4" />

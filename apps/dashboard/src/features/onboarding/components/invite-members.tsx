@@ -1,14 +1,14 @@
 import React from "react";
+import { useForm } from "@tanstack/react-form";
+import { Plus, Trash2 } from "lucide-react";
+
+import { Button } from "@vidcastx/ui/components/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@dashboard/components/field";
-import { useForm } from "@tanstack/react-form";
-import { Plus, Trash2 } from "lucide-react";
-
-import { Button } from "@vidcastx/ui/components/button";
+} from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 import { Separator } from "@vidcastx/ui/components/separator";
 

@@ -46,8 +46,12 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
 
   const getInitials = (name: string) => {
     if (!name) return "OR";
-    const parts = name.trim().split(" ");
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    const parts = name.trim().split(" ").filter(Boolean);
+    if (parts.length >= 2) {
+      const first = parts[0]?.[0] ?? "";
+      const second = parts[1]?.[0] ?? "";
+      return (first + second).toUpperCase();
+    }
     return name.slice(0, 2).toUpperCase();
   };
 
