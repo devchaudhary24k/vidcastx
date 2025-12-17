@@ -8,9 +8,9 @@ import { auth } from "@vidcastx/auth";
 
 import v1Router from "./modules/v1";
 
-const server = new Elysia({
-  prefix: "/api",
-})
+const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router);
+
+const server = new Elysia()
   .use(opentelemetry())
   .use(openapi({ references: fromTypes() }))
   .use(logger())
@@ -32,12 +32,8 @@ const server = new Elysia({
       maxAge: 300,
     }),
   )
-  .use(v1Router)
-  // Auth Routes
-  .all("/auth/*", ({ request }) => {
-    return auth.handler(request);
-  })
-
+  .use(apiRouter)
+  .mount(auth.handler)
   .listen(3001);
 
 console.log(
