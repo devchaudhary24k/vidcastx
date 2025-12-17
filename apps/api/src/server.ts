@@ -19,9 +19,9 @@ const server = new Elysia({
       origin: ({ headers }) => {
         const allowedOrigins = [
           "https://vidcastx.daymlabs.com",
-          ...(process.env.NODE_ENV === "development"
-            ? ["http://localhost:3000", "http://localhost:3001"]
-            : []),
+          ...(process.env.NODE_ENV === "production"
+            ? ["https://vidcastx.daymlabs.com"]
+            : ["http://localhost:3000"]),
         ];
         const origin = headers.get("origin");
         return !origin || allowedOrigins.includes(origin);
