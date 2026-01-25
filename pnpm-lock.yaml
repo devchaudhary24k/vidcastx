@@ -167,8 +167,8 @@ importers:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
       eslint-config-next:
-        specifier: 16.0.7
-        version: 16.0.7(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+        specifier: 16.1.4
+        version: 16.1.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4.1.17
         version: 4.1.17
@@ -191,8 +191,8 @@ importers:
   packages/analytics:
     dependencies:
       '@next/third-parties':
-        specifier: ^16.0.7
-        version: 16.0.7(next@16.0.9(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
+        specifier: ^16.1.4
+        version: 16.1.4(next@16.0.9(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
       '@t3-oss/env-core':
         specifier: ^0.13.8
         version: 0.13.8(typescript@5.9.3)(zod@4.1.13)
@@ -588,8 +588,8 @@ importers:
         version: 9.39.1
     devDependencies:
       '@next/eslint-plugin-next':
-        specifier: ^16.0.7
-        version: 16.0.7
+        specifier: ^16.1.4
+        version: 16.1.4
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -1585,8 +1585,8 @@ packages:
   '@next/env@16.0.9':
     resolution: {integrity: sha512-6284pl8c8n9PQidN63qjPVEu1uXXKjnmbmaLebOzIfTrSXdGiAPsIMRi4pk/+v/ezqweE1/B8bFqiAAfC6lMXg==}
 
-  '@next/eslint-plugin-next@16.0.7':
-    resolution: {integrity: sha512-hFrTNZcMEG+k7qxVxZJq3F32Kms130FAhG8lvw2zkKBgAcNOJIxlljNiCjGygvBshvaGBdf88q2CqWtnqezDHA==}
+  '@next/eslint-plugin-next@16.1.4':
+    resolution: {integrity: sha512-38WMjGP8y+1MN4bcZFs+GTcBe0iem5GGTzFE5GWW/dWdRKde7LOXH3lQT2QuoquVWyfl2S0fQRchGmeacGZ4Wg==}
 
   '@next/swc-darwin-arm64@16.0.9':
     resolution: {integrity: sha512-j06fWg/gPqiWjK+sEpCDsh5gX+Bdy9gnPYjFqMBvBEOIcCFy1/ecF6pY6XAce7WyCJAbBPVb+6GvpmUZKNq0oQ==}
@@ -1636,8 +1636,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@next/third-parties@16.0.7':
-    resolution: {integrity: sha512-YZ1VNUCNIokMwt1PTXU+/ZcFZzRHEBZTNrjkVja58XNPWxogr30PpGhuJhDsj7StgKfAEjF0IsLTAAONMmMe4g==}
+  '@next/third-parties@16.1.4':
+    resolution: {integrity: sha512-mucTu6xE1jlx0cDVVoBmbHjAUDrgh35kLa3zbGO/GD9Uv5wsVKqDBlXLyMwXAg9rbGaloUhSMeFUSD+GV0jU9w==}
     peerDependencies:
       next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0-beta.0
       react: ^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0
@@ -3878,8 +3878,8 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
 
-  eslint-config-next@16.0.7:
-    resolution: {integrity: sha512-WubFGLFHfk2KivkdRGfx6cGSFhaQqhERRfyO8BRx+qiGPGp7WLKcPvYC4mdx1z3VhVRcrfFzczjjTrbJZOpnEQ==}
+  eslint-config-next@16.1.4:
+    resolution: {integrity: sha512-iCrrNolUPpn/ythx0HcyNRfUBgTkaNBXByisKUbusPGCl8DMkDXXAu7exlSTSLGTIsH9lFE/c4s/3Qiyv2qwdA==}
     peerDependencies:
       eslint: '>=9.0.0'
       typescript: '>=3.3.1'
@@ -6950,7 +6950,7 @@ snapshots:
 
   '@next/env@16.0.9': {}
 
-  '@next/eslint-plugin-next@16.0.7':
+  '@next/eslint-plugin-next@16.1.4':
     dependencies:
       fast-glob: 3.3.1
 
@@ -6978,7 +6978,7 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.0.9':
     optional: true
 
-  '@next/third-parties@16.0.7(next@16.0.9(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)':
+  '@next/third-parties@16.1.4(next@16.0.9(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)':
     dependencies:
       next: 16.0.9(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       react: 19.2.1
@@ -9433,9 +9433,9 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-config-next@16.0.7(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
+  eslint-config-next@16.1.4(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
-      '@next/eslint-plugin-next': 16.0.7
+      '@next/eslint-plugin-next': 16.1.4
       eslint: 9.39.1(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.1(jiti@2.6.1)))(eslint@9.39.1(jiti@2.6.1))
