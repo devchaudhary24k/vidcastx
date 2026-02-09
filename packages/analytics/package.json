@@ -30,7 +30,7 @@
     "@next/third-parties": "^16.0.7",
     "@t3-oss/env-core": "^0.13.8",
     "@vercel/analytics": "^1.6.1",
-    "posthog-js": "^1.302.0",
+    "posthog-js": "^1.342.1",
     "posthog-node": "^5.17.2",
     "react": "19.2.1",
     "server-only": "^0.0.1",
