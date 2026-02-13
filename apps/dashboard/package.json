@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@elysiajs/eden": "^1.4.5",
-    "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@hugeicons/core-free-icons": "^2.0.0",
     "@hugeicons/react": "^1.1.1",
@@ -31,7 +30,6 @@
     "@vidcastx/ui": "workspace:*",
     "better-auth": "^1.4.5",
     "date-fns": "^4.1.0",
-    "gsap": "^3.13.0",
     "lucide-react": "^0.556.0",
     "next": "16.0.7",
     "pg": "^8.16.3",

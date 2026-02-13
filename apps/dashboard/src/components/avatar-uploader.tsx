@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Pencil, Trash2, Upload } from "lucide-react";
 
 import {
   Avatar,
@@ -37,21 +37,41 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
     }
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   return (
     <div className={className}>
       <div
         className="group relative inline-block cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Avatar className="border-border h-24 w-24 border-2 transition-opacity group-hover:opacity-90">
+        <Avatar className="border-border h-24 w-24 border-2 transition-opacity">
           <AvatarImage src={value} className="object-cover" />
-          <AvatarFallback className="text-xl font-bold uppercase">
+          <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-bold uppercase">
             {fallbackInitials}
           </AvatarFallback>
         </Avatar>
-        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-          <Camera className="h-8 w-8 text-white" />
+
+        <div className="absolute -right-1 -bottom-1 z-10">
+          {value ? (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white shadow-sm transition-colors dark:border-gray-950"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          ) : (
+            <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-full border-2 border-white shadow-sm dark:border-gray-950">
+              <Pencil className="h-4 w-4" />
+            </div>
+          )}
         </div>
+
         <input
           type="file"
           accept="image/*"

@@ -11,21 +11,14 @@ export const basicInfoSchema = z.object({
 // --- Step 2: Organization ---
 export const organizationSchema = z.object({
   orgName: z.string().min(3, "Organization name must be at least 3 characters"),
-  orgSlug: z
+  orgIdentifier: z
     .string()
-    .min(3, "Slug must be at least 3 characters")
+    .min(3, "Identifier must be at least 3 characters")
     .regex(
       /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers, and dashes",
+      "Identifier can only contain lowercase letters, numbers, and dashes",
     ),
   orgAvatarUrl: z.string(),
-});
-
-// --- Step 3: Plan Selection ---
-export const planSelectionSchema = z.object({
-  planId: z.enum(["starter", "pro", "enterprise"], {
-    message: "Please select a plan to continue",
-  }),
 });
 
 // --- Step 4: Billing ---

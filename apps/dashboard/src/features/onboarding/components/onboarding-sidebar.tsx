@@ -1,12 +1,12 @@
 import React from "react";
-import { Building, Check, CreditCard, Layout, User, Users } from "lucide-react";
+import { Building, Check, CreditCard, User, Users } from "lucide-react";
 
 import { cn } from "@vidcastx/ui/lib/utils";
 
 const STEPS = [
   { id: 1, title: "Basic Info", icon: User },
   { id: 2, title: "Organization", icon: Building },
-  { id: 3, title: "Plan", icon: Layout },
+  // Step 3 (Plan) is skipped
   { id: 4, title: "Billing", icon: CreditCard },
   { id: 5, title: "Invite", icon: Users },
 ];
@@ -21,55 +21,60 @@ export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({
   completedSteps,
 }) => {
   return (
-    <nav className="flex w-fit flex-col gap-6">
-      {STEPS.map((step) => {
+    <nav className="flex w-fit flex-col gap-8">
+      {STEPS.map((step, index) => {
         const isCompleted = completedSteps.includes(step.id);
         const isCurrent = currentStep === step.id;
         const Icon = step.icon;
+        const isLast = index === STEPS.length - 1;
+        const nextStep = STEPS[index + 1];
+        const isNextCompleted =
+          nextStep && completedSteps.includes(nextStep.id);
 
         return (
           <div
             key={step.id}
             className={cn(
-              "group flex items-center gap-4 transition-all duration-300",
-              isCurrent ? "opacity-100" : "opacity-40 hover:opacity-70",
+              "flex items-center gap-4 transition-colors duration-200",
+              isCurrent || isCompleted ? "opacity-100" : "opacity-40",
             )}
           >
-            <div
-              className={cn(
-                "relative flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-300",
-                isCompleted
-                  ? "border-primary bg-primary text-primary-foreground scale-90"
-                  : isCurrent
-                    ? "border-primary text-primary bg-background shadow-primary/20 scale-110 shadow-lg"
-                    : "border-muted-foreground text-muted-foreground scale-90 bg-transparent",
-              )}
-            >
-              {isCompleted ? (
-                <Check className="h-3.5 w-3.5" />
-              ) : (
-                <Icon className="h-3.5 w-3.5" />
-              )}
+            <div className="relative flex flex-col items-center">
+              <div
+                className={cn(
+                  "relative z-20 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors duration-200",
+                  isCompleted
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : isCurrent
+                      ? "border-primary bg-background text-primary shadow-sm"
+                      : "border-muted-foreground bg-background text-muted-foreground",
+                )}
+              >
+                {isCompleted ? (
+                  <Check className="h-5 w-5" />
+                ) : (
+                  <Icon className="h-5 w-5" />
+                )}
+              </div>
 
               {/* Connector Line */}
-              {step.id !== STEPS.length && (
+              {!isLast && (
                 <div
                   className={cn(
-                    "absolute top-full left-1/2 -z-10 -ml-px h-6 w-0.5",
-                    completedSteps.includes(step.id)
+                    "absolute top-10 -z-10 h-full w-0.5",
+                    completedSteps.includes(step.id) && isNextCompleted
                       ? "bg-primary"
                       : "bg-border",
                   )}
+                  style={{ height: "calc(100% + 32px)" }}
                 />
               )}
             </div>
 
             <div
               className={cn(
-                "origin-left whitespace-nowrap transition-all duration-300",
-                isCurrent
-                  ? "translate-x-0 text-sm font-semibold"
-                  : "hidden -translate-x-2 text-xs font-medium opacity-0 group-hover:translate-x-0 group-hover:opacity-100 lg:block",
+                "text-sm font-medium",
+                isCurrent ? "text-primary font-bold" : "text-muted-foreground",
               )}
             >
               {step.title}
