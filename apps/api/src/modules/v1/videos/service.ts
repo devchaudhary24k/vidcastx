@@ -10,6 +10,8 @@ import {
   signMultipartPart,
 } from "@vidcastx/storage";
 
+type Video = typeof videos.$inferSelect;
+
 export class VideoService {
   /**
    * Create a Video Draft and generate the S3 Key
@@ -53,10 +55,7 @@ export class VideoService {
   /**
    * Start the Multipart Upload on S3
    */
-  static async initMultipart(
-    video: typeof videos.$inferSelect,
-    contentType: string,
-  ) {
+  static async initMultipart(video: Video, contentType: string) {
     const uploadId = await initMultipartUpload(
       video.masterAccessUrl!,
       contentType,
@@ -73,7 +72,7 @@ export class VideoService {
   }
 
   static async completeMultipart(
-    video: typeof videos.$inferSelect,
+    video: Video,
     uploadId: string,
     parts: { ETag: string; PartNumber: number }[],
   ) {
@@ -97,15 +96,12 @@ export class VideoService {
    * @param uploadId
    * @returns
    */
-  static async listParts(video: typeof videos.$inferSelect, uploadId: string) {
+  static async listParts(video: Video, uploadId: string) {
     if (!video.masterAccessUrl) throw new Error("Video has no access URL");
     return await listParts(video.masterAccessUrl, uploadId);
   }
 
-  static async abortMultipart(
-    video: typeof videos.$inferSelect,
-    uploadId: string,
-  ) {
+  static async abortMultipart(video: Video, uploadId: string) {
     if (!video.masterAccessUrl) throw new Error("Video has no access URL");
     await abortMultipartUpload(video.masterAccessUrl!, uploadId);
 
