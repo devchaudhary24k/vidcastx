@@ -2,6 +2,7 @@
   "name": "studio",
   "version": "1.0.0",
   "scripts": {
+    "dev": "pnpm run db:studio",
     "db:migrate": "cd ../../packages/database && pnpm with-env drizzle-kit migrate",
     "db:generate": "cd ../../packages/database && pnpm with-env drizzle-kit generate",
     "db:push": "cd ../../packages/database && pnpm with-env drizzle-kit push",
