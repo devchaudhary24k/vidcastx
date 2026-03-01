@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { AvatarUploader } from "@dashboard/components/avatar-uploader";
+import { createOrganization } from "@dashboard/features/onboarding/api/create-organization";
 import { useForm, useStore } from "@tanstack/react-form";
 import { ArrowRight, Fingerprint } from "lucide-react";
 
@@ -34,7 +35,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
     },
     validators: { onChange: organizationSchema },
     onSubmit: async ({ value }) => {
-      console.log("Step 2 Data:", value);
+      await createOrganization(value);
       onComplete();
     },
   });

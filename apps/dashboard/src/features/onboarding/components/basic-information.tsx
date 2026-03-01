@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AvatarUploader } from "@dashboard/components/avatar-uploader";
+import { updateUser } from "@dashboard/features/onboarding/api/update-user";
+import { useUser } from "@dashboard/lib/use-user";
 import { useForm } from "@tanstack/react-form";
 import { ArrowRight } from "lucide-react";
 
@@ -21,19 +23,32 @@ interface StepProps {
 }
 
 export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
+  const { data: session } = useUser();
+
   const form = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      firstName: session?.user?.firstName || "",
+      lastName: session?.user?.lastName || "",
       recoveryEmail: "",
       avatarUrl: "",
     },
     validators: { onSubmit: basicInfoSchema },
     onSubmit: async ({ value }) => {
-      console.log("Step 1 Data:", value);
+      await updateUser(value);
       onComplete();
     },
   });
+
+  useEffect(() => {
+    if (session?.user) {
+      if (session.user.firstName)
+        form.setFieldValue("firstName", session.user.firstName);
+      if (session.user.lastName)
+        form.setFieldValue("lastName", session.user.lastName);
+    }
+  }, [session, form]);
+
+  if (!session) return null;
 
   return (
     <Card className="mx-auto max-w-lg">

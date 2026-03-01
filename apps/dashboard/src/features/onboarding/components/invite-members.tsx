@@ -1,4 +1,5 @@
 import React from "react";
+import { inviteMembers } from "@dashboard/features/onboarding/api/invite-members";
 import { useForm } from "@tanstack/react-form";
 import { Mail, Plus, Shield, Sparkles, Trash2, UserPlus } from "lucide-react";
 
@@ -46,7 +47,7 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
     },
     validators: { onChange: inviteMembersSchema },
     onSubmit: async ({ value }) => {
-      console.log("Step 5 Data:", value);
+      await inviteMembers(value);
       onComplete();
     },
   });

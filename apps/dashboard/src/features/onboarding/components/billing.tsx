@@ -1,4 +1,5 @@
 import React from "react";
+import { updateBilling } from "@dashboard/features/onboarding/api/update-billing";
 import { useForm } from "@tanstack/react-form";
 import { ArrowRight, Lock } from "lucide-react";
 
@@ -31,7 +32,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
     },
     validators: { onChange: billingSchema },
     onSubmit: async ({ value }) => {
-      console.log("Step 4 Data:", value);
+      await updateBilling(value);
       onComplete();
     },
   });
