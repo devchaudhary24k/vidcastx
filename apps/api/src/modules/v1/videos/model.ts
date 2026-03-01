@@ -54,4 +54,12 @@ export const VideoModel = {
       }),
     ),
   }),
+
+  multipartListParts: z.object({
+    uploadId: z.string(),
+  }),
+
+  multipartAbort: z.object({
+    uploadId: z.string(),
+  }),
 };

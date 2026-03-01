@@ -97,6 +97,20 @@ export const videoController = new Elysia({ prefix: "/videos" })
                 {
                   body: VideoModel.multipartComplete,
                 },
+              )
+              .get(
+                "./list-parts",
+                async ({ video, query }) => {
+                  return VideoService.listParts(video, query.uploadId);
+                },
+                { query: VideoModel.multipartListParts },
+              )
+              .delete(
+                "./abort",
+                async ({ video, query }) => {
+                  return VideoService.abortMultipart(video, query.uploadId);
+                },
+                { query: VideoModel.multipartAbort },
               ),
           ),
       ),

@@ -3,8 +3,10 @@ import { db } from "@vidcastx/database/client";
 import { videos } from "@vidcastx/database/schema/video-schema";
 import { generateId } from "@vidcastx/database/utils/id";
 import {
+  abortMultipartUpload,
   completeMultipartUpload,
   initMultipartUpload,
+  listParts,
   signMultipartPart,
 } from "@vidcastx/storage";
 
@@ -85,6 +87,34 @@ export class VideoService {
     //    TODO: Trigger BullMQ Worker here
 
     console.log(`[VideoService] Queued transcoding for ${video.id}`);
+    return { status: "success", videoId: video.id };
+  }
+
+  /**
+   * List parts of a multipart upload to resume it.
+   *
+   * @param video
+   * @param uploadId
+   * @returns
+   */
+  static async listParts(video: typeof videos.$inferSelect, uploadId: string) {
+    if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+    return await listParts(video.masterAccessUrl, uploadId);
+  }
+
+  static async abortMultipart(
+    video: typeof videos.$inferSelect,
+    uploadId: string,
+  ) {
+    if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+    await abortMultipartUpload(video.masterAccessUrl!, uploadId);
+
+    await db
+      .update(videos)
+      .set({ status: "failed", errorReason: "Upload aborted" })
+      .where(eq(videos.id, video.id));
+
+    console.log(`[VideoService] Upload aborted for ${video.id}`);
     return { status: "success", videoId: video.id };
   }
 }
