@@ -1,12 +1,19 @@
+import type { UppyFile } from "@uppy/core";
 import { uploadActions } from "@dashboard/features/videos/stores/upload-store";
 import client from "@dashboard/lib/api";
 import AwsS3 from "@uppy/aws-s3";
 import Uppy from "@uppy/core";
 
-export const uppy = new Uppy({
+type UppyMeta = {
+  videoId: string;
+  [key: string]: unknown; // Uppy requires an index signature for other dynamic meta it might add
+};
+
+export const uppy = new Uppy<UppyMeta>({
   autoProceed: true,
   restrictions: {
     allowedFileTypes: ["video/*"],
+    maxFileSize: 50 * 1024 * 1024 * 1024, // 50GB
   },
 });
 
@@ -35,6 +42,7 @@ uppy.use(AwsS3, {
   signPart: async (file, partData) => {
     const videoId = file.meta.videoId as string;
     const { uploadId, partNumber } = partData;
+    if (!uploadId) throw new Error("Missing uploadId");
 
     const { data: url } = await client.api.v1
       .videos({ id: videoId })
@@ -67,19 +75,33 @@ uppy.use(AwsS3, {
   },
 
   abortMultipartUpload: async (file, { uploadId, key }) => {
-    console.log("Abort requested for", uploadId);
+    if (!uploadId) throw new Error("Missing uploadId");
+    const videoId = file.meta.videoId as string;
+
+    await client.api.v1.videos({ id: videoId }).multipart.abort.delete({
+      uploadId,
+    });
     return;
   },
 
   listParts: async (file, { uploadId, key }) => {
-    return [];
+    if (!uploadId) throw new Error("Missing uploadId");
+    const videoId = file.meta.videoId as string;
+
+    const { data } = await client.api.v1
+      .videos({ id: videoId })
+      .multipart["list-parts"].get({
+        query: { uploadId },
+      });
+
+    return data || [];
   },
 });
 
 uppy.on("file-added", (file) => {
   uploadActions.addUpload(file.id, {
     id: file.id,
-    videoId: file.meta.videoId as string,
+    videoId: file.meta.videoId,
     filename: file.name,
     progress: 0,
     status: "uploading",

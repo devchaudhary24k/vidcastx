@@ -23,7 +23,7 @@ export function VideoUploadForm() {
   const router = useRouter();
 
   // 1. Use the Hook
-  const { startUploadProcess, isUploading } = useVideoUpload();
+  const { startUploadProcess, isCreatingDraft: isUploading } = useVideoUpload();
 
   // 2. Local state to store the actual File object
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);

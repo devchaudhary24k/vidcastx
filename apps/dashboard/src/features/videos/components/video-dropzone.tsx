@@ -48,7 +48,7 @@ export function VideoDropzone({
 
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
-    form.setValue("title", file.name.split(".")[0]);
+    form.setValue("title", file.name.split(".")[0] || "Untitled");
 
     // Manually set the file in react-hook-form
     const dataTransfer = new DataTransfer();

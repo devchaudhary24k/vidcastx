@@ -154,10 +154,10 @@ export const videoController = new Elysia({ prefix: "/videos" })
            */
           .delete(
             "/abort",
-            async ({ video, query }) => {
-              return VideoService.abortMultipart(video, query.uploadId);
+            async ({ video, body }) => {
+              return VideoService.abortMultipart(video, body.uploadId);
             },
-            { query: VideoModel.multipartAbort },
+            { body: VideoModel.multipartAbort },
           ),
       ),
   );
