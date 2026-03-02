@@ -265,5 +265,12 @@ export async function listParts(key: string, uploadId: string) {
     }),
   );
 
-  return response.Parts || [];
+  // We explicitly map the properties to prevent AWS SDK `Part` types from
+  // leaking to other packages and causing TypeScript "non-portable" type
+  // inference errors in the Elysia router (e.g., in apps/api).
+  return (response.Parts || []).map((part) => ({
+    PartNumber: part.PartNumber,
+    ETag: part.ETag,
+    Size: part.Size,
+  }));
 }
