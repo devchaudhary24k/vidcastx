@@ -1,5 +1,6 @@
 "use client";
 
+import type { UploadItem as UploadItemType } from "@dashboard/features/videos/stores/upload-store";
 import { useEffect } from "react";
 import { uploadStore } from "@dashboard/features/videos/stores/upload-store";
 import { uppy } from "@dashboard/lib/uppy-client";
@@ -21,7 +22,7 @@ import { Spinner } from "@vidcastx/ui/components/spinner";
 
 export function GlobalUploadIndicator() {
   // 1. Subscribe to the store
-  const { uploads } = useStore(uploadStore);
+  const { uploads } = useStore(uploadStore, (state) => state);
   const uploadList = Object.values(uploads);
 
   // 2. Hide completely if no uploads exist
@@ -36,7 +37,7 @@ export function GlobalUploadIndicator() {
   );
 }
 
-function UploadItem({ upload }: { upload: any }) {
+function UploadItem({ upload }: { upload: UploadItemType }) {
   const isComplete = upload.status === "complete";
   const isError = upload.status === "error";
 
