@@ -1,24 +1,16 @@
 "use client";
 
 import type { UploadItem as UploadItemType } from "@dashboard/features/videos/stores/upload-store";
-import { useEffect } from "react";
-import { uploadStore } from "@dashboard/features/videos/stores/upload-store";
+import { useEffect, useRef } from "react";
+import {
+  uploadActions,
+  uploadStore,
+} from "@dashboard/features/videos/stores/upload-store";
 import { uppy } from "@dashboard/lib/uppy-client";
 import { useStore } from "@tanstack/react-store";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from "@vidcastx/ui/components/button";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemFooter,
-  ItemMedia,
-  ItemTitle,
-} from "@vidcastx/ui/components/item";
 import { Progress } from "@vidcastx/ui/components/progress";
-import { Spinner } from "@vidcastx/ui/components/spinner";
 
 export function GlobalUploadIndicator() {
   // 1. Subscribe to the store
@@ -29,71 +21,69 @@ export function GlobalUploadIndicator() {
   if (uploadList.length === 0) return null;
 
   return (
-    <div className="fixed right-6 bottom-6 z-50 flex w-full max-w-md flex-col gap-4 transition-all duration-300">
+    <>
       {uploadList.map((upload) => (
-        <UploadItem key={upload.id} upload={upload} />
+        <UploadToast key={upload.id} upload={upload} />
       ))}
-    </div>
+    </>
   );
 }
 
-function UploadItem({ upload }: { upload: UploadItemType }) {
-  const isComplete = upload.status === "complete";
-  const isError = upload.status === "error";
+function UploadToast({ upload }: { upload: UploadItemType }) {
+  const hasFinishedRef = useRef(false);
 
   useEffect(() => {
-    if (upload.status === "complete") {
-      const timer = setTimeout(() => {}, 5000);
-      return () => clearTimeout(timer);
+    const isComplete = upload.status === "complete";
+    const isError = upload.status === "error";
+
+    if (isComplete) {
+      if (!hasFinishedRef.current) {
+        toast.success("Upload Complete", {
+          id: upload.id,
+          description: upload.filename,
+          duration: 5000,
+        });
+        hasFinishedRef.current = true;
+      }
+    } else if (isError) {
+      if (!hasFinishedRef.current) {
+        toast.error("Upload Failed", {
+          id: upload.id,
+          description: upload.error || upload.filename,
+          duration: 5000,
+        });
+        hasFinishedRef.current = true;
+      }
+    } else {
+      toast.loading("Uploading...", {
+        id: upload.id,
+        description: (
+          <div className="mt-2 flex w-full flex-col gap-2">
+            <div className="text-muted-foreground flex items-center justify-between text-xs">
+              <span className="max-w-[150px] truncate">{upload.filename}</span>
+              <span>{Math.round(upload.progress)}%</span>
+            </div>
+            <Progress value={upload.progress} className="h-2" />
+          </div>
+        ),
+        action: {
+          label: "Cancel",
+          onClick: () => {
+            uppy.removeFile(upload.id);
+            uploadActions.removeUpload(upload.id);
+            toast.dismiss(upload.id);
+          },
+        },
+        duration: Infinity,
+      });
     }
-  }, [upload.status, upload.id]);
+  }, [
+    upload.status,
+    upload.progress,
+    upload.id,
+    upload.filename,
+    upload.error,
+  ]);
 
-  const handleCancel = () => {
-    uppy.removeFile(upload.id);
-  };
-
-  return (
-    <div className="animate-in slide-in-from-bottom-2 fade-in flex w-full flex-col gap-4 [--radius:1rem]">
-      <Item variant="outline" className="bg-background shadow-lg">
-        <ItemMedia variant="icon">
-          {isComplete ? (
-            <CheckCircle2 className="h-5 w-5 text-green-500" />
-          ) : isError ? (
-            <XCircle className="h-5 w-5 text-red-500" />
-          ) : (
-            <Spinner />
-          )}
-        </ItemMedia>
-
-        <ItemContent>
-          <ItemTitle>
-            {isComplete
-              ? "Upload Complete"
-              : isError
-                ? "Upload Failed"
-                : "Uploading..."}
-          </ItemTitle>
-          <ItemDescription className="max-w-[200px] truncate">
-            {/* Showing filename and percentage */}
-            {upload.filename} — {Math.round(upload.progress)}%
-          </ItemDescription>
-        </ItemContent>
-
-        <ItemActions className="hidden sm:flex">
-          {!isComplete && !isError && (
-            <Button variant="outline" size="sm" onClick={handleCancel}>
-              Cancel
-            </Button>
-          )}
-        </ItemActions>
-
-        <ItemFooter>
-          <Progress
-            value={upload.progress}
-            className={isError ? "bg-red-100" : ""}
-          />
-        </ItemFooter>
-      </Item>
-    </div>
-  );
+  return null;
 }
