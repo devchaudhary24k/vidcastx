@@ -12,11 +12,11 @@
   },
   "prettier": "@vidcastx/prettier",
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.3.3",
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/prettier": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
     "dotenv-cli": "^11.0.0",
-    "eslint": "^9.39.1"
+    "eslint": "^10.0.2"
   }
 }
