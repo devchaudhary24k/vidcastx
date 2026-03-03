@@ -1,7 +1,18 @@
+import {
+  inferAdditionalFields,
+  inferOrgAdditionalFields,
+  organizationClient,
+} from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
-export type BetterAuthClient = ReturnType<typeof createAuthClient>;
+import { type auth as authServer } from "@vidcastx/auth";
 
-export const auth: BetterAuthClient = createAuthClient({
+export const auth = createAuthClient({
   baseURL: "http://localhost:3000",
+  plugins: [
+    organizationClient({
+      schema: inferOrgAdditionalFields<typeof authServer>(),
+    }),
+    inferAdditionalFields<typeof authServer>(),
+  ],
 });

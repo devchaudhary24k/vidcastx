@@ -1,1 +1,1 @@
-export { default } from "@workspace/ui/postcss.config";
+export { default } from "@vidcastx/ui/postcss.config";

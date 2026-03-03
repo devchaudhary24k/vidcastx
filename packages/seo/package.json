@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/seo",
+  "name": "@vidcastx/seo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,21 +13,21 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore"
   },
-  "prettier": "@workspace/prettier",
+  "prettier": "@vidcastx/prettier",
   "devDependencies": {
     "@types/lodash.merge": "^4.6.9",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.7",
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9.39.1"
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
+    "eslint": "^10.0.2"
   },
   "dependencies": {
     "lodash.merge": "^4.6.2",
-    "next": "16.1.5",
-    "react": "19.2.1",
+    "next": "16.1.6",
+    "react": "19.2.4",
     "schema-dts": "^1.1.5"
   }
 }

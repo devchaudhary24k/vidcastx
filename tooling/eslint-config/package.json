@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/eslint-config",
+  "name": "@vidcastx/eslint-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -12,24 +12,24 @@
     "./react-internal": "./react-internal.js"
   },
   "dependencies": {
-    "@eslint/js": "^9.39.1"
+    "@eslint/js": "^10.0.1"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^16.0.7",
-    "@types/node": "^24.10.1",
-    "@typescript-eslint/eslint-plugin": "^8.48.1",
-    "@typescript-eslint/parser": "^8.48.1",
-    "@workspace/prettier": "workspace:*",
-    "eslint": "^9.39.1",
+    "@next/eslint-plugin-next": "^16.1.6",
+    "@types/node": "^25.3.3",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "@vidcastx/prettier": "workspace:*",
+    "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-only-warn": "^1.1.0",
+    "eslint-plugin-only-warn": "^1.2.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-turbo": "^2.6.3",
-    "globals": "^16.5.0",
+    "eslint-plugin-turbo": "^2.8.12",
+    "globals": "^17.4.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.48.1"
+    "typescript-eslint": "^8.56.1"
   },
-  "prettier": "@workspace/prettier"
+  "prettier": "@vidcastx/prettier"
 }

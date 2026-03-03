@@ -1,14 +1,19 @@
 import type { NextRequest } from "next/server";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import {
   authRoutes,
   DEFAULT_LOGIN_REDIRECT,
   protectedRoutes,
 } from "@dashboard/constants/route";
-import { getSessionCookie } from "better-auth/cookies";
+
+import { auth } from "@vidcastx/auth";
 
 export async function proxy(request: NextRequest) {
-  const sessionCookie = getSessionCookie(request);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   const path = request.nextUrl.pathname;
   const isAuthRoute = authRoutes.includes(path);
   const isProtectedRoute = protectedRoutes.some(
@@ -16,7 +21,7 @@ export async function proxy(request: NextRequest) {
   );
 
   if (isProtectedRoute) {
-    if (!sessionCookie) {
+    if (!session) {
       const callbackUrl = encodeURIComponent(path);
       return NextResponse.redirect(
         new URL(`/auth/login?callbackUrl=${callbackUrl}`, request.nextUrl),
@@ -29,7 +34,7 @@ export async function proxy(request: NextRequest) {
 
   if (isAuthRoute) {
     // If authRoute and user is authenticated, redirect user to dashboard.
-    if (sessionCookie) {
+    if (session) {
       return NextResponse.redirect(
         new URL(DEFAULT_LOGIN_REDIRECT, request.nextUrl),
       );

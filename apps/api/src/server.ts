@@ -4,12 +4,13 @@ import { fromTypes, openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
 import { Elysia } from "elysia";
 
-import { auth } from "./auth/auth";
+import { auth } from "@vidcastx/auth";
+
 import v1Router from "./modules/v1";
 
-const server = new Elysia({
-  prefix: "/api",
-})
+const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router);
+
+const server = new Elysia()
   .use(opentelemetry())
   .use(openapi({ references: fromTypes() }))
   .use(logger())
@@ -18,9 +19,9 @@ const server = new Elysia({
       origin: ({ headers }) => {
         const allowedOrigins = [
           "https://vidcastx.daymlabs.com",
-          ...(process.env.NODE_ENV === "development"
-            ? ["http://localhost:3000", "http://localhost:3001"]
-            : []),
+          ...(process.env.NODE_ENV === "production"
+            ? ["https://vidcastx.daymlabs.com"]
+            : ["http://localhost:3000"]),
         ];
         const origin = headers.get("origin");
         return !origin || allowedOrigins.includes(origin);
@@ -31,12 +32,8 @@ const server = new Elysia({
       maxAge: 300,
     }),
   )
-  .use(v1Router)
-  // Auth Routes
-  .all("/auth/*", ({ request }) => {
-    return auth.handler(request);
-  })
-
+  .use(apiRouter)
+  .mount(auth.handler)
   .listen(3001);
 
 console.log(

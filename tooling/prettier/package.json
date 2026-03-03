@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/prettier",
+  "name": "@vidcastx/prettier",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,13 +12,13 @@
     "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "dependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-    "prettier": "^3.7.4",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "@workspace/typescript-config": "workspace:*"
+    "@types/node": "^25.3.3",
+    "@vidcastx/typescript-config": "workspace:*"
   },
-  "prettier": "@workspace/prettier"
+  "prettier": "@vidcastx/prettier"
 }

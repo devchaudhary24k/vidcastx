@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
 import {
   BarChart2,
   Clapperboard,
@@ -9,7 +10,6 @@ import {
   Folder,
   LayoutDashboard,
   Library,
-  LifeBuoy,
   Link2,
   Users,
 } from "lucide-react";
@@ -19,16 +19,18 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@workspace/ui/components/sidebar";
+  useSidebar,
+} from "@vidcastx/ui/components/sidebar";
+import { cn } from "@vidcastx/ui/lib/utils";
 
+import type { Organization, SidebarData, UserData } from "./types";
+import { CommandMenu } from "./command-menu";
 import { NavMain } from "./nav-main";
-import { NavSecondary } from "./nav-secondary";
+import { NavSearch } from "./nav-search";
 import { NavUser } from "./nav-user";
+import { TeamSwitcher } from "./team-switcher";
 
-const data = {
+const data: SidebarData = {
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -37,27 +39,27 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboard,
       isActive: true,
     },
     {
       title: "Projects",
-      url: "#",
+      url: "/dashboard/projects",
       icon: Folder,
     },
     {
       title: "Studio",
-      url: "#",
+      url: "/dashboard/studio",
       icon: Clapperboard,
       items: [
         {
           title: "Create New",
-          url: "#",
+          url: "/dashboard/studio/new",
         },
         {
           title: "Video Editor",
-          url: "#",
+          url: "/dashboard/studio/editor",
           disabled: true,
           badge: "Soon",
         },
@@ -65,35 +67,35 @@ const data = {
     },
     {
       title: "Assets",
-      url: "#",
+      url: "/dashboard/assets",
       icon: Library,
       items: [
         {
           title: "Media Library",
-          url: "#",
+          url: "/dashboard/assets",
         },
         {
           title: "Exports",
-          url: "#",
+          url: "/dashboard/assets/exports",
         },
         {
           title: "Trash",
-          url: "#",
+          url: "/dashboard/assets/trash",
         },
       ],
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/dashboard/analytics",
       icon: BarChart2,
       items: [
         {
           title: "Overview",
-          url: "#",
+          url: "/dashboard/analytics",
         },
         {
           title: "Content Reports",
-          url: "#",
+          url: "/dashboard/analytics/reports",
         },
       ],
     },
@@ -101,101 +103,108 @@ const data = {
   navAdmin: [
     {
       title: "Team",
-      url: "#",
+      url: "/dashboard/team",
       icon: Users,
       items: [
         {
           title: "Members",
-          url: "#",
+          url: "/dashboard/team/members",
         },
         {
           title: "Roles & Permissions",
-          url: "#",
+          url: "/dashboard/team/roles",
         },
       ],
     },
     {
       title: "Integrations",
-      url: "#",
+      url: "/dashboard/integrations",
       icon: Link2,
       items: [
         {
           title: "Connected Apps",
-          url: "#",
+          url: "/dashboard/integrations/apps",
         },
         {
           title: "Webhooks",
-          url: "#",
+          url: "/dashboard/integrations/webhooks",
         },
       ],
     },
     {
       title: "Billing",
-      url: "#",
+      url: "/dashboard/billing",
       icon: CreditCard,
       items: [
         {
           title: "Subscription",
-          url: "#",
+          url: "/dashboard/billing/subscription",
         },
         {
           title: "Invoices",
-          url: "#",
+          url: "/dashboard/billing/invoices",
         },
       ],
     },
     {
       title: "Developers",
-      url: "#",
+      url: "/dashboard/developers",
       icon: Code,
       items: [
         {
           title: "API Keys",
-          url: "#",
+          url: "/dashboard/developers/api-keys",
         },
         {
           title: "Documentation",
-          url: "#",
+          url: "/dashboard/developers/docs",
         },
       ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-  ],
 };
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+export function AppSidebar({
+  user,
+  activeOrganizationId,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  user: UserData;
+  activeOrganizationId: string;
+}) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  const [commandMenuOpen, setCommandMenuOpen] = useState(false);
+
   return (
-    <Sidebar variant="inset" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Clapperboard className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">VidCastX</span>
-                  <span className="truncate text-xs">Studio</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain label="Platform" items={data.navMain} />
-        <NavMain label="Organization" items={data.navAdmin} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
+    <>
+      <Sidebar variant="floating" collapsible="icon" {...props}>
+        <SidebarHeader
+          className={cn(
+            "flex w-full md:pt-3.5",
+            isCollapsed
+              ? "flex-row items-center justify-between gap-y-4 md:flex-col md:items-start md:justify-start"
+              : "flex-row items-center justify-between",
+          )}
+        >
+          <TeamSwitcher activeOrganizationId={activeOrganizationId} />
+        </SidebarHeader>
+        <SidebarContent className="gap-4 px-2 py-4">
+          <NavSearch onClick={() => setCommandMenuOpen(true)} />
+          <NavMain label="Platform" items={data.navMain} />
+          <NavMain label="Organization" items={data.navAdmin} />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser user={user} />
+        </SidebarFooter>
+      </Sidebar>
+
+      <CommandMenu
+        open={commandMenuOpen}
+        setOpen={setCommandMenuOpen}
+        data={data}
+      />
+    </>
   );
 }

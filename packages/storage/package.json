@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/storage",
+  "name": "@vidcastx/storage",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,20 +14,20 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "with-env": "dotenv -e ../../.env --"
   },
-  "prettier": "@workspace/prettier",
+  "prettier": "@vidcastx/prettier",
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@types/node": "^25.3.3",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
     "dotenv-cli": "^11.0.0",
-    "eslint": "^9.39.1"
+    "eslint": "^10.0.2"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.943.0",
-    "@aws-sdk/lib-storage": "^3.943.0",
-    "@aws-sdk/s3-request-presigner": "^3.943.0",
-    "@t3-oss/env-core": "^0.13.8",
-    "zod": "^4.1.13"
+    "@aws-sdk/client-s3": "^3.1000.0",
+    "@aws-sdk/lib-storage": "^3.1000.0",
+    "@aws-sdk/s3-request-presigner": "^3.1000.0",
+    "@t3-oss/env-core": "^0.13.10",
+    "zod": "^4.3.6"
   }
 }

@@ -1,19 +1,14 @@
 import { createEnv } from "@t3-oss/env-core";
-import { z } from "zod";
 
-import { env as databaseEnv, env as storageEnv } from "@workspace/database/env";
-import { env as redisEnv } from "@workspace/redis/env";
+import { env as authEnv } from "@vidcastx/auth/env";
+import { env as databaseEnv } from "@vidcastx/database/env";
+import { env as redisEnv } from "@vidcastx/redis/env";
+import { env as storageEnv } from "@vidcastx/storage/env";
 
 export const env = createEnv({
-  extends: [databaseEnv, redisEnv, storageEnv],
+  extends: [databaseEnv, redisEnv, storageEnv, authEnv],
 
-  server: {
-    AYYO: z.string().min(1),
-    GITHUB_CLIENT_ID: z.string().min(1),
-    GITHUB_CLIENT_SECRET: z.string().min(1),
-    DISCORD_CLIENT_ID: z.string().min(1),
-    DISCORD_CLIENT_SECRET: z.string().min(1),
-  },
+  server: {},
 
   clientPrefix: "PUBLIC_",
   client: {},

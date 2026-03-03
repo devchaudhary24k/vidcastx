@@ -1,53 +1,67 @@
-import { AppSidebar } from "@dashboard/features/dashboard";
-
+import { type ReactNode } from "react";
+import { redirect } from "next/navigation";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@workspace/ui/components/breadcrumb";
-import { Separator } from "@workspace/ui/components/separator";
+  AppSidebar,
+  getOrganizationsAction,
+  getSessionAction,
+  Header,
+} from "@dashboard/features/dashboard";
+import { GlobalUploadIndicator } from "@dashboard/features/videos/components/global-upload-indicator";
 import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@workspace/ui/components/sidebar";
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
-export default function DashboardLayout({
+import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
+
+export default async function DashboardLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
+  const queryClient = new QueryClient();
+
+  const sessionData = await queryClient.fetchQuery({
+    queryKey: ["session"],
+    queryFn: getSessionAction,
+  });
+
+  if (!sessionData) {
+    redirect("/auth/login");
+  }
+
+  if (!sessionData.user.hasOrganization) {
+    redirect("/onboarding");
+  }
+
+  await queryClient.prefetchQuery({
+    queryKey: ["organizations"],
+    queryFn: getOrganizationsAction,
+  });
+
+  const activeOrgId = sessionData.session.activeOrganizationId;
+
+  if (!activeOrgId) {
+    return null;
+  }
+
+  const user = {
+    name: sessionData.user.name,
+    email: sessionData.user.email,
+    avatar: sessionData.user.image || "",
+  };
+
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <SidebarProvider>
+        <AppSidebar user={user} activeOrganizationId={activeOrgId} />
+        <SidebarInset>
+          <Header />
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+          <GlobalUploadIndicator />
+        </SidebarInset>
+      </SidebarProvider>
+    </HydrationBoundary>
   );
 }

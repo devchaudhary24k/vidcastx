@@ -47,3 +47,7 @@ npm-debug.log*
 **/*.tgz
 **/*.log
 **/*.bun
+
+
+# Misc
+personal/

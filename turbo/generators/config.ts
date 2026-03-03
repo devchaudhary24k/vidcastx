@@ -8,7 +8,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         type: "input",
         name: "name",
         message:
-          "What is the name of the package? (You can skip the `@workspace/` prefix)",
+          "What is the name of the package? (You can skip the `@vidcastx/` prefix)",
       },
     ],
     actions: [
@@ -16,9 +16,9 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         if (
           "name" in answers &&
           typeof answers.name === "string" &&
-          answers.name.startsWith("@workspace/")
+          answers.name.startsWith("@vidcastx/")
         ) {
-          answers.name = answers.name.replace("@workspace/", "");
+          answers.name = answers.name.replace("@vidcastx/", "");
         }
         return "Config sanitized";
       },

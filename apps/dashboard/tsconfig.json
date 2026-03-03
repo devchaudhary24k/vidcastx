@@ -1,10 +1,10 @@
 {
-  "extends": "@workspace/typescript-config/nextjs.json",
+  "extends": "@vidcastx/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@dashboard/*": ["./src/*"],
-      "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@vidcastx/ui/*": ["../../packages/ui/src/*"],
       "@server/*": ["../api/src/*"]
     },
     "plugins": [

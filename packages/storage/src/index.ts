@@ -10,6 +10,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
+  ListPartsCommand,
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
@@ -26,10 +27,10 @@ export const s3Client = new S3Client({
     accessKeyId: env.S3_ACCESS_KEY_ID!,
     secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
   },
-  forcePathStyle: env.S3_FORCE_PATH_STYLE === true,
+  forcePathStyle: env.S3_FORCE_PATH_STYLE,
 });
 
-export const BUCKET_NAME = env.S3_BUCKET_NAME!;
+export const BUCKET_NAME = env.S3_BUCKET_NAME;
 
 /**
  * Helper to generate a presigned URL for a given command.
@@ -246,4 +247,30 @@ export async function deleteFolder(prefix: string) {
   if (listedObjects.IsTruncated) {
     await deleteFolder(prefix);
   }
+}
+
+/**
+ * Lists parts of a multipart upload.
+ *
+ * @param key
+ * @param uploadId
+ * @returns
+ */
+export async function listParts(key: string, uploadId: string) {
+  const response = await s3Client.send(
+    new ListPartsCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      UploadId: uploadId,
+    }),
+  );
+
+  // We explicitly map the properties to prevent AWS SDK `Part` types from
+  // leaking to other packages and causing TypeScript "non-portable" type
+  // inference errors in the Elysia router (e.g., in apps/api).
+  return (response.Parts || []).map((part) => ({
+    PartNumber: part.PartNumber,
+    ETag: part.ETag,
+    Size: part.Size,
+  }));
 }

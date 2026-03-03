@@ -10,8 +10,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@workspace/ui/components/dialog";
-import { cn } from "@workspace/ui/lib/utils";
+} from "@vidcastx/ui/components/dialog";
+import { cn } from "@vidcastx/ui/lib/utils";
 
 function Command({
   className,

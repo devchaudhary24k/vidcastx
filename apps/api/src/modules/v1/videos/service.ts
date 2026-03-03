@@ -1,12 +1,16 @@
-import { and, eq } from "@workspace/database";
-import { db } from "@workspace/database/client";
-import { videos } from "@workspace/database/schema/video-schema";
-import { generateId } from "@workspace/database/utils/id";
+import { and, eq } from "@vidcastx/database";
+import { db } from "@vidcastx/database/client";
+import { videos } from "@vidcastx/database/schema/video-schema";
+import { generateId } from "@vidcastx/database/utils/id";
 import {
+  abortMultipartUpload,
   completeMultipartUpload,
   initMultipartUpload,
+  listParts,
   signMultipartPart,
-} from "@workspace/storage";
+} from "@vidcastx/storage";
+
+type Video = typeof videos.$inferSelect;
 
 export class VideoService {
   /**
@@ -51,16 +55,13 @@ export class VideoService {
   /**
    * Start the Multipart Upload on S3
    */
-  static async initMultipart(
-    video: typeof videos.$inferSelect,
-    contentType: string,
-  ) {
+  static async initMultipart(video: Video, contentType: string) {
     const uploadId = await initMultipartUpload(
       video.masterAccessUrl!,
       contentType,
     );
 
-    return { uploadId, key: video.masterAccessUrl };
+    return { uploadId, key: video.masterAccessUrl! };
   }
 
   /**
@@ -71,7 +72,7 @@ export class VideoService {
   }
 
   static async completeMultipart(
-    video: typeof videos.$inferSelect,
+    video: Video,
     uploadId: string,
     parts: { ETag: string; PartNumber: number }[],
   ) {
@@ -85,6 +86,31 @@ export class VideoService {
     //    TODO: Trigger BullMQ Worker here
 
     console.log(`[VideoService] Queued transcoding for ${video.id}`);
+    return { status: "success", videoId: video.id };
+  }
+
+  /**
+   * List parts of a multipart upload to resume it.
+   *
+   * @param video
+   * @param uploadId
+   * @returns
+   */
+  static async listParts(video: Video, uploadId: string) {
+    if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+    return await listParts(video.masterAccessUrl, uploadId);
+  }
+
+  static async abortMultipart(video: Video, uploadId: string) {
+    if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+    await abortMultipartUpload(video.masterAccessUrl!, uploadId);
+
+    await db
+      .update(videos)
+      .set({ status: "failed", errorReason: "Upload aborted" })
+      .where(eq(videos.id, video.id));
+
+    console.log(`[VideoService] Upload aborted for ${video.id}`);
     return { status: "success", videoId: video.id };
   }
 }

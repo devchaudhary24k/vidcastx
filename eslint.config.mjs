@@ -1,4 +1,4 @@
-import { config as baseConfig } from "@workspace/eslint-config/base";
+import { config as baseConfig } from "@vidcastx/eslint-config/base";
 
 /**
  * @type {import("eslint").Linter.Config}

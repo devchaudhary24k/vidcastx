@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/database",
+  "name": "@vidcastx/database",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -17,22 +17,22 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "with-env": "dotenv -e ../../.env --"
   },
-  "prettier": "@workspace/prettier",
+  "prettier": "@vidcastx/prettier",
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "@types/pg": "^8.15.6",
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/prettier": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@types/node": "^25.3.3",
+    "@types/pg": "^8.18.0",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
     "dotenv-cli": "^11.0.0",
-    "drizzle-kit": "^0.31.8"
+    "drizzle-kit": "^0.31.9"
   },
   "dependencies": {
-    "@t3-oss/env-core": "^0.13.8",
-    "drizzle-orm": "^0.45.0",
+    "@t3-oss/env-core": "^0.13.10",
+    "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
     "nanoid": "^5.1.6",
-    "pg": "^8.16.3",
-    "zod": "^4.1.13"
+    "pg": "^8.19.0",
+    "zod": "^4.3.6"
   }
 }

@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764943056820,
-      "tag": "0000_initial_migration",
+      "when": 1770992578661,
+      "tag": "0000_enable_extentions",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770992695925,
+      "tag": "0001_init",
       "breakpoints": true
     }
   ]
