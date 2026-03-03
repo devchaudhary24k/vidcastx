@@ -14,9 +14,9 @@ export const videoController = new Elysia({ prefix: "/videos" })
 
   /**
    * Middleware to ensure the user has an active organization selected.
-   * Derives `orgId` for downstream routes.
+   * Resolve `orgId` for downstream routes.
    */
-  .derive(({ session }) => {
+  .resolve(({ session }) => {
     if (!session?.activeOrganizationId) {
       throw new Error("No Organization Found");
     }
