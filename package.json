@@ -42,7 +42,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "tooling/*"
+    "tooling/*",
+    "workers/*"
   ],
   "overrides": {
     "@types/minimatch": "5.1.2"
