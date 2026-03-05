@@ -320,6 +320,10 @@ const authOptions = {
       },
     }),
   ],
+
+  experimental: {
+    joins: true,
+  },
 } satisfies BetterAuthOptions;
 
 export const auth = betterAuth({
