@@ -21,9 +21,10 @@
     "@t3-oss/env-core": "^0.13.10",
     "@vidcastx/auth": "workspace:^",
     "@vidcastx/database": "workspace:*",
+    "@vidcastx/queue": "workspace:^",
     "@vidcastx/redis": "workspace:^",
     "@vidcastx/storage": "workspace:^",
-    "better-auth": "^1.5.2",
+    "better-auth": "^1.5.3",
     "elysia": "latest",
     "zod": "^4.3.6"
   },

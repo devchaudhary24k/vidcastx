@@ -8,6 +8,7 @@ linkWorkspacePackages: true
 
 overrides:
   "@types/minimatch": 5.1.2
+  "ioredis": 5.10.0
 
 publicHoistPattern:
   - "@ianvs/prettier-plugin-sort-imports"
