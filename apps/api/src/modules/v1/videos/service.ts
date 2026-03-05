@@ -2,6 +2,7 @@ import { and, eq } from "@vidcastx/database";
 import { db } from "@vidcastx/database/client";
 import { videos } from "@vidcastx/database/schema/video-schema";
 import { generateId } from "@vidcastx/database/utils/id";
+import { transcodeQueue } from "@vidcastx/queue";
 import {
   abortMultipartUpload,
   completeMultipartUpload,
@@ -84,8 +85,22 @@ export class VideoService {
       .where(eq(videos.id, video.id));
 
     //    TODO: Trigger BullMQ Worker here
+    await transcodeQueue.add(
+      `transcode-${video.id}`,
+      {
+        videoId: video.id,
+        orgId: video.orgId,
+        s3InputKey: video.masterAccessUrl!,
+        userId: video.uploaderId!,
+      },
+      {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 2000 },
+      },
+    );
 
-    console.log(`[VideoService] Queued transcoding for ${video.id}`);
+    console.log(`[VideoService] Queued transcoding job for video: ${video.id}`);
+
     return { status: "success", videoId: video.id };
   }
 

@@ -10,6 +10,9 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "with-env": "dotenv -e ../../.env --"
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "prettier": "@vidcastx/prettier",
   "devDependencies": {
     "@types/node": "^25.3.3",
