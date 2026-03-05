@@ -84,7 +84,6 @@ export class VideoService {
       .set({ status: "processing" })
       .where(eq(videos.id, video.id));
 
-    //    TODO: Trigger BullMQ Worker here
     await transcodeQueue.add(
       `transcode-${video.id}`,
       {
