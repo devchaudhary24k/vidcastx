@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import path from "node:path";
 
 type TranscodeOptions = {
   inputPath: string;
@@ -113,52 +114,115 @@ function buildStreamVariants(sourceHeight: number, sourceFps: number): StreamVar
   return variants;
 }
 
-export async function runFFmpegTranscode(inputPath: string, outputPath: string): Promise<void> {
-  const args = [
-    "-i",
-    inputPath, // Input file
-    "-y", // Overwrite output file if it exists
-    "-vf",
-    "scale='min(1920,iw)':-2", // Scale to 1080p max, preserve aspect ratio
-    "-c:v",
-    "libx264", // Standard widely-supported video codec
-    "-preset",
-    "fast", // Encoding speed vs compression ratio
-    "-crf",
-    "23", // Visual quality (lower is better, 23 is standard)
+export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: TranscodeOptions): Promise<void> {
+  // Probe the video first
+  const { duration: totalDuration, height: inputHeight, fps: inputFps } = await probeVideo(inputPath);
+  console.log(`[FFmpeg] Probed video: ${inputPath}p @ ${inputFps}fps, Duration: ${totalDuration}s`);
+
+  // Build the exact variants needed
+  const streamVariants = buildStreamVariants(inputHeight, inputFps);
+  console.log(
+    `[FFmpeg] Generating ${streamVariants.length} HLS variants:`,
+    streamVariants.map((v) => v.name).join(", "),
+  );
+
+  // Build the dynamic FFmpeg command for HLS
+  const args = ["-i", inputPath, "-y"];
+
+  let varStreamMap = "";
+
+  // Create video mapping for each valid resolution & framerate
+  streamVariants.forEach((variant, idx) => {
+    args.push(
+      "-map",
+      "0:v:0",
+      `-c:v:${idx}`,
+      "libx264",
+      `-b:v:${idx}`,
+      `${variant.bitrate}k`,
+      `-maxrate:v:${idx}`,
+      `${Math.round(variant.bitrate * 1.05)}k`,
+      `-bufsize:v:${idx}`,
+      `${Math.round(variant.bitrate * 1.5)}k`,
+      `-vf:v:${idx}`,
+      `scale=-2:${variant.height}`, // Scale proportionally
+      `-r:v:${idx}`,
+      `${variant.fps}`, // Force specific framerate rendering
+      `-preset`,
+      "fast",
+      `-crf`,
+      "23",
+    );
+
+    // Bind video and audio streams together, and assign the Display Name (e.g., name:1080p60)
+    varStreamMap += `v:${idx},a:0,name:${variant.name} `;
+  });
+
+  // Add standard audio mapping
+  args.push(
+    "-map",
+    "0:a:0?", // The '?' ensures it doesn't crash if video has no audio
     "-c:a",
-    "aac", // Standard audio codec
+    "aac",
     "-b:a",
-    "128k", // Audio bitrate
-    "-movflags",
-    "+faststart", // Optimizes MP4 for immediate web streaming
-    outputPath, // Output file
-  ];
+    "128k",
+    "-ac",
+    "2",
+  );
+
+  // Configure HLS Output
+  args.push(
+    "-f",
+    "hls",
+    "-hls_time",
+    "6", // 6-second chunks for smooth adaptive switching
+    "-hls_playlist_type",
+    "vod",
+    "-hls_segment_filename",
+    path.join(outputDir, "%v_segment%03d.ts"),
+    "-master_pl_name",
+    "master.m3u8",
+    "-var_stream_map",
+    varStreamMap.trim(),
+    path.join(outputDir, "%v_playlist.m3u8"),
+  );
 
   return new Promise((resolve, reject) => {
-    // Spawn a native process
+    // Spawn the process
     const ffmpeg = spawn("ffmpeg", args);
 
-    //Listen to the output (FFmpeg logs to stderr, not stdout!)
+    // Parse progress output
     ffmpeg.stderr.on("data", (data) => {
       const output = data.toString();
 
-      if (output.includes("frame=") || output.includes("time=")) process.stdout.write(`\r[FFmpeg] ${output.trim()}`);
-    });
+      // Print raw logs to terminal
+      if (output.includes("frame=") || output.includes("time="))
+        process.stdout.write(`\r[FFmpeg Engine] ${output.trim()}`);
 
-    // Handle completion
-    ffmpeg.on("close", (code) => {
-      // Print a new line after the progress stream finishes
-      process.stdout.write("\n");
+      const timeMatch = output.match(/time=(\d{2}):(\d{2}):(\d{2}\.\d+)/);
+      if (timeMatch && totalDuration > 0 && onProgress) {
+        const hours = parseInt(timeMatch[1], 10);
+        const minutes = parseInt(timeMatch[2], 10);
+        const seconds = parseInt(timeMatch[3]);
 
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`FFmpeg process exited with code ${code}`));
+        const currentTime = hours * 3600 + minutes * 60 + seconds;
+        let percent = Math.round((currentTime / totalDuration) * 100);
+        percent = Math.min(percent, 99);
+
+        onProgress(percent);
       }
     });
 
-    //
+    ffmpeg.on("close", (code) => {
+      process.stdout.write(`\n`);
+      if (code === 0) {
+        if (onProgress) onProgress(100);
+        resolve();
+      } else {
+        reject(new Error(`FFmpeg exited with error code ${code}`));
+      }
+    });
+
     ffmpeg.on("error", (err) => {
       reject(err);
     });
