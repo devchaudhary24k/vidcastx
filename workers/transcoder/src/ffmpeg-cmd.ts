@@ -1,6 +1,8 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
 
+import { env } from "./env";
+
 /**
  * Configuration options for the transcoding process.
  */
@@ -30,6 +32,16 @@ const BASE_RESOLUTIONS = [
   { namePrefix: "720p", height: 720, baseBitrate: 2800 },
   { namePrefix: "480p", height: 480, baseBitrate: 1400 },
 ];
+
+/**
+ * Hardware Acceleration Toggle
+ * Set HW_ENCODER in your .env file to utilize GPU encoding:
+ * - 'h264_nvenc' for NVIDIA GPUs (Production/AWS)
+ * - 'h264_videotoolbox' for Apple Silicon (Mac M1/M2/M3)
+ * - 'h264_amf' for AMD GPUs
+ * Defaults to 'libx264' (CPU) if no hardware encoder is specified.
+ */
+const VIDEO_ENCODER = env.HW_ENCODER || "libx264";
 
 /**
  * Extracts metadata from a video file using ffprobe.
@@ -81,7 +93,6 @@ async function probeVideo(
  * Generates an array of optimal stream variants based on the source video's constraints.
  * Ensures the transcoder never attempts to upscale resolutions or interpolate framerates.
  * * @param sourceHeight - The pixel height of the original video.
- * @param sourceHeight
  * @param sourceFps - The frames per second of the original video.
  * @returns An array of stream configurations to be processed.
  */
@@ -133,6 +144,7 @@ export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: T
   console.log(
     `[FFmpeg] Probed video: ${inputHeight}p @ ${inputFps}fps, Duration: ${totalDuration}s, Audio: ${hasAudio}`,
   );
+  console.log(`[FFmpeg] Using Video Encoder: ${VIDEO_ENCODER}`);
 
   const streamVariants = buildStreamVariants(inputHeight, inputFps);
   console.log(
@@ -150,10 +162,10 @@ export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: T
       args.push("-map", "0:a:0");
     }
 
-    // Configure video encoding parameters for the variant
+    // Configure video encoding parameters for the variant, utilizing the hardware toggle
     args.push(
       `-c:v:${idx}`,
-      "libx264",
+      VIDEO_ENCODER,
       `-b:v:${idx}`,
       `${variant.bitrate}k`,
       `-maxrate:v:${idx}`,
@@ -166,9 +178,12 @@ export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: T
       `${variant.fps}`,
       `-preset`,
       "fast",
-      `-crf`,
-      "23",
     );
+
+    // Only apply CRF to the software encoder, as NVENC and VideoToolbox handle rate control differently
+    if (VIDEO_ENCODER === "libx264") {
+      args.push(`-crf`, "23");
+    }
 
     // Configure audio encoding parameters matching the current variant index
     if (hasAudio) {

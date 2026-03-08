@@ -6,6 +6,7 @@ export const env = createEnv({
     TRANSCODER_SECRET: z.string(),
     API_URL: z.string(),
     TRANSCODER_ID: z.string(),
+    HW_ENCODER: z.string(),
   },
 
   shared: {
