@@ -1,19 +1,29 @@
 import { spawn } from "node:child_process";
 import path from "node:path";
 
-type TranscodeOptions = {
+/**
+ * Configuration options for the transcoding process.
+ */
+interface TranscodeOptions {
   inputPath: string;
   outputDir: string;
   onProgress?: (percent: number) => void | Promise<void>;
-};
+}
 
-type StreamVariants = {
+/**
+ * Represents a single HLS stream variant (e.g., 1080p60, 720p30).
+ */
+interface StreamVariant {
   name: string;
   height: number;
   fps: number;
-  bitrate: number; // in kbps
-};
+  bitrate: number;
+}
 
+/**
+ * Baseline bitrates for standard 30fps viewing at maximum supported resolutions.
+ * High framerates will dynamically multiply these base bitrates.
+ */
 const BASE_RESOLUTIONS = [
   { namePrefix: "4K", height: 2160, baseBitrate: 15000 },
   { namePrefix: "1080p", height: 1080, baseBitrate: 5000 },
@@ -22,19 +32,19 @@ const BASE_RESOLUTIONS = [
 ];
 
 /**
- * X-Rays the video using ffprobe to get exact duration, height, and precise framerate.
- *
- * @param filePath
+ * Extracts metadata from a video file using ffprobe.
+ * * @param filePath - The absolute path to the video file.
+ * @returns A promise resolving to the video's duration, height, fps, and audio presence.
  */
-async function probeVideo(filePath: string): Promise<{ duration: number; height: number; fps: number }> {
+async function probeVideo(
+  filePath: string,
+): Promise<{ duration: number; height: number; fps: number; hasAudio: boolean }> {
   return new Promise((resolve, reject) => {
     const ffprobe = spawn("ffprobe", [
       "-v",
       "error",
-      "-select_streams",
-      "v:0",
       "-show_entries",
-      "stream=height,duration,r_frame_rate:format=duration",
+      "stream=codec_type,height,duration,r_frame_rate:format=duration",
       "-of",
       "json",
       filePath,
@@ -48,15 +58,18 @@ async function probeVideo(filePath: string): Promise<{ duration: number; height:
 
       try {
         const meta = JSON.parse(output);
-        const height = parseInt(meta.streams[0]?.height || "1080");
-        const duration = parseFloat(meta.streams[0]?.duration || meta.format?.duration || 0);
 
-        // Parse framerate (usually stored as a fraction like "60000/1001" "144/1")
-        const r_frame_rate = meta.streams[0]?.frame_rate || "30/1";
+        const videoStream = meta.streams?.find((s: any) => s.codec_type === "video");
+        const hasAudio = meta.streams?.some((s: any) => s.codec_type === "audio") || false;
+
+        const height = parseInt(videoStream?.height || "1080");
+        const duration = parseFloat(videoStream?.duration || meta.format?.duration || 0);
+
+        const r_frame_rate = videoStream?.r_frame_rate || "30/1";
         const [num, den] = r_frame_rate.split("/");
         const fps = Math.round(parseInt(num, 10) / parseInt(den, 10) || 30);
 
-        resolve({ height, duration, fps });
+        resolve({ height, duration, fps, hasAudio });
       } catch (err) {
         reject(new Error("Failed to parse ffprobe output."));
       }
@@ -65,35 +78,30 @@ async function probeVideo(filePath: string): Promise<{ duration: number; height:
 }
 
 /**
- * Dynamically builds the array of variants to encode based on source constraints.
- *
+ * Generates an array of optimal stream variants based on the source video's constraints.
+ * Ensures the transcoder never attempts to upscale resolutions or interpolate framerates.
+ * * @param sourceHeight - The pixel height of the original video.
  * @param sourceHeight
- * @param sourceFps
+ * @param sourceFps - The frames per second of the original video.
+ * @returns An array of stream configurations to be processed.
  */
-function buildStreamVariants(sourceHeight: number, sourceFps: number): StreamVariants[] {
-  const variants: StreamVariants[] = [];
+function buildStreamVariants(sourceHeight: number, sourceFps: number): StreamVariant[] {
+  const variants: StreamVariant[] = [];
 
   BASE_RESOLUTIONS.forEach((res) => {
-    // Skip upscaling (but always guarantee at least a 480p output)
-    // If the input is 8k (4320p), it will hit the 4k (2160p) rule and properly downscale
     if (res.height > sourceHeight && res.height !== 480) return;
 
-    // Determine which framerates to generate for this height
-    // Keep the original FPS, if it's cinematic/low (e.g. 28fps), otherwise cap baseline at 30.
     let targetFramerates = [sourceFps < 30 ? sourceFps : 30];
 
-    // Only offer high-framerate option for HD content and above
     if (res.height >= 720) {
       if (sourceFps >= 58) targetFramerates.push(60);
       if (sourceFps >= 115 && sourceFps < 140) targetFramerates.push(120);
       if (sourceFps >= 140) targetFramerates.push(144);
     }
 
-    // Deduplicate and construct specific variants
     targetFramerates = [...new Set(targetFramerates)];
 
     targetFramerates.forEach((fps) => {
-      // Calculate Bitrate scaling for high FPS (more frames = more data needed)
       let fpsMultiplier = 1;
       if (fps > 30 && fps <= 60) fpsMultiplier = 1.5;
       if (fps > 60 && fps <= 120) fpsMultiplier = 2.4;
@@ -114,28 +122,36 @@ function buildStreamVariants(sourceHeight: number, sourceFps: number): StreamVar
   return variants;
 }
 
+/**
+ * Orchestrates the FFmpeg process to transcode an input video into an Adaptive Bitrate (ABR) HLS stream.
+ * Automatically generates a master playlist linking multiple resolutions and framerates.
+ * * @param options - Transcoding settings including input/output paths and progress callbacks.
+ */
 export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: TranscodeOptions): Promise<void> {
-  // Probe the video first
-  const { duration: totalDuration, height: inputHeight, fps: inputFps } = await probeVideo(inputPath);
-  console.log(`[FFmpeg] Probed video: ${inputPath}p @ ${inputFps}fps, Duration: ${totalDuration}s`);
+  const { duration: totalDuration, height: inputHeight, fps: inputFps, hasAudio } = await probeVideo(inputPath);
 
-  // Build the exact variants needed
+  console.log(
+    `[FFmpeg] Probed video: ${inputHeight}p @ ${inputFps}fps, Duration: ${totalDuration}s, Audio: ${hasAudio}`,
+  );
+
   const streamVariants = buildStreamVariants(inputHeight, inputFps);
   console.log(
     `[FFmpeg] Generating ${streamVariants.length} HLS variants:`,
     streamVariants.map((v) => v.name).join(", "),
   );
 
-  // Build the dynamic FFmpeg command for HLS
   const args = ["-i", inputPath, "-y"];
-
   let varStreamMap = "";
 
-  // Create video mapping for each valid resolution & framerate
   streamVariants.forEach((variant, idx) => {
+    // Map individual video and audio streams for the current variant to prevent packet starvation
+    args.push("-map", "0:v:0");
+    if (hasAudio) {
+      args.push("-map", "0:a:0");
+    }
+
+    // Configure video encoding parameters for the variant
     args.push(
-      "-map",
-      "0:v:0",
       `-c:v:${idx}`,
       "libx264",
       `-b:v:${idx}`,
@@ -144,38 +160,32 @@ export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: T
       `${Math.round(variant.bitrate * 1.05)}k`,
       `-bufsize:v:${idx}`,
       `${Math.round(variant.bitrate * 1.5)}k`,
-      `-vf:v:${idx}`,
-      `scale=-2:${variant.height}`, // Scale proportionally
+      `-filter:v:${idx}`,
+      `scale=-2:${variant.height}`,
       `-r:v:${idx}`,
-      `${variant.fps}`, // Force specific framerate rendering
+      `${variant.fps}`,
       `-preset`,
       "fast",
       `-crf`,
       "23",
     );
 
-    // Bind video and audio streams together, and assign the Display Name (e.g., name:1080p60)
-    varStreamMap += `v:${idx},a:0,name:${variant.name} `;
+    // Configure audio encoding parameters matching the current variant index
+    if (hasAudio) {
+      args.push(`-c:a:${idx}`, "aac", `-b:a:${idx}`, "128k", `-ac:${idx}`, "2");
+    }
+
+    // Construct the variant map entry for the HLS master playlist
+    const audioMap = hasAudio ? `,a:${idx}` : "";
+    varStreamMap += `v:${idx}${audioMap},name:${variant.name} `;
   });
 
-  // Add standard audio mapping
-  args.push(
-    "-map",
-    "0:a:0?", // The '?' ensures it doesn't crash if video has no audio
-    "-c:a",
-    "aac",
-    "-b:a",
-    "128k",
-    "-ac",
-    "2",
-  );
-
-  // Configure HLS Output
+  // Apply global HLS packaging constraints
   args.push(
     "-f",
     "hls",
     "-hls_time",
-    "6", // 6-second chunks for smooth adaptive switching
+    "6",
     "-hls_playlist_type",
     "vod",
     "-hls_segment_filename",
@@ -188,22 +198,21 @@ export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: T
   );
 
   return new Promise((resolve, reject) => {
-    // Spawn the process
     const ffmpeg = spawn("ffmpeg", args);
 
-    // Parse progress output
     ffmpeg.stderr.on("data", (data) => {
       const output = data.toString();
 
-      // Print raw logs to terminal
-      if (output.includes("frame=") || output.includes("time="))
+      if (output.includes("frame=") || output.includes("time=")) {
         process.stdout.write(`\r[FFmpeg Engine] ${output.trim()}`);
+      }
 
+      // Extract current timestamp to calculate completion percentage
       const timeMatch = output.match(/time=(\d{2}):(\d{2}):(\d{2}\.\d+)/);
       if (timeMatch && totalDuration > 0 && onProgress) {
         const hours = parseInt(timeMatch[1], 10);
         const minutes = parseInt(timeMatch[2], 10);
-        const seconds = parseInt(timeMatch[3]);
+        const seconds = parseFloat(timeMatch[3]);
 
         const currentTime = hours * 3600 + minutes * 60 + seconds;
         let percent = Math.round((currentTime / totalDuration) * 100);
@@ -214,7 +223,7 @@ export async function runFFmpegTranscode({ inputPath, outputDir, onProgress }: T
     });
 
     ffmpeg.on("close", (code) => {
-      process.stdout.write(`\n`);
+      process.stdout.write("\n");
       if (code === 0) {
         if (onProgress) onProgress(100);
         resolve();
