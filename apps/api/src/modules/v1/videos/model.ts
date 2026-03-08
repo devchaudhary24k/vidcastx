@@ -1,19 +1,18 @@
 import { z } from "zod";
 
-// Default NanoID is 21 characters
 export const VideoModel = {
-  // 1. Common Params (Client sends ID in URL)
+  // Common Params (Client sends ID in URL)
   params: z.object({
     id: z.string(),
   }),
 
-  // 2. Pagination Query
+  // Pagination Query
   pagination: z.object({
     page: z.coerce.number().min(1).default(1).optional(),
     limit: z.coerce.number().min(1).max(100).default(10).optional(),
   }),
 
-  // 3. Create Draft
+  // Create Draft
   create: z.object({
     title: z.string().min(3).max(100).optional(),
     folderId: z.string().optional(),
@@ -22,7 +21,7 @@ export const VideoModel = {
     description: z.string().optional(),
   }),
 
-  // 4. Update Metadata
+  // Update Metadata
   update: z.object({
     title: z.string().min(3).max(100).optional(),
     description: z.string().optional(),
@@ -30,10 +29,7 @@ export const VideoModel = {
     schedule: z.iso.datetime().optional(), // ISO Date string
   }),
 
-  // =========================================
-  // MULTIPART UPLOAD MODELS
-  // =========================================
-
+  // Multipart
   multipartInit: z.object({
     contentType: z.string(),
   }),
@@ -41,8 +37,6 @@ export const VideoModel = {
   multipartSign: z.object({
     uploadId: z.string(),
     partNumber: z.coerce.number(),
-    // NOTE: We do NOT ask the client for 'key' anymore.
-    // We get the key securely from the 'video' object in the database.
   }),
 
   multipartComplete: z.object({
@@ -61,5 +55,11 @@ export const VideoModel = {
 
   multipartAbort: z.object({
     uploadId: z.string(),
+  }),
+
+  updateProcessingStatus: z.object({
+    status: z.enum({ processing: "processing", ready: "ready", failed: "failed" }),
+    playbackUrl: z.string().optional(),
+    errorReason: z.string().optional(),
   }),
 };

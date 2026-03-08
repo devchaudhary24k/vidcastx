@@ -15,6 +15,7 @@
     "@elysiajs/bearer": "^1.4.3",
     "@elysiajs/cors": "^1.4.1",
     "@elysiajs/cron": "^1.4.1",
+    "@elysiajs/jwt": "^1.4.1",
     "@elysiajs/openapi": "^1.4.14",
     "@elysiajs/opentelemetry": "^1.4.10",
     "@elysiajs/server-timing": "^1.4.0",

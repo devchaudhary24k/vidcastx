@@ -33,7 +33,8 @@
       "@server/*": ["./src/*"],
       "@vidcastx/database/*": ["../../packages/database/src/*"],
       "@vidcastx/storage/*": ["../../packages/storage/src/*"],
-      "@vidcastx/redis/*": ["../../packages/redis/src/*"]
+      "@vidcastx/redis/*": ["../../packages/redis/src/*"],
+      "@transcoder/*": ["../../workers/transcoder/src/*"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */

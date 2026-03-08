@@ -114,4 +114,18 @@ export class VideoService {
     console.log(`[VideoService] Upload aborted for ${video.id}`);
     return { status: "success", videoId: video.id };
   }
+
+  static async updateProcessingStatus(
+    videoId: string,
+    status: "processing" | "ready" | "failed",
+    data?: { playbackUrl?: string; errorReason?: string },
+  ) {
+    await db
+      .update(videos)
+      .set({ status, playbackUrl: data?.playbackUrl, errorReason: data?.errorReason })
+      .where(eq(videos.id, videoId));
+
+    console.log(`[Internal API] Video ${videoId} status updated to ${status}`);
+    return { success: true };
+  }
 }

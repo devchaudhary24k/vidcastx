@@ -14,11 +14,13 @@
   },
   "prettier": "@vidcastx/prettier",
   "dependencies": {
+    "@t3-oss/env-core": "^0.13.10",
     "@vidcastx/queue": "workspace:^",
     "@vidcastx/redis": "workspace:^",
     "@vidcastx/storage": "workspace:^",
     "bullmq": "^5.70.1",
-    "dotenv-cli": "^11.0.0"
+    "dotenv-cli": "^11.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",

@@ -6,9 +6,10 @@ import { Elysia } from "elysia";
 
 import { auth } from "@vidcastx/auth";
 
+import internalController from "./modules/internal";
 import v1Router from "./modules/v1";
 
-const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router);
+const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router).use(internalController);
 
 const server = new Elysia()
   .use(opentelemetry())
