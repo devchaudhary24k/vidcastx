@@ -1,11 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  foreignKey,
-  index,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { foreignKey, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization, user } from "./auth-schema";

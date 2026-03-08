@@ -6,13 +6,7 @@ import { useForm } from "@tanstack/react-form";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@vidcastx/ui/components/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 
@@ -41,10 +35,8 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
 
   useEffect(() => {
     if (session?.user) {
-      if (session.user.firstName)
-        form.setFieldValue("firstName", session.user.firstName);
-      if (session.user.lastName)
-        form.setFieldValue("lastName", session.user.lastName);
+      if (session.user.firstName) form.setFieldValue("firstName", session.user.firstName);
+      if (session.user.lastName) form.setFieldValue("lastName", session.user.lastName);
     }
   }, [session, form]);
 
@@ -53,12 +45,8 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
   return (
     <Card className="mx-auto max-w-lg">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">
-          Welcome! Let&apos;s get started.
-        </CardTitle>
-        <CardDescription>
-          Tell us a bit about yourself so we can personalize your experience.
-        </CardDescription>
+        <CardTitle className="text-xl">Welcome! Let&apos;s get started.</CardTitle>
+        <CardDescription>Tell us a bit about yourself so we can personalize your experience.</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -72,16 +60,10 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
           <form.Field name="avatarUrl">
             {(field) => (
               <div className="flex flex-col items-center gap-4">
-                <AvatarUploader
-                  value={field.state.value || ""}
-                  onChange={field.handleChange}
-                  fallbackInitials="ME"
-                />
+                <AvatarUploader value={field.state.value || ""} onChange={field.handleChange} fallbackInitials="ME" />
                 <div className="text-center">
                   <p className="text-sm font-medium">Profile Photo</p>
-                  <p className="text-muted-foreground text-xs">
-                    Click to upload (JPG, PNG, GIF)
-                  </p>
+                  <p className="text-muted-foreground text-xs">Click to upload (JPG, PNG, GIF)</p>
                 </div>
               </div>
             )}
@@ -90,9 +72,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="firstName">
               {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0;
+                const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
                 return (
                   <Field>
                     <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
@@ -113,9 +93,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
 
             <form.Field name="lastName">
               {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0;
+                const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
                 return (
                   <Field>
                     <FieldLabel htmlFor={field.name}>Last Name</FieldLabel>
@@ -137,9 +115,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
 
           <form.Field name="recoveryEmail">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched &&
-                field.state.meta.errors.length > 0;
+              const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
               return (
                 <Field>
                   <FieldLabel htmlFor={field.name}>Recovery Email</FieldLabel>
@@ -159,9 +135,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
             }}
           </form.Field>
 
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button type="submit" disabled={!canSubmit} className="w-full">
                 {isSubmitting ? "Saving..." : "Next Step"}

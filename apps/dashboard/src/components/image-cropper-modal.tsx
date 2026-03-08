@@ -4,13 +4,7 @@ import { RotateCcw, RotateCw, ZoomIn, ZoomOut } from "lucide-react";
 import Cropper from "react-easy-crop";
 
 import { Button } from "@vidcastx/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@vidcastx/ui/components/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@vidcastx/ui/components/dialog";
 import { Slider } from "@vidcastx/ui/components/slider";
 
 interface ImageCropperModalProps {
@@ -20,12 +14,7 @@ interface ImageCropperModalProps {
   onCropComplete: (croppedImageBase64: string) => void;
 }
 
-export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
-  isOpen,
-  onClose,
-  imageSrc,
-  onCropComplete,
-}) => {
+export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({ isOpen, onClose, imageSrc, onCropComplete }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -33,11 +22,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
   const handleSave = async () => {
     if (imageSrc && croppedAreaPixels) {
-      const croppedImage = await getCroppedImg(
-        imageSrc,
-        croppedAreaPixels,
-        rotation,
-      );
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
       if (croppedImage) {
         onCropComplete(croppedImage);
         onClose();
@@ -92,23 +77,11 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRotateLeft}
-              title="Rotate Left"
-            >
+            <Button variant="outline" size="icon" onClick={handleRotateLeft} title="Rotate Left">
               <RotateCcw className="h-4 w-4" />
             </Button>
-            <div className="text-muted-foreground min-w-[3ch] text-center text-sm">
-              {rotation % 360}°
-            </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRotateRight}
-              title="Rotate Right"
-            >
+            <div className="text-muted-foreground min-w-[3ch] text-center text-sm">{rotation % 360}°</div>
+            <Button variant="outline" size="icon" onClick={handleRotateRight} title="Rotate Right">
               <RotateCw className="h-4 w-4" />
             </Button>
           </div>
@@ -147,10 +120,8 @@ function rotateSize(width: number, height: number, rotation: number) {
   const rotRad = getRadianAngle(rotation);
 
   return {
-    width:
-      Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
-    height:
-      Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+    width: Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+    height: Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
   };
 }
 
@@ -171,11 +142,7 @@ async function getCroppedImg(
   const rotRad = getRadianAngle(rotation);
 
   // calculate bounding box of the rotated image
-  const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
-    image.width,
-    image.height,
-    rotation,
-  );
+  const { width: bBoxWidth, height: bBoxHeight } = rotateSize(image.width, image.height, rotation);
 
   // set canvas size to match the bounding box
   canvas.width = bBoxWidth;
@@ -192,12 +159,7 @@ async function getCroppedImg(
 
   // croppedAreaPixels values are bounding box relative
   // extract the cropped image using these values
-  const data = ctx.getImageData(
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
-  );
+  const data = ctx.getImageData(pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height);
 
   // set canvas width to final desired crop size - this will clear existing context
   canvas.width = pixelCrop.width;

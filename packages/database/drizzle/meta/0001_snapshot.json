@@ -4705,13 +4705,7 @@
     "public.ai_job_type": {
       "name": "ai_job_type",
       "schema": "public",
-      "values": [
-        "transcribe",
-        "translate",
-        "dub",
-        "clean_mode",
-        "generate_metadata"
-      ]
+      "values": ["transcribe", "translate", "dub", "clean_mode", "generate_metadata"]
     },
     "public.distribution_status": {
       "name": "distribution_status",
@@ -4731,15 +4725,7 @@
     "public.subscription_status": {
       "name": "subscription_status",
       "schema": "public",
-      "values": [
-        "active",
-        "canceled",
-        "past_due",
-        "trialing",
-        "paused",
-        "incomplete",
-        "incomplete_expired"
-      ]
+      "values": ["active", "canceled", "past_due", "trialing", "paused", "incomplete", "incomplete_expired"]
     },
     "public.usage_type": {
       "name": "usage_type",
@@ -4761,15 +4747,7 @@
     "public.device_type": {
       "name": "device_type",
       "schema": "public",
-      "values": [
-        "desktop",
-        "mobile",
-        "tablet",
-        "tv",
-        "console",
-        "wearable",
-        "unknown"
-      ]
+      "values": ["desktop", "mobile", "tablet", "tv", "console", "wearable", "unknown"]
     },
     "public.player_event_type": {
       "name": "player_event_type",

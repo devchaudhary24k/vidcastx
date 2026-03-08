@@ -1,31 +1,13 @@
 import { relations } from "drizzle-orm";
-import {
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 import { assets, videos } from "./video-schema";
 
-export const jobTypeEnum = pgEnum("ai_job_type", [
-  "transcribe",
-  "translate",
-  "dub",
-  "clean_mode",
-  "generate_metadata",
-]);
+export const jobTypeEnum = pgEnum("ai_job_type", ["transcribe", "translate", "dub", "clean_mode", "generate_metadata"]);
 
-export const jobStatusEnum = pgEnum("ai_job_status", [
-  "pending",
-  "processing",
-  "completed",
-  "failed",
-]);
+export const jobStatusEnum = pgEnum("ai_job_status", ["pending", "processing", "completed", "failed"]);
 
 export const aiJobs = pgTable("ai_job", {
   id: text("id")

@@ -16,10 +16,7 @@ interface OnboardingSidebarProps {
   completedSteps: number[];
 }
 
-export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({
-  currentStep,
-  completedSteps,
-}) => {
+export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({ currentStep, completedSteps }) => {
   return (
     <nav className="flex w-fit flex-col gap-8">
       {STEPS.map((step, index) => {
@@ -28,8 +25,7 @@ export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({
         const Icon = step.icon;
         const isLast = index === STEPS.length - 1;
         const nextStep = STEPS[index + 1];
-        const isNextCompleted =
-          nextStep && completedSteps.includes(nextStep.id);
+        const isNextCompleted = nextStep && completedSteps.includes(nextStep.id);
 
         return (
           <div
@@ -50,11 +46,7 @@ export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({
                       : "border-muted-foreground bg-background text-muted-foreground",
                 )}
               >
-                {isCompleted ? (
-                  <Check className="h-5 w-5" />
-                ) : (
-                  <Icon className="h-5 w-5" />
-                )}
+                {isCompleted ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
               </div>
 
               {/* Connector Line */}
@@ -62,21 +54,14 @@ export const OnboardingSidebar: React.FC<OnboardingSidebarProps> = ({
                 <div
                   className={cn(
                     "absolute top-10 -z-10 h-full w-0.5",
-                    completedSteps.includes(step.id) && isNextCompleted
-                      ? "bg-primary"
-                      : "bg-border",
+                    completedSteps.includes(step.id) && isNextCompleted ? "bg-primary" : "bg-border",
                   )}
                   style={{ height: "calc(100% + 32px)" }}
                 />
               )}
             </div>
 
-            <div
-              className={cn(
-                "text-sm font-medium",
-                isCurrent ? "text-primary font-bold" : "text-muted-foreground",
-              )}
-            >
+            <div className={cn("text-sm font-medium", isCurrent ? "text-primary font-bold" : "text-muted-foreground")}>
               {step.title}
             </div>
           </div>

@@ -1,15 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  real,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, real, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
@@ -67,9 +57,7 @@ export const videoStats = pgTable(
     date: timestamp("date").notNull(), // The date of the stats
     views: integer("views").default(0).notNull(), // The number of views
     uniqueViewers: integer("unique_viewers").default(0).notNull(), // The number of unique viewers
-    totalWatchTimeSeconds: integer("total_watch_time_seconds")
-      .default(0)
-      .notNull(), // The total watch time in seconds
+    totalWatchTimeSeconds: integer("total_watch_time_seconds").default(0).notNull(), // The total watch time in seconds
     avgWatchTimeSeconds: integer("avg_watch_time_seconds").default(0), // The average watch time in seconds
     avgPercentageWatched: real("avg_percentage_watched").default(0), // The average percentage of the video watched
     likes: integer("likes").default(0).notNull(), // The number of likes
@@ -105,9 +93,7 @@ export const videoHeatmap = pgTable(
     dropOffPoints: jsonb("drop_off_points").default([]), // The points where viewers dropped off
     createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the heatmap was created
   },
-  (table) => [
-    index("video_heatmap_videoId_date_idx").on(table.videoId, table.date),
-  ],
+  (table) => [index("video_heatmap_videoId_date_idx").on(table.videoId, table.date)],
 );
 
 export const viewSessions = pgTable(
@@ -199,13 +185,7 @@ export const videoStatsByDimension = pgTable(
     avgPercentageWatched: real("avg_percentage_watched").default(0), // The average percentage of the video watched
     createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the stats were created
   },
-  (table) => [
-    index("stats_dimension_video_date_idx").on(
-      table.videoId,
-      table.date,
-      table.dimension,
-    ),
-  ],
+  (table) => [index("stats_dimension_video_date_idx").on(table.videoId, table.date, table.dimension)],
 );
 
 export const streamStats = pgTable(
@@ -244,9 +224,7 @@ export const orgStats = pgTable(
     date: timestamp("date").notNull(), // The date of the stats
     totalViews: integer("total_views").default(0).notNull(), // The total number of views
     totalUniqueViewers: integer("total_unique_viewers").default(0).notNull(), // The total number of unique viewers
-    totalWatchTimeSeconds: integer("total_watch_time_seconds")
-      .default(0)
-      .notNull(), // The total watch time in seconds
+    totalWatchTimeSeconds: integer("total_watch_time_seconds").default(0).notNull(), // The total watch time in seconds
     videosUploaded: integer("videos_uploaded").default(0), // The number of videos uploaded
     videosPublished: integer("videos_published").default(0), // The number of videos published
     streamsStarted: integer("streams_started").default(0), // The number of streams started
@@ -299,10 +277,7 @@ export const searchQueries = pgTable(
     clickedTimestamp: integer("clicked_timestamp"), // The timestamp of the clicked video
     createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the query was created
   },
-  (table) => [
-    index("search_query_orgId_idx").on(table.orgId),
-    index("search_query_query_idx").on(table.query),
-  ],
+  (table) => [index("search_query_orgId_idx").on(table.orgId), index("search_query_query_idx").on(table.query)],
 );
 
 export const embedStats = pgTable(
@@ -340,9 +315,7 @@ export const realtimeMetrics = pgTable(
     viewsLastHour: integer("views_last_hour").default(0), // The number of views in the last hour
     updatedAt: timestamp("updated_at").defaultNow().notNull(), // The timestamp when the metrics were last updated
   },
-  (table) => [
-    index("realtime_entity_idx").on(table.entityType, table.entityId),
-  ],
+  (table) => [index("realtime_entity_idx").on(table.entityType, table.entityId)],
 );
 
 export const videoStatsRelations = relations(videoStats, ({ one }) => ({
@@ -359,16 +332,13 @@ export const videoHeatmapRelations = relations(videoHeatmap, ({ one }) => ({
   }),
 }));
 
-export const viewSessionsRelations = relations(
-  viewSessions,
-  ({ one, many }) => ({
-    video: one(videos, {
-      fields: [viewSessions.videoId],
-      references: [videos.id],
-    }),
-    events: many(playerEvents),
+export const viewSessionsRelations = relations(viewSessions, ({ one, many }) => ({
+  video: one(videos, {
+    fields: [viewSessions.videoId],
+    references: [videos.id],
   }),
-);
+  events: many(playerEvents),
+}));
 
 export const playerEventsRelations = relations(playerEvents, ({ one }) => ({
   session: one(viewSessions, {
@@ -381,15 +351,12 @@ export const playerEventsRelations = relations(playerEvents, ({ one }) => ({
   }),
 }));
 
-export const videoStatsByDimensionRelations = relations(
-  videoStatsByDimension,
-  ({ one }) => ({
-    video: one(videos, {
-      fields: [videoStatsByDimension.videoId],
-      references: [videos.id],
-    }),
+export const videoStatsByDimensionRelations = relations(videoStatsByDimension, ({ one }) => ({
+  video: one(videos, {
+    fields: [videoStatsByDimension.videoId],
+    references: [videos.id],
   }),
-);
+}));
 
 export const streamStatsRelations = relations(streamStats, ({ one }) => ({
   stream: one(streams, {
@@ -405,19 +372,16 @@ export const orgStatsRelations = relations(orgStats, ({ one }) => ({
   }),
 }));
 
-export const channelSubscribersRelations = relations(
-  channelSubscribers,
-  ({ one }) => ({
-    organization: one(organization, {
-      fields: [channelSubscribers.orgId],
-      references: [organization.id],
-    }),
-    sourceVideo: one(videos, {
-      fields: [channelSubscribers.sourceVideoId],
-      references: [videos.id],
-    }),
+export const channelSubscribersRelations = relations(channelSubscribers, ({ one }) => ({
+  organization: one(organization, {
+    fields: [channelSubscribers.orgId],
+    references: [organization.id],
   }),
-);
+  sourceVideo: one(videos, {
+    fields: [channelSubscribers.sourceVideoId],
+    references: [videos.id],
+  }),
+}));
 
 export const searchQueriesRelations = relations(searchQueries, ({ one }) => ({
   organization: one(organization, {

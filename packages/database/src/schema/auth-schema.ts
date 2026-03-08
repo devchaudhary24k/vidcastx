@@ -20,10 +20,9 @@ export const user = pgTable("user", {
   firstName: text("first_name"),
   lastName: text("last_name"),
   deletedAt: timestamp("deleted_at"),
-  lastActiveOrganizationId: text("last_active_organization_id").references(
-    () => organization.id,
-    { onDelete: "set null" },
-  ),
+  lastActiveOrganizationId: text("last_active_organization_id").references(() => organization.id, {
+    onDelete: "set null",
+  }),
 });
 
 export const session = pgTable(
@@ -109,10 +108,7 @@ export const member = pgTable(
     role: text("role").default("member").notNull(),
     createdAt: timestamp("created_at").notNull(),
   },
-  (table) => [
-    index("member_organizationId_idx").on(table.organizationId),
-    index("member_userId_idx").on(table.userId),
-  ],
+  (table) => [index("member_organizationId_idx").on(table.organizationId), index("member_userId_idx").on(table.userId)],
 );
 
 export const invitation = pgTable(

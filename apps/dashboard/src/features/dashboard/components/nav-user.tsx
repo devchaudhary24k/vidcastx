@@ -2,20 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { auth } from "@dashboard/lib/auth";
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@vidcastx/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,12 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@vidcastx/ui/components/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
 
 export function NavUser({
   user,

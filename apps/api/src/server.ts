@@ -19,9 +19,7 @@ const server = new Elysia()
       origin: ({ headers }) => {
         const allowedOrigins = [
           "https://vidcastx.daymlabs.com",
-          ...(process.env.NODE_ENV === "production"
-            ? ["https://vidcastx.daymlabs.com"]
-            : ["http://localhost:3000"]),
+          ...(process.env.NODE_ENV === "production" ? ["https://vidcastx.daymlabs.com"] : ["http://localhost:3000"]),
         ];
         const origin = headers.get("origin");
         return !origin || allowedOrigins.includes(origin);
@@ -36,8 +34,6 @@ const server = new Elysia()
   .mount(auth.handler)
   .listen(3001);
 
-console.log(
-  `🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`,
-);
+console.log(`🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`);
 
 export type App = typeof server;

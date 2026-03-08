@@ -62,9 +62,7 @@ export const uploadActions = {
         [id]: newItem,
       };
 
-      const isStillUploading = Object.values(newUploads).some(
-        (u) => u.status === "uploading",
-      );
+      const isStillUploading = Object.values(newUploads).some((u) => u.status === "uploading");
 
       return {
         ...state,
@@ -101,9 +99,7 @@ export const uploadActions = {
     uploadStore.setState((state) => {
       const { [id]: removed, ...restUploads } = state.uploads;
 
-      const isStillUploading = Object.values(restUploads).some(
-        (u) => u.status === "uploading",
-      );
+      const isStillUploading = Object.values(restUploads).some((u) => u.status === "uploading");
 
       return {
         ...state,

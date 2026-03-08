@@ -20,9 +20,7 @@ const BASE_RESOLUTIONS = [
   { namePrefix: "480p", height: 480, baseBitrate: 1400 },
 ];
 
-async function probeVideo(
-  filePath: string,
-): Promise<{ duration: number; height: number; fps: number }> {
+async function probeVideo(filePath: string): Promise<{ duration: number; height: number; fps: number }> {
   return new Promise((resolve, reject) => {
     const ffprobe = spawn("ffprobe", [
       "-v",
@@ -40,17 +38,14 @@ async function probeVideo(
     ffprobe.stdout.on("data", (data) => (output += data.toString()));
 
     ffprobe.on("close", (code) => {
-      if (code !== 0)
-        return reject(new Error("ffprobe failed to read video metadata"));
+      if (code !== 0) return reject(new Error("ffprobe failed to read video metadata"));
 
       try {
         const meta = JSON.parse(output);
         const height = parseInt(meta.streams[0]?.height || "1080");
-        const duration = parseFloat(
-          meta.streams[0]?.duration || meta.format?.duration || 0,
-        );
+        const duration = parseFloat(meta.streams[0]?.duration || meta.format?.duration || 0);
 
-        // Parse framerate (usually stored as a fraction like "60000/1001" or "144/1")
+        // Parse framerate (usually stored as a fraction like "60000/1001" "144/1")
         // const r_frame_rate =
       } catch (err) {
         reject(new Error("Failed to parse ffprobe output."));
@@ -59,10 +54,7 @@ async function probeVideo(
   });
 }
 
-export async function runFFmpegTranscode(
-  inputPath: string,
-  outputPath: string,
-): Promise<void> {
+export async function runFFmpegTranscode(inputPath: string, outputPath: string): Promise<void> {
   const args = [
     "-i",
     inputPath, // Input file
@@ -92,8 +84,7 @@ export async function runFFmpegTranscode(
     ffmpeg.stderr.on("data", (data) => {
       const output = data.toString();
 
-      if (output.includes("frame=") || output.includes("time="))
-        process.stdout.write(`\r[FFmpeg] ${output.trim()}`);
+      if (output.includes("frame=") || output.includes("time=")) process.stdout.write(`\r[FFmpeg] ${output.trim()}`);
     });
 
     // Handle completion

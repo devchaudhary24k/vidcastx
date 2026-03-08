@@ -17,12 +17,6 @@ const defaultOptions: QueueOptions = {
   },
 };
 
-export const transcodeQueue = new Queue<TranscodeJobData>(
-  QUEUES.VIDEO_TRANSCODE,
-  defaultOptions,
-);
+export const transcodeQueue = new Queue<TranscodeJobData>(QUEUES.VIDEO_TRANSCODE, defaultOptions);
 
-export const transciptionQueue = new Queue<TranscriptionJobData>(
-  QUEUES.AI_TRANSCRIPTION,
-  defaultOptions,
-);
+export const transciptionQueue = new Queue<TranscriptionJobData>(QUEUES.AI_TRANSCRIPTION, defaultOptions);

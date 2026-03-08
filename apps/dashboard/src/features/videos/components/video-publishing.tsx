@@ -6,13 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Calendar } from "@vidcastx/ui/components/calendar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@vidcastx/ui/components/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import {
   FormControl,
   FormDescription,
@@ -21,18 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@vidcastx/ui/components/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@vidcastx/ui/components/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@vidcastx/ui/components/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@vidcastx/ui/components/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@vidcastx/ui/components/select";
 import { cn } from "@vidcastx/ui/lib/utils";
 
 import { VideoUploadFormValues } from "../schemas";
@@ -84,10 +68,8 @@ export function VideoPublishing({ form }: VideoPublishingProps) {
               </Select>
               <FormDescription className="text-xs">
                 {field.value === "public" && "Everyone can see this video."}
-                {field.value === "private" &&
-                  "Only you and invited users can watch."}
-                {field.value === "unlisted" &&
-                  "Anyone with the link can watch."}
+                {field.value === "private" && "Only you and invited users can watch."}
+                {field.value === "unlisted" && "Anyone with the link can watch."}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -107,16 +89,9 @@ export function VideoPublishing({ form }: VideoPublishingProps) {
                   <FormControl>
                     <Button
                       variant={"outline"}
-                      className={cn(
-                        "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground",
-                      )}
+                      className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                     >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
@@ -131,9 +106,7 @@ export function VideoPublishing({ form }: VideoPublishingProps) {
                   />
                 </PopoverContent>
               </Popover>
-              <FormDescription className="text-xs">
-                Schedule when this video becomes public.
-              </FormDescription>
+              <FormDescription className="text-xs">Schedule when this video becomes public.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

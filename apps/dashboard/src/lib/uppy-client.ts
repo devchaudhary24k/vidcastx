@@ -26,11 +26,9 @@ uppy.use(AwsS3, {
     const videoId = file.meta.videoId as string;
     if (!videoId) throw new Error("Missing videoId metadata");
 
-    const { data: multipartInit } = await client.api.v1
-      .videos({ id: videoId })
-      .multipart.init.post({
-        contentType: file.type,
-      });
+    const { data: multipartInit } = await client.api.v1.videos({ id: videoId }).multipart.init.post({
+      contentType: file.type,
+    });
 
     if (!multipartInit) throw new Error("Failed API Call");
     return {
@@ -44,14 +42,12 @@ uppy.use(AwsS3, {
     const { uploadId, partNumber } = partData;
     if (!uploadId) throw new Error("Missing uploadId");
 
-    const { data: url } = await client.api.v1
-      .videos({ id: videoId })
-      .multipart["sign-part"].get({
-        query: {
-          uploadId,
-          partNumber: partNumber,
-        },
-      });
+    const { data: url } = await client.api.v1.videos({ id: videoId }).multipart["sign-part"].get({
+      query: {
+        uploadId,
+        partNumber: partNumber,
+      },
+    });
 
     if (!url) throw new Error("Failed to sign part");
     return { url };
@@ -64,12 +60,10 @@ uppy.use(AwsS3, {
       ETag: part.ETag!,
     }));
 
-    const { data } = await client.api.v1
-      .videos({ id: videoId })
-      .multipart.complete.post({
-        uploadId,
-        parts: formattedPart,
-      });
+    const { data } = await client.api.v1.videos({ id: videoId }).multipart.complete.post({
+      uploadId,
+      parts: formattedPart,
+    });
 
     return { location: "" };
   },
@@ -88,11 +82,9 @@ uppy.use(AwsS3, {
     if (!uploadId) throw new Error("Missing uploadId");
     const videoId = file.meta.videoId as string;
 
-    const { data } = await client.api.v1
-      .videos({ id: videoId })
-      .multipart["list-parts"].get({
-        query: { uploadId },
-      });
+    const { data } = await client.api.v1.videos({ id: videoId }).multipart["list-parts"].get({
+      query: { uploadId },
+    });
 
     return data || [];
   },

@@ -14,10 +14,7 @@ export const organizationSchema = z.object({
   orgIdentifier: z
     .string()
     .min(3, "Identifier must be at least 3 characters")
-    .regex(
-      /^[a-z0-9-]+$/,
-      "Identifier can only contain lowercase letters, numbers, and dashes",
-    ),
+    .regex(/^[a-z0-9-]+$/, "Identifier can only contain lowercase letters, numbers, and dashes"),
   orgAvatarUrl: z.string(),
 });
 

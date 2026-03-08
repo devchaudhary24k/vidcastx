@@ -4,11 +4,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@vidcastx/auth";
 
-export default async function OnboardingLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function OnboardingLayout({ children }: { children: ReactNode }) {
   const h = await headers();
   const session = await auth.api.getSession({
     headers: h,

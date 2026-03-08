@@ -3,20 +3,8 @@
 import { FileText, Video } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@vidcastx/ui/components/card";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@vidcastx/ui/components/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@vidcastx/ui/components/form";
 import { Input } from "@vidcastx/ui/components/input";
 import { Textarea } from "@vidcastx/ui/components/textarea";
 
@@ -43,11 +31,7 @@ export function VideoDetails({ form }: VideoDetailsProps) {
               <FormControl>
                 <div className="relative">
                   <Video className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
-                  <Input
-                    placeholder="e.g. My Awesome Project Walkthrough"
-                    className="pl-9"
-                    {...field}
-                  />
+                  <Input placeholder="e.g. My Awesome Project Walkthrough" className="pl-9" {...field} />
                 </div>
               </FormControl>
               <FormMessage />

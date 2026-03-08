@@ -1,11 +1,7 @@
 import type { NextRequest } from "next/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import {
-  authRoutes,
-  DEFAULT_LOGIN_REDIRECT,
-  protectedRoutes,
-} from "@dashboard/constants/route";
+import { authRoutes, DEFAULT_LOGIN_REDIRECT, protectedRoutes } from "@dashboard/constants/route";
 
 import { auth } from "@vidcastx/auth";
 
@@ -16,16 +12,12 @@ export async function proxy(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAuthRoute = authRoutes.includes(path);
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => path === route || path.startsWith(`${route}/`),
-  );
+  const isProtectedRoute = protectedRoutes.some((route) => path === route || path.startsWith(`${route}/`));
 
   if (isProtectedRoute) {
     if (!session) {
       const callbackUrl = encodeURIComponent(path);
-      return NextResponse.redirect(
-        new URL(`/auth/login?callbackUrl=${callbackUrl}`, request.nextUrl),
-      );
+      return NextResponse.redirect(new URL(`/auth/login?callbackUrl=${callbackUrl}`, request.nextUrl));
     }
 
     // If protectedRoute and user is authenticated, give access.
@@ -35,9 +27,7 @@ export async function proxy(request: NextRequest) {
   if (isAuthRoute) {
     // If authRoute and user is authenticated, redirect user to dashboard.
     if (session) {
-      return NextResponse.redirect(
-        new URL(DEFAULT_LOGIN_REDIRECT, request.nextUrl),
-      );
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, request.nextUrl));
     }
 
     // If authRoute and user is not authenticated, allow access.

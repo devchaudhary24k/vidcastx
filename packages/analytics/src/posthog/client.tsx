@@ -12,9 +12,7 @@ type PostHogProviderProps = {
   readonly children: ReactNode;
 };
 
-export const PostHogProvider = (
-  properties: Omit<PostHogProviderProps, "client">,
-) => {
+export const PostHogProvider = (properties: Omit<PostHogProviderProps, "client">) => {
   useEffect(() => {
     posthog.init(clientKeys().NEXT_PUBLIC_POSTHOG_KEY, {
       api_host: "/ingest",

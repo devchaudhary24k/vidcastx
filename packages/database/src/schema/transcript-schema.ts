@@ -1,25 +1,10 @@
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-  vector,
-} from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, vector } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { videos } from "./video-schema";
 
-export const transcriptStatusEnum = pgEnum("transcript_status", [
-  "pending",
-  "processing",
-  "completed",
-  "failed",
-]);
+export const transcriptStatusEnum = pgEnum("transcript_status", ["pending", "processing", "completed", "failed"]);
 
 export const transcripts = pgTable(
   "transcript",
@@ -149,19 +134,16 @@ export const transcriptsRelations = relations(transcripts, ({ one, many }) => ({
   embeddings: many(transcriptEmbeddings),
 }));
 
-export const transcriptEmbeddingsRelations = relations(
-  transcriptEmbeddings,
-  ({ one }) => ({
-    transcript: one(transcripts, {
-      fields: [transcriptEmbeddings.transcriptId],
-      references: [transcripts.id],
-    }),
-    video: one(videos, {
-      fields: [transcriptEmbeddings.videoId],
-      references: [videos.id],
-    }),
+export const transcriptEmbeddingsRelations = relations(transcriptEmbeddings, ({ one }) => ({
+  transcript: one(transcripts, {
+    fields: [transcriptEmbeddings.transcriptId],
+    references: [transcripts.id],
   }),
-);
+  video: one(videos, {
+    fields: [transcriptEmbeddings.videoId],
+    references: [videos.id],
+  }),
+}));
 
 export const videoChaptersRelations = relations(videoChapters, ({ one }) => ({
   video: one(videos, {

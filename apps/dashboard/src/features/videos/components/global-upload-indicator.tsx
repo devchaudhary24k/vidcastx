@@ -2,10 +2,7 @@
 
 import type { UploadItem as UploadItemType } from "@dashboard/features/videos/stores/upload-store";
 import { useEffect, useRef } from "react";
-import {
-  uploadActions,
-  uploadStore,
-} from "@dashboard/features/videos/stores/upload-store";
+import { uploadActions, uploadStore } from "@dashboard/features/videos/stores/upload-store";
 import { uppy } from "@dashboard/lib/uppy-client";
 import { useStore } from "@tanstack/react-store";
 import { X } from "lucide-react";
@@ -82,13 +79,7 @@ function UploadToast({ upload }: { upload: UploadItemType }) {
       },
       duration: Infinity,
     });
-  }, [
-    upload.status,
-    upload.progress,
-    upload.id,
-    upload.filename,
-    upload.error,
-  ]);
+  }, [upload.status, upload.progress, upload.id, upload.filename, upload.error]);
 
   return null;
 }

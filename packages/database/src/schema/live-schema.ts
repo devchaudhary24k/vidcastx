@@ -1,13 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
@@ -34,10 +26,7 @@ export const channels = pgTable(
       .notNull(), // The timestamp when the channel was last updated
     deletedAt: timestamp("deleted_at"), // The timestamp when the channel was deleted
   },
-  (table) => [
-    index("channel_orgId_idx").on(table.orgId),
-    index("channel_streamKey_idx").on(table.streamKey),
-  ],
+  (table) => [index("channel_orgId_idx").on(table.orgId), index("channel_streamKey_idx").on(table.streamKey)],
 );
 
 export const streams = pgTable(

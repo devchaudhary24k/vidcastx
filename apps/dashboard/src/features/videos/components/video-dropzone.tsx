@@ -7,12 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Card, CardContent } from "@vidcastx/ui/components/card";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@vidcastx/ui/components/form";
+import { FormControl, FormField, FormItem, FormMessage } from "@vidcastx/ui/components/form";
 import { Input } from "@vidcastx/ui/components/input";
 import { cn } from "@vidcastx/ui/lib/utils";
 
@@ -27,13 +22,7 @@ interface VideoDropzoneProps {
   onFileSelect?: (file: File) => void;
 }
 
-export function VideoDropzone({
-  form,
-  previewUrl,
-  setPreviewUrl,
-  fileInputRef,
-  onFileSelect,
-}: VideoDropzoneProps) {
+export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef, onFileSelect }: VideoDropzoneProps) {
   const [isDragging, setIsDragging] = React.useState(false);
 
   const handleFile = (file: File) => {
@@ -132,9 +121,7 @@ export function VideoDropzone({
                         <CloudUpload className="text-muted-foreground h-10 w-10" />
                       </div>
                       <h3 className="text-lg font-semibold">
-                        {isDragging
-                          ? "Drop file to upload"
-                          : "Drag & drop or click to upload"}
+                        {isDragging ? "Drop file to upload" : "Drag & drop or click to upload"}
                       </h3>
                       <p className="text-muted-foreground mt-2 max-w-xs text-sm">
                         Support for MP4, MOV, and WebM files up to 5GB
@@ -142,11 +129,7 @@ export function VideoDropzone({
                     </div>
                   ) : (
                     <div className="relative aspect-video w-full bg-black">
-                      <video
-                        src={previewUrl}
-                        controls
-                        className="h-full w-full object-contain"
-                      />
+                      <video src={previewUrl} controls className="h-full w-full object-contain" />
                       <div className="absolute top-0 right-0 left-0 bg-gradient-to-b from-black/50 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
                         <div className="flex justify-end">
                           <Button
