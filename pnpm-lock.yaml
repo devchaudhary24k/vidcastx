@@ -762,6 +762,9 @@ importers:
       '@vidcastx/storage':
         specifier: workspace:^
         version: link:../../packages/storage
+      bullmq:
+        specifier: ^5.70.1
+        version: 5.70.1
       dotenv-cli:
         specifier: ^11.0.0
         version: 11.0.0

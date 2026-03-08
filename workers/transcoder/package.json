@@ -14,10 +14,10 @@
   },
   "prettier": "@vidcastx/prettier",
   "dependencies": {
-    "@vidcastx/database": "workspace:^",
     "@vidcastx/queue": "workspace:^",
     "@vidcastx/redis": "workspace:^",
     "@vidcastx/storage": "workspace:^",
+    "bullmq": "^5.70.1",
     "dotenv-cli": "^11.0.0"
   },
   "devDependencies": {

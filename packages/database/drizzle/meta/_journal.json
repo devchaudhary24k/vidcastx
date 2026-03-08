@@ -15,6 +15,13 @@
       "when": 1770992695925,
       "tag": "0001_init",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772966114816,
+      "tag": "0002_new_field_for_processed_video",
+      "breakpoints": true
     }
   ]
 }
