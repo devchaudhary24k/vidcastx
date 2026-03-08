@@ -9,6 +9,7 @@ import { QUEUES } from "@vidcastx/queue/types";
 import { redis } from "@vidcastx/redis";
 import { downloadToPath, uploadFile } from "@vidcastx/storage";
 
+import { notifyApiStatus } from "./api";
 import { runFFmpegTranscode } from "./ffmpeg-cmd";
 
 console.log("Native HLS Transcoder Worker Started. Listening for jobs...");
@@ -25,6 +26,7 @@ const transcoderWorker = new Worker<TranscodeJobData>(
     const outputDir = path.join(jobWorkspace, "output_hls");
 
     try {
+      await notifyApiStatus(videoId, "processing");
       // Prepare local directories
       await fsp.mkdir(jobWorkspace, { recursive: true });
       await fsp.mkdir(outputDir, { recursive: true });
@@ -67,13 +69,14 @@ const transcoderWorker = new Worker<TranscodeJobData>(
       console.log(`[Job ${job.id}] 💾 Notifying API of completion...`);
       const masterPlaylistKey = `processed/${orgId}/${videoId}/master.m3u8`;
 
-      // TODO: Update API call for status ready
+      await notifyApiStatus(videoId, "ready", { playbackUrl: masterPlaylistKey });
+
       await job.updateProgress(100);
       return { status: "success", playbackUrl: masterPlaylistKey };
     } catch (err: any) {
       console.error(`\n[Job ${job.id}] Failed:`, err.message);
 
-      // TODO: Notify API of failure
+      await notifyApiStatus(videoId, "failed", { errorReason: err.message });
 
       throw err;
     } finally {

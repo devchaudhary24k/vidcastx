@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts",
-    "start": "node dist/index.js",
+    "dev": "pnpm with-env tsx watch src/index.ts",
+    "build": "pnpm with-env tsup src/index.ts",
+    "start": "pnpm with-env node dist/index.js",
     "lint": "eslint",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "check-types": "tsc --noEmit",
@@ -15,6 +15,7 @@
   "prettier": "@vidcastx/prettier",
   "dependencies": {
     "@t3-oss/env-core": "^0.13.10",
+    "@vidcastx/m2m": "workspace:^",
     "@vidcastx/queue": "workspace:^",
     "@vidcastx/redis": "workspace:^",
     "@vidcastx/storage": "workspace:^",

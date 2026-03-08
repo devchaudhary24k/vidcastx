@@ -4,6 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     TRANSCODER_SECRET: z.string(),
+    API_URL: z.string(),
+    TRANSCODER_ID: z.string(),
   },
 
   shared: {

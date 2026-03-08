@@ -1,0 +1,24 @@
+{
+  "name": "@vidcastx/m2m",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "check-types": "tsc --noEmit --emitDeclarationOnly false",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
+    "typescript": "5.9.3"
+  },
+  "prettier": "@vidcastx/prettier"
+}
