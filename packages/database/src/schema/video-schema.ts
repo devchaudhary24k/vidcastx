@@ -6,7 +6,15 @@ import { organization, user } from "./auth-schema";
 import { folders } from "./folder-schema";
 import { transcripts, videoChapters, videoSummaries } from "./transcript-schema";
 
-export const videoStatusEnum = pgEnum("video_status", ["waiting_upload", "processing", "ready", "failed"]);
+export const videoStatusEnum = pgEnum("video_status", [
+  "draft",
+  "uploaded",
+  "queued",
+  "dispatch",
+  "processing",
+  "ready",
+  "failed",
+]);
 
 export const visibilityEnum = pgEnum("visibility", ["public", "private", "unlisted"]);
 
@@ -40,7 +48,7 @@ export const videos = pgTable(
     visibility: visibilityEnum("visibility").default("private").notNull(), // The visibility of the video
     scheduledAt: timestamp("scheduled_at"), // The timestamp when the video is scheduled to be published
     publishedAt: timestamp("published_at"), // The timestamp when the video was published
-    status: videoStatusEnum("status").default("waiting_upload").notNull(), // The status of the video
+    status: videoStatusEnum("status").default("draft").notNull(), // The status of the video
     errorReason: text("error_reason"), // The reason for any errors
     duration: integer("duration"), // The duration of the video in seconds
     resolution: text("resolution"), // The resolution of the video

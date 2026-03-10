@@ -33,7 +33,7 @@ export class VideoService {
         orgId,
         uploaderId: userId,
         title: data.title || data.filename,
-        status: "waiting_upload",
+        status: "draft",
         masterAccessUrl: s3Key,
         folderId: data.folderId || null,
       })
