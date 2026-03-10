@@ -2,13 +2,7 @@ export const AuthHeader = () => {
   return (
     <a href="#" className="flex items-center gap-2 self-center font-medium">
       <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-        <svg
-          width="40"
-          height="40"
-          viewBox="0 0 40 40"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             fillRule="evenodd"
             clipRule="evenodd"

@@ -4,14 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { ArrowRight, Lock } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@vidcastx/ui/components/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 
@@ -41,9 +34,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
     <Card className="mx-auto max-w-lg">
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Billing Information</CardTitle>
-        <CardDescription>
-          Where should we send your invoices? Securely processed.
-        </CardDescription>
+        <CardDescription>Where should we send your invoices? Securely processed.</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -56,9 +47,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
         >
           <form.Field name="streetAddress">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched &&
-                field.state.meta.errors.length > 0;
+              const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
               return (
                 <Field>
                   <FieldLabel htmlFor={field.name}>Street Address</FieldLabel>
@@ -80,9 +69,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="city">
               {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0;
+                const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
                 return (
                   <Field>
                     <FieldLabel htmlFor={field.name}>City</FieldLabel>
@@ -103,14 +90,10 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
 
             <form.Field name="state">
               {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0;
+                const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
                 return (
                   <Field>
-                    <FieldLabel htmlFor={field.name}>
-                      State / Province
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>State / Province</FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -130,9 +113,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="zipCode">
               {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0;
+                const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
                 return (
                   <Field>
                     <FieldLabel htmlFor={field.name}>Zip Code</FieldLabel>
@@ -153,9 +134,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
 
             <form.Field name="country">
               {(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0;
+                const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
                 return (
                   <Field>
                     <FieldLabel htmlFor={field.name}>Country</FieldLabel>
@@ -175,9 +154,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
             </form.Field>
           </div>
 
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button type="submit" disabled={!canSubmit} className="w-full">
                 {isSubmitting ? "Saving..." : "Next Step"}

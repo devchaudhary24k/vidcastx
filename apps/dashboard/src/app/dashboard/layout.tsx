@@ -1,17 +1,8 @@
 import { type ReactNode } from "react";
 import { redirect } from "next/navigation";
-import {
-  AppSidebar,
-  getOrganizationsAction,
-  getSessionAction,
-  Header,
-} from "@dashboard/features/dashboard";
+import { AppSidebar, getOrganizationsAction, getSessionAction, Header } from "@dashboard/features/dashboard";
 import { GlobalUploadIndicator } from "@dashboard/features/videos/components/global-upload-indicator";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
 import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
 

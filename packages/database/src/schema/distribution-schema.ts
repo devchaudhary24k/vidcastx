@@ -5,19 +5,9 @@ import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
 import { videos } from "./video-schema";
 
-export const integrationProviderEnum = pgEnum("integration_provider", [
-  "youtube",
-  "twitch",
-  "tiktok",
-  "facebook",
-]);
+export const integrationProviderEnum = pgEnum("integration_provider", ["youtube", "twitch", "tiktok", "facebook"]);
 
-export const distributionStatusEnum = pgEnum("distribution_status", [
-  "pending",
-  "processing",
-  "success",
-  "failed",
-]);
+export const distributionStatusEnum = pgEnum("distribution_status", ["pending", "processing", "success", "failed"]);
 
 export const integrations = pgTable("integration", {
   id: text("id")
@@ -54,27 +44,21 @@ export const distributionLogs = pgTable("distribution_log", {
   syncedAt: timestamp("synced_at").defaultNow(), // The timestamp when the distribution was synced
 });
 
-export const integrationsRelations = relations(
-  integrations,
-  ({ one, many }) => ({
-    organization: one(organization, {
-      fields: [integrations.orgId],
-      references: [organization.id],
-    }),
-    logs: many(distributionLogs),
+export const integrationsRelations = relations(integrations, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [integrations.orgId],
+    references: [organization.id],
   }),
-);
+  logs: many(distributionLogs),
+}));
 
-export const distributionLogsRelations = relations(
-  distributionLogs,
-  ({ one }) => ({
-    video: one(videos, {
-      fields: [distributionLogs.videoId],
-      references: [videos.id],
-    }),
-    integration: one(integrations, {
-      fields: [distributionLogs.integrationId],
-      references: [integrations.id],
-    }),
+export const distributionLogsRelations = relations(distributionLogs, ({ one }) => ({
+  video: one(videos, {
+    fields: [distributionLogs.videoId],
+    references: [videos.id],
   }),
-);
+  integration: one(integrations, {
+    fields: [distributionLogs.integrationId],
+    references: [integrations.id],
+  }),
+}));

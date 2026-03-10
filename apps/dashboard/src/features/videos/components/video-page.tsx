@@ -57,9 +57,7 @@ export function VideoList() {
 
       {/* Empty State / Content Placeholder */}
       <div className="flex min-h-[400px] items-center justify-center rounded-xl border border-dashed p-8 text-center">
-        <p className="text-muted-foreground text-sm">
-          Your projects will appear here.
-        </p>
+        <p className="text-muted-foreground text-sm">Your projects will appear here.</p>
       </div>
     </div>
   );

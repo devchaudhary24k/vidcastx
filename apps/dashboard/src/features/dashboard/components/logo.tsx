@@ -1,13 +1,7 @@
 import { SVGProps } from "react";
 
 export const Logo = (props: SVGProps<SVGSVGElement>) => (
-  <svg
-    fill="currentColor"
-    height="48"
-    viewBox="0 0 40 48"
-    width="40"
-    {...props}
-  >
+  <svg fill="currentColor" height="48" viewBox="0 0 40 48" width="40" {...props}>
     <clipPath id="a">
       <path d="m0 0h40v48h-40z" />
     </clipPath>

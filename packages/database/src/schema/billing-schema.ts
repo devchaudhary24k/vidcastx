@@ -1,14 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization } from "./auth-schema";
@@ -32,13 +23,7 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", [
   "incomplete_expired",
 ]);
 
-export const invoiceStatusEnum = pgEnum("invoice_status", [
-  "draft",
-  "open",
-  "paid",
-  "void",
-  "uncollectible",
-]);
+export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "open", "paid", "void", "uncollectible"]);
 
 export const usageRecords = pgTable(
   "usage_record",
@@ -80,9 +65,7 @@ export const usageSummary = pgTable(
     storageGb: integer("storage_gb").default(0).notNull(), // The total storage in GB
     aiTokens: integer("ai_tokens").default(0).notNull(), // The total AI tokens used
     bandwidthGb: integer("bandwidth_gb").default(0).notNull(), // The total bandwidth in GB
-    liveStreamingMinutes: integer("live_streaming_minutes")
-      .default(0)
-      .notNull(), // The total live streaming minutes
+    liveStreamingMinutes: integer("live_streaming_minutes").default(0).notNull(), // The total live streaming minutes
     apiRequests: integer("api_requests").default(0).notNull(), // The total API requests
     encodingCostCents: integer("encoding_cost_cents").default(0), // The cost of encoding in cents
     storageCostCents: integer("storage_cost_cents").default(0), // The cost of storage in cents
@@ -95,9 +78,7 @@ export const usageSummary = pgTable(
       .$onUpdate(() => new Date())
       .notNull(), // The timestamp when the usage summary was last updated
   },
-  (table) => [
-    index("usage_summary_orgId_date_idx").on(table.orgId, table.date),
-  ],
+  (table) => [index("usage_summary_orgId_date_idx").on(table.orgId, table.date)],
 );
 
 export const subscriptions = pgTable(
@@ -236,16 +217,13 @@ export const usageSummaryRelations = relations(usageSummary, ({ one }) => ({
   }),
 }));
 
-export const subscriptionsRelations = relations(
-  subscriptions,
-  ({ one, many }) => ({
-    organization: one(organization, {
-      fields: [subscriptions.orgId],
-      references: [organization.id],
-    }),
-    invoices: many(invoices),
+export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
+  organization: one(organization, {
+    fields: [subscriptions.orgId],
+    references: [organization.id],
   }),
-);
+  invoices: many(invoices),
+}));
 
 export const invoicesRelations = relations(invoices, ({ one }) => ({
   organization: one(organization, {

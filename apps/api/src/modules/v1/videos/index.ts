@@ -14,9 +14,9 @@ export const videoController = new Elysia({ prefix: "/videos" })
 
   /**
    * Middleware to ensure the user has an active organization selected.
-   * Derives `orgId` for downstream routes.
+   * Resolve `orgId` for downstream routes.
    */
-  .derive(({ session }) => {
+  .resolve(({ session }) => {
     if (!session?.activeOrganizationId) {
       throw new Error("No Organization Found");
     }
@@ -114,11 +114,7 @@ export const videoController = new Elysia({ prefix: "/videos" })
           .get(
             "/sign-part",
             async ({ video, query }) => {
-              return VideoService.signPart(
-                video.masterAccessUrl!,
-                query.uploadId,
-                query.partNumber,
-              );
+              return VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
             },
             { query: VideoModel.multipartSign },
           )
@@ -129,11 +125,7 @@ export const videoController = new Elysia({ prefix: "/videos" })
           .post(
             "/complete",
             async ({ video, body }) => {
-              return VideoService.completeMultipart(
-                video,
-                body.uploadId,
-                body.parts,
-              );
+              return VideoService.completeMultipart(video, body.uploadId, body.parts);
             },
             { body: VideoModel.multipartComplete },
           )

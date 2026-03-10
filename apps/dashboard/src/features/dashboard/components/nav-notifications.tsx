@@ -2,11 +2,7 @@
 
 import { BellIcon } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@vidcastx/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";
 import { Button } from "@vidcastx/ui/components/button";
 import {
   DropdownMenu,
@@ -36,12 +32,7 @@ export function NotificationsPopover({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn("rounded-full", className)}
-          aria-label="Open notifications"
-        >
+        <Button variant="ghost" size="icon" className={cn("rounded-full", className)} aria-label="Open notifications">
           <BellIcon className="size-5" />
         </Button>
       </DropdownMenuTrigger>

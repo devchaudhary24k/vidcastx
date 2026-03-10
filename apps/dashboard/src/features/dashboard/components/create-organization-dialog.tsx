@@ -19,11 +19,7 @@ import {
 import { Input } from "@vidcastx/ui/components/input";
 import { Label } from "@vidcastx/ui/components/label";
 
-export function CreateOrganizationDialog({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CreateOrganizationDialog({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
   const [slug, setSlug] = React.useState("");
@@ -59,10 +55,7 @@ export function CreateOrganizationDialog({
         <form onSubmit={handleCreate}>
           <DialogHeader>
             <DialogTitle>Create Organization</DialogTitle>
-            <DialogDescription>
-              Create a new organization to manage your projects and team
-              members.
-            </DialogDescription>
+            <DialogDescription>Create a new organization to manage your projects and team members.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -87,11 +80,7 @@ export function CreateOrganizationDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>

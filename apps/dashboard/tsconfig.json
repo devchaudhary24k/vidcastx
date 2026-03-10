@@ -5,7 +5,8 @@
     "paths": {
       "@dashboard/*": ["./src/*"],
       "@vidcastx/ui/*": ["../../packages/ui/src/*"],
-      "@server/*": ["../api/src/*"]
+      "@server/*": ["../api/src/*"],
+      "@transcoder/*": ["../../workers/transcoder/src/*"]
     },
     "plugins": [
       {
@@ -13,12 +14,6 @@
       }
     ]
   },
-  "include": [
-    "next-env.d.ts",
-    "next.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
+  "include": ["next-env.d.ts", "next.config.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

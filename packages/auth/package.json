@@ -25,10 +25,11 @@
     "eslint": "^10.0.2"
   },
   "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.5.3",
     "@t3-oss/env-core": "^0.13.10",
     "@vidcastx/database": "workspace:^",
     "@vidcastx/redis": "workspace:^",
-    "better-auth": "^1.5.2",
+    "better-auth": "^1.5.3",
     "zod": "^4.3.6"
   }
 }

@@ -5,19 +5,8 @@ import { useForm, useStore } from "@tanstack/react-form";
 import { ArrowRight, Fingerprint } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@vidcastx/ui/components/card";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@vidcastx/ui/components/field";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
+import { Field, FieldDescription, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 
 import { organizationSchema } from "../validators/schema";
@@ -68,9 +57,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
     <Card className="mx-auto max-w-lg">
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Create your Organization</CardTitle>
-        <CardDescription>
-          This will be your shared workspace for collaboration.
-        </CardDescription>
+        <CardDescription>This will be your shared workspace for collaboration.</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -91,9 +78,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
                 />
                 <div className="text-center">
                   <p className="text-sm font-medium">Organization Logo</p>
-                  <p className="text-muted-foreground text-xs">
-                    Upload a logo to make your workspace recognizable.
-                  </p>
+                  <p className="text-muted-foreground text-xs">Upload a logo to make your workspace recognizable.</p>
                 </div>
               </div>
             )}
@@ -101,14 +86,10 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
 
           <form.Field name="orgName">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched &&
-                field.state.meta.errors.length > 0;
+              const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
               return (
                 <Field>
-                  <FieldLabel htmlFor={field.name}>
-                    Organization Name
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Organization Name</FieldLabel>
                   <Input
                     id={field.name}
                     name={field.name}
@@ -126,9 +107,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
 
           <form.Field name="orgIdentifier">
             {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched &&
-                field.state.meta.errors.length > 0;
+              const isInvalid = field.state.meta.isTouched && field.state.meta.errors.length > 0;
               return (
                 <Field>
                   <FieldLabel htmlFor={field.name}>Organization ID</FieldLabel>
@@ -147,18 +126,14 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
                       aria-invalid={isInvalid}
                     />
                   </div>
-                  <FieldDescription>
-                    This unique ID will be used to identify your organization.
-                  </FieldDescription>
+                  <FieldDescription>This unique ID will be used to identify your organization.</FieldDescription>
                   <FieldError errors={field.state.meta.errors} />
                 </Field>
               );
             }}
           </form.Field>
 
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button type="submit" disabled={!canSubmit} className="w-full">
                 {isSubmitting ? "Saving..." : "Next Step"}

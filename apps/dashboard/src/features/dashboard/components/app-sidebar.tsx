@@ -14,13 +14,7 @@ import {
   Users,
 } from "lucide-react";
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  useSidebar,
-} from "@vidcastx/ui/components/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from "@vidcastx/ui/components/sidebar";
 import { cn } from "@vidcastx/ui/lib/utils";
 
 import type { Organization, SidebarData, UserData } from "./types";
@@ -200,11 +194,7 @@ export function AppSidebar({
         </SidebarFooter>
       </Sidebar>
 
-      <CommandMenu
-        open={commandMenuOpen}
-        setOpen={setCommandMenuOpen}
-        data={data}
-      />
+      <CommandMenu open={commandMenuOpen} setOpen={setCommandMenuOpen} data={data} />
     </>
   );
 }

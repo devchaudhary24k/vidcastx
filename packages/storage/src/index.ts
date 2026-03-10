@@ -95,11 +95,7 @@ export async function downloadToPath(key: string, localPath: string) {
  * @param fileStream - The read stream of the local file.
  * @param contentType - Optional MIME type.
  */
-export async function uploadFile(
-  key: string,
-  fileStream: fs.ReadStream,
-  contentType?: string,
-) {
+export async function uploadFile(key: string, fileStream: fs.ReadStream, contentType?: string) {
   const upload = new Upload({
     client: s3Client,
     params: {
@@ -158,11 +154,7 @@ export async function initMultipartUpload(key: string, contentType: string) {
  * @param partNumber - The part number (index).
  * @returns A promise that resolves to the signed URL for the part.
  */
-export async function signMultipartPart(
-  key: string,
-  uploadId: string,
-  partNumber: number,
-) {
+export async function signMultipartPart(key: string, uploadId: string, partNumber: number) {
   return generatePresignedUrl(
     new UploadPartCommand({
       Bucket: BUCKET_NAME,
@@ -179,11 +171,7 @@ export async function signMultipartPart(
  * @param uploadId - The multipart upload session ID.
  * @param parts - Array of completed parts with ETags.
  */
-export async function completeMultipartUpload(
-  key: string,
-  uploadId: string,
-  parts: CompletedPart[],
-) {
+export async function completeMultipartUpload(key: string, uploadId: string, parts: CompletedPart[]) {
   return s3Client.send(
     new CompleteMultipartUploadCommand({
       Bucket: BUCKET_NAME,

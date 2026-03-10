@@ -48,10 +48,7 @@ export const OnboardingWrapper: React.FC = () => {
     <div className="bg-background text-foreground relative flex min-h-screen flex-col">
       {/* Absolute Sidebar - Desktop */}
       <div className="fixed top-1/2 left-12 z-50 hidden -translate-y-1/2 xl:block">
-        <OnboardingSidebar
-          currentStep={currentStep}
-          completedSteps={completedSteps}
-        />
+        <OnboardingSidebar currentStep={currentStep} completedSteps={completedSteps} />
       </div>
 
       {/* Main Content Area */}

@@ -121,11 +121,7 @@ const authOptions = {
     session: {
       create: {
         before: async (session) => {
-          const [userData] = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.id, session.userId))
-            .limit(1);
+          const [userData] = await db.select().from(userTable).where(eq(userTable.id, session.userId)).limit(1);
 
           if (!userData) {
             throw new APIError("UNAUTHORIZED", {
@@ -146,12 +142,7 @@ const authOptions = {
             const [isValidOrg] = await db
               .select({ id: organizationTable.id })
               .from(organizationTable)
-              .where(
-                and(
-                  eq(organizationTable.id, activeOrganizationId),
-                  isNull(organizationTable.deletedAt),
-                ),
-              )
+              .where(and(eq(organizationTable.id, activeOrganizationId), isNull(organizationTable.deletedAt)))
               .limit(1);
 
             if (!isValidOrg) {
@@ -164,16 +155,8 @@ const authOptions = {
             const [fallbackOrganization] = await db
               .select({ id: organizationTable.id })
               .from(organizationTable)
-              .innerJoin(
-                memberTable,
-                eq(memberTable.organizationId, organizationTable.id),
-              )
-              .where(
-                and(
-                  eq(memberTable.userId, session.userId),
-                  isNull(organizationTable.deletedAt),
-                ),
-              )
+              .innerJoin(memberTable, eq(memberTable.organizationId, organizationTable.id))
+              .where(and(eq(memberTable.userId, session.userId), isNull(organizationTable.deletedAt)))
               .orderBy(organizationTable.createdAt)
               .limit(1);
 
@@ -211,11 +194,7 @@ const authOptions = {
               .where(eq(userTable.id, session.userId))
               .limit(1);
 
-            if (
-              user &&
-              user.lastActiveOrganizationId !==
-                typedSession.activeOrganizationId
-            ) {
+            if (user && user.lastActiveOrganizationId !== typedSession.activeOrganizationId) {
               await db
                 .update(userTable)
                 .set({
@@ -237,15 +216,12 @@ const authOptions = {
             const [orgData] = await db
               .select({ deletedAt: organizationTable.deletedAt })
               .from(organizationTable)
-              .where(
-                eq(organizationTable.id, typedUpdates.activeOrganizationId),
-              )
+              .where(eq(organizationTable.id, typedUpdates.activeOrganizationId))
               .limit(1);
 
             if (orgData?.deletedAt) {
               throw new APIError("FORBIDDEN", {
-                message:
-                  "Cannot switch to an organization scheduled for deletion",
+                message: "Cannot switch to an organization scheduled for deletion",
               });
             }
           }
@@ -320,6 +296,10 @@ const authOptions = {
       },
     }),
   ],
+
+  experimental: {
+    joins: true,
+  },
 } satisfies BetterAuthOptions;
 
 export const auth = betterAuth({
@@ -332,16 +312,8 @@ export const auth = betterAuth({
       const [membership] = await db
         .select({ id: memberTable.id })
         .from(memberTable)
-        .innerJoin(
-          organizationTable,
-          eq(memberTable.organizationId, organizationTable.id),
-        )
-        .where(
-          and(
-            eq(memberTable.userId, user.id),
-            isNull(organizationTable.deletedAt),
-          ),
-        )
+        .innerJoin(organizationTable, eq(memberTable.organizationId, organizationTable.id))
+        .where(and(eq(memberTable.userId, user.id), isNull(organizationTable.deletedAt)))
         .limit(1);
 
       return {

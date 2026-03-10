@@ -1,37 +1,14 @@
 import { relations } from "drizzle-orm";
-import {
-  bigint,
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { bigint, boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization, user } from "./auth-schema";
 import { folders } from "./folder-schema";
-import {
-  transcripts,
-  videoChapters,
-  videoSummaries,
-} from "./transcript-schema";
+import { transcripts, videoChapters, videoSummaries } from "./transcript-schema";
 
-export const videoStatusEnum = pgEnum("video_status", [
-  "waiting_upload",
-  "processing",
-  "ready",
-  "failed",
-]);
+export const videoStatusEnum = pgEnum("video_status", ["waiting_upload", "processing", "ready", "failed"]);
 
-export const visibilityEnum = pgEnum("visibility", [
-  "public",
-  "private",
-  "unlisted",
-]);
+export const visibilityEnum = pgEnum("visibility", ["public", "private", "unlisted"]);
 
 export const assetTypeEnum = pgEnum("asset_type", [
   "hls_playlist",
@@ -70,6 +47,7 @@ export const videos = pgTable(
     aspectRatio: text("aspect_ratio"), // The aspect ratio of the video
     frameCount: integer("frame_count"), // The frame count of the video
     masterAccessUrl: text("master_access_url"), // The master access URL for the video
+    playbackUrl: text("playback_url"), // The playback URL for the video
     metadata: jsonb("metadata").default({}), // Metadata associated with the video
     createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the video was created
     updatedAt: timestamp("updated_at")

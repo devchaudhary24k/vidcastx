@@ -6,9 +6,10 @@ import { Elysia } from "elysia";
 
 import { auth } from "@vidcastx/auth";
 
+import internalController from "./modules/internal";
 import v1Router from "./modules/v1";
 
-const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router);
+const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router).use(internalController);
 
 const server = new Elysia()
   .use(opentelemetry())
@@ -19,9 +20,7 @@ const server = new Elysia()
       origin: ({ headers }) => {
         const allowedOrigins = [
           "https://vidcastx.daymlabs.com",
-          ...(process.env.NODE_ENV === "production"
-            ? ["https://vidcastx.daymlabs.com"]
-            : ["http://localhost:3000"]),
+          ...(process.env.NODE_ENV === "production" ? ["https://vidcastx.daymlabs.com"] : ["http://localhost:3000"]),
         ];
         const origin = headers.get("origin");
         return !origin || allowedOrigins.includes(origin);
@@ -36,8 +35,6 @@ const server = new Elysia()
   .mount(auth.handler)
   .listen(3001);
 
-console.log(
-  `🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`,
-);
+console.log(`🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`);
 
 export type App = typeof server;

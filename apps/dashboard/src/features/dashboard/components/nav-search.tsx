@@ -3,12 +3,7 @@
 import * as React from "react";
 import { Search } from "lucide-react";
 
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@vidcastx/ui/components/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
 import { cn } from "@vidcastx/ui/lib/utils";
 
 export function NavSearch({ onClick }: { onClick: () => void }) {
@@ -18,11 +13,7 @@ export function NavSearch({ onClick }: { onClick: () => void }) {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton
-          tooltip="Search"
-          onClick={onClick}
-          className={cn("text-muted-foreground")}
-        >
+        <SidebarMenuButton tooltip="Search" onClick={onClick} className={cn("text-muted-foreground")}>
           <Search className="size-4" />
           {!isCollapsed && (
             <>

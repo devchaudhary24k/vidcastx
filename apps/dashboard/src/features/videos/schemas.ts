@@ -1,12 +1,7 @@
 import { z } from "zod";
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5GB
-export const ACCEPTED_VIDEO_TYPES = [
-  "video/mp4",
-  "video/mov",
-  "video/quicktime",
-  "video/webm",
-];
+export const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/mov", "video/quicktime", "video/webm"];
 
 export const videoUploadSchema = z.object({
   title: z.string().min(1, "Title is required"),

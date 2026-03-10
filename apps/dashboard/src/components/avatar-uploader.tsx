@@ -3,11 +3,7 @@
 import React, { useRef, useState } from "react";
 import { Camera, Pencil, Trash2, Upload } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@vidcastx/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";
 
 import { ImageCropperModal } from "./image-cropper-modal";
 
@@ -45,10 +41,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 
   return (
     <div className={className}>
-      <div
-        className="group relative inline-block cursor-pointer"
-        onClick={() => fileInputRef.current?.click()}
-      >
+      <div className="group relative inline-block cursor-pointer" onClick={() => fileInputRef.current?.click()}>
         <Avatar className="border-border h-24 w-24 border-2 transition-opacity">
           <AvatarImage src={value} className="object-cover" />
           <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-bold uppercase">
@@ -72,13 +65,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
           )}
         </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={onFileChange}
-          className="hidden"
-        />
+        <input type="file" accept="image/*" ref={fileInputRef} onChange={onFileChange} className="hidden" />
       </div>
 
       <ImageCropperModal
@@ -97,11 +84,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 function readFile(file: File): Promise<string> {
   return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.addEventListener(
-      "load",
-      () => resolve(reader.result as string),
-      false,
-    );
+    reader.addEventListener("load", () => resolve(reader.result as string), false);
     reader.readAsDataURL(file);
   });
 }

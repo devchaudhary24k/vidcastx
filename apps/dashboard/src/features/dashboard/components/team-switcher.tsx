@@ -17,22 +17,13 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@vidcastx/ui/components/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
 
 import type { Organization } from "./types";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import { Logo } from "./logo";
 
-export function TeamSwitcher({
-  activeOrganizationId,
-}: {
-  activeOrganizationId: string;
-}) {
+export function TeamSwitcher({ activeOrganizationId }: { activeOrganizationId: string }) {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
@@ -41,9 +32,7 @@ export function TeamSwitcher({
     queryFn: getOrganizationsAction,
   });
 
-  const activeOrganization =
-    organizations.find((org) => org.id === activeOrganizationId) ||
-    organizations[0];
+  const activeOrganization = organizations.find((org) => org.id === activeOrganizationId) || organizations[0];
 
   const handleSwitchOrganization = async (org: Organization) => {
     if (org.id === activeOrganizationId) return;
@@ -75,19 +64,13 @@ export function TeamSwitcher({
             >
               <div className="bg-background text-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 {activeOrganization.logo ? (
-                  <img
-                    src={activeOrganization.logo}
-                    alt={activeOrganization.name}
-                    className="size-4"
-                  />
+                  <img src={activeOrganization.logo} alt={activeOrganization.name} className="size-4" />
                 ) : (
                   <Logo className="size-4" />
                 )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {activeOrganization.name}
-                </span>
+                <span className="truncate font-semibold">{activeOrganization.name}</span>
                 <span className="truncate text-xs">Organization</span>
               </div>
             </SidebarMenuButton>
@@ -98,22 +81,12 @@ export function TeamSwitcher({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Organizations
-            </DropdownMenuLabel>
+            <DropdownMenuLabel className="text-muted-foreground text-xs">Organizations</DropdownMenuLabel>
             {organizations.map((org, index) => (
-              <DropdownMenuItem
-                key={org.id}
-                onClick={() => handleSwitchOrganization(org)}
-                className="gap-2 p-2"
-              >
+              <DropdownMenuItem key={org.id} onClick={() => handleSwitchOrganization(org)} className="gap-2 p-2">
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   {org.logo ? (
-                    <img
-                      src={org.logo}
-                      alt={org.name}
-                      className="size-4 shrink-0"
-                    />
+                    <img src={org.logo} alt={org.name} className="size-4 shrink-0" />
                   ) : (
                     <Logo className="size-4 shrink-0" />
                   )}
@@ -124,16 +97,11 @@ export function TeamSwitcher({
             ))}
             <DropdownMenuSeparator />
             <CreateOrganizationDialog>
-              <DropdownMenuItem
-                className="gap-2 p-2"
-                onSelect={(e) => e.preventDefault()}
-              >
+              <DropdownMenuItem className="gap-2 p-2" onSelect={(e) => e.preventDefault()}>
                 <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                   <Plus className="size-4" />
                 </div>
-                <div className="text-muted-foreground font-medium">
-                  Add organization
-                </div>
+                <div className="text-muted-foreground font-medium">Add organization</div>
               </DropdownMenuItem>
             </CreateOrganizationDialog>
           </DropdownMenuContent>
