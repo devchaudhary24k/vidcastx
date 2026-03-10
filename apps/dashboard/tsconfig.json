@@ -5,7 +5,8 @@
     "paths": {
       "@dashboard/*": ["./src/*"],
       "@vidcastx/ui/*": ["../../packages/ui/src/*"],
-      "@server/*": ["../api/src/*"]
+      "@server/*": ["../api/src/*"],
+      "@transcoder/*": ["../../workers/transcoder/src/*"]
     },
     "plugins": [
       {
