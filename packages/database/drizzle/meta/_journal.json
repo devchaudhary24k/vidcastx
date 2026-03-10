@@ -5,29 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1770992578661,
-      "tag": "0000_enable_extentions",
+      "when": 1773169002169,
+      "tag": "0000_enable_extention",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1770992695925,
+      "when": 1773169033216,
       "tag": "0001_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1772966114816,
-      "tag": "0002_new_field_for_processed_video",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1773168419400,
-      "tag": "0003_enum change on videos",
       "breakpoints": true
     }
   ]

@@ -1,1 +1,0 @@
-ALTER TABLE "video" ADD COLUMN "playback_url" text;
