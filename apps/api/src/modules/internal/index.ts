@@ -1,23 +1,64 @@
 import bearer from "@elysiajs/bearer";
 import jwt from "@elysiajs/jwt";
-import { InternalModel } from "@server/modules/internal/model";
-import { VideoModel } from "@server/modules/v1/videos/model";
-import { VideoService } from "@server/modules/v1/videos/service";
 import { Elysia } from "elysia";
 
 import { env } from "../../env";
+import { VideoService } from "../v1/videos/service";
+import { ErrorResponse, InternalModel, TokenResponse, UpdateStatusResponse } from "./model";
 
-// Define our allowed workers and their secure secrets.
+interface M2MPayload {
+  role: string;
+  machine: string;
+}
+
+/**
+ * Rate limiter for M2M token endpoint (in-memory, per-IP)
+ * Limits to 10 requests per minute per IP
+ */
+class RateLimiter {
+  private readonly attempts: Map<string, number[]> = new Map();
+  private readonly limit = 10;
+  private readonly windowMs = 60_000; // 1 minute
+
+  isAllowed(ip: string): boolean {
+    const now = Date.now();
+
+    if (!this.attempts.has(ip)) {
+      this.attempts.set(ip, []);
+    }
+
+    const timestamps = this.attempts.get(ip)!;
+    const recent = timestamps.filter((t) => now - t < this.windowMs);
+
+    if (recent.length >= this.limit) {
+      return false;
+    }
+
+    recent.push(now);
+    this.attempts.set(ip, recent);
+    return true;
+  }
+}
+
+const rateLimiter = new RateLimiter();
+
+// Allowed workers and their shared secrets
 const VALID_WORKERS: Record<string, string> = {
   "worker-transcoder": env.TRANSCODER_SECRET,
 };
 
 /**
- * Controller strictly for internal microservices (Workers).
- * Completely isolated from BetterAuth and v1 user routes.
+ * Internal Controller: Strictly for inter-service communication (M2M).
+ * Isolated from BetterAuth and v1 user routes.
+ *
+ * Endpoints:
+ * - POST /internal/token — OAuth2 Client Credentials (rate-limited)
+ * - PATCH /internal/videos/:id/status — Status updates (requires M2M bearer token)
  */
-const internalController = new Elysia({ prefix: "/internal" })
-  // Setup JWT generator (Tokens expire in 1 hour)
+export default new Elysia({
+  prefix: "/internal",
+  name: "internal-controller",
+})
   .use(
     jwt({
       name: "m2mJwt",
@@ -27,19 +68,25 @@ const internalController = new Elysia({ prefix: "/internal" })
   )
   .use(bearer())
 
-  // The Token Exchange Endpoint (OAuth2 Client Credentials Flow)
+  // POST /internal/token — OAuth2 Client Credentials exchange
   .post(
     "/token",
-    async ({ body, m2mJwt, set }) => {
-      const expectedSecret = VALID_WORKERS[body.clientId];
+    async ({ body, m2mJwt, status, request }) => {
+      const clientIp = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
 
-      // Validate that the machine exists AND the secret matches
-      if (!expectedSecret || body.clientSecret !== expectedSecret) {
-        set.status = 401;
-        return { error: "Invalid Machine Credentials" };
+      if (!rateLimiter.isAllowed(clientIp)) {
+        console.warn(`[M2M] Rate limit exceeded for IP: ${clientIp}`);
+        return status(429, { error: "Too many requests. Try again later." });
       }
 
-      console.log(`Granting M2M access token to: ${body.clientId}`);
+      const expectedSecret = VALID_WORKERS[body.clientId];
+
+      if (!expectedSecret || body.clientSecret !== expectedSecret) {
+        console.warn(`[M2M] Invalid credentials for client: ${body.clientId}`);
+        return status(401, { error: "Invalid client credentials" });
+      }
+
+      console.log(`[M2M] Granting token to: ${body.clientId}`);
 
       const token = await m2mJwt.sign({
         role: "internal-worker",
@@ -48,46 +95,59 @@ const internalController = new Elysia({ prefix: "/internal" })
 
       return {
         access_token: token,
-        token_type: "Bearer",
+        token_type: "Bearer" as const,
         expires_in: 3600,
       };
     },
     {
       body: InternalModel.token,
+      response: {
+        200: TokenResponse,
+        401: ErrorResponse,
+        429: ErrorResponse,
+      },
     },
   )
 
-  // Protected Routes (Require the Bearer Token we just generated)
-  .guard(
+  /**
+   * Protected scope: requires a valid M2M bearer token.
+   * Uses resolve (not beforeHandle) so `machine` is injected into context.
+   */
+  .resolve(async ({ bearer, m2mJwt, status }) => {
+    if (!bearer) {
+      return status(401, { error: "Missing bearer token" });
+    }
+
+    const raw = await m2mJwt.verify(bearer);
+    if (!raw) {
+      return status(403, { error: "Invalid or expired token" });
+    }
+
+    const payload = raw as unknown as M2MPayload;
+
+    if (payload.role !== "internal-worker") {
+      return status(403, { error: "Invalid or expired token" });
+    }
+
+    return { machine: payload.machine };
+  })
+
+  // PATCH /internal/videos/:id/status
+  .patch(
+    "/videos/:id/status",
+    async ({ params, body, machine }) => {
+      console.log(`[M2M] Status update from ${machine} for video ${params.id}`);
+      return VideoService.updateProcessingStatus(params.id, body.status, {
+        playbackUrl: body.playbackUrl,
+        errorReason: body.errorReason,
+      });
+    },
     {
-      async beforeHandle({ bearer, m2mJwt, set }) {
-        if (!bearer) {
-          set.status = 401;
-          return { error: "Missing bearer token" };
-        }
-
-        const payload = await m2mJwt.verify(bearer);
-        if (!payload || payload.role !== "internal-worker") {
-          set.status = 403;
-          return { error: "Invalid or expired machine token" };
-        }
-
-        console.log(`Request made by machine: ${payload.machine}`);
+      body: InternalModel.updateProcessingStatus,
+      response: {
+        200: UpdateStatusResponse,
+        401: ErrorResponse,
+        403: ErrorResponse,
       },
     },
-    (app) =>
-      app.patch(
-        "/videos/:id/status",
-        ({ params, body }) => {
-          return VideoService.updateProcessingStatus(params.id, body.status, {
-            playbackUrl: body.playbackUrl,
-            errorReason: body.errorReason,
-          });
-        },
-        {
-          body: VideoModel.updateProcessingStatus,
-        },
-      ),
   );
-
-export default internalController;

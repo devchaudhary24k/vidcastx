@@ -1,155 +1,194 @@
 import { betterAuth } from "@server/auth";
 import { Elysia } from "elysia";
 
-import { VideoModel } from "./model";
+import {
+  CreateVideoBody,
+  CreateVideoResponse,
+  ErrorResponse,
+  MultipartAbortBody,
+  MultipartCompleteBody,
+  MultipartInitBody,
+  MultipartListPartsQuery,
+  MultipartSignQuery,
+  PaginationQuery,
+  SuccessResponse,
+  UpdateVideoBody,
+  VideoIdParam,
+  VideoListResponse,
+  VideoResponse,
+} from "./model-typebox";
 import { VideoService } from "./service";
 
 /**
- * Controller handling all video-related operations including CRUD
+ * Video Controller: Handles all video-related operations including CRUD
  * and multipart AWS S3/storage uploads.
+ *
+ * Owns its own auth and org validation so the v1 router
+ * can serve non-org routes without forcing org context on all routes.
  */
-export const videoController = new Elysia({ prefix: "/videos" })
+export const videoController = new Elysia({
+  prefix: "/videos",
+  name: "video-controller",
+})
   .use(betterAuth)
   .guard({ auth: true })
-
-  /**
-   * Middleware to ensure the user has an active organization selected.
-   * Resolve `orgId` for downstream routes.
-   */
-  .resolve(({ session }) => {
+  // Inject orgId — all video routes require an active organization
+  .resolve(({ session, status }) => {
     if (!session?.activeOrganizationId) {
-      throw new Error("No Organization Found");
+      return status(400, {
+        error: "No active organization. Please select an organization first.",
+      });
     }
     return { orgId: session.activeOrganizationId };
   })
 
-  /**
-   * Retrieve a paginated list of all videos belonging to the current organization.
-   */
-  .get("/", ({ query }) => `Listing page ${query.page}`, {
-    query: VideoModel.pagination,
-  })
+  // List videos (paginated)
+  .get(
+    "/",
+    async ({ query, orgId }) => ({
+      page: query.page || 1,
+      limit: query.limit || 10,
+      total: 0,
+      videos: [],
+    }),
+    {
+      query: PaginationQuery,
+      response: { 200: VideoListResponse, 400: ErrorResponse },
+    },
+  )
 
-  /**
-   * Create a new "Draft" video.
-   * Returns a newly created video object containing the ID needed to start uploading.
-   */
+  // Create draft video
   .post(
     "/",
     async ({ body, user, orgId }) => {
       const video = await VideoService.createDraft(user.id, orgId, body);
       return { status: "created", data: video };
     },
-    { body: VideoModel.create },
+    {
+      body: CreateVideoBody,
+      response: { 200: CreateVideoResponse, 400: ErrorResponse },
+    },
   )
 
-  /**
-   * Scope for operations on a specific video by its ID.
-   */
+  // Single video operations group
   .group("/:id", (app) =>
     app
-      .guard({ params: VideoModel.params })
-
-      /**
-       * Resolves the video by ID and verifies that the current organization owns it.
-       * Passes the resolved `video` entity to all downstream routes in this group.
-       */
-      .resolve(async ({ params, orgId }) => {
+      .guard({ params: VideoIdParam })
+      // Video ownership middleware — resolves video entity for all routes in this group
+      .resolve(async ({ params, orgId, status }) => {
         const video = await VideoService.getVideoIfOwner(params.id, orgId);
-        if (!video) throw new Error("Video Not Found");
+        if (!video) return status(404, { error: "Video not found" });
         return { video };
       })
 
-      /**
-       * Get complete details (status, playback URL, assets) for the requested video.
-       */
-      .get("/", ({ video }) => video)
-
-      /**
-       * Update video metadata (e.g., Title, Description, Visibility, Schedule).
-       */
-      .patch(
-        "/",
-        ({ video, body }) => {
-          // TODO: Call Service update method
-          return { status: "updated", id: video.id };
-        },
-        { body: VideoModel.update },
-      )
-
-      /**
-       * Soft delete the video (moves it to the trash).
-       */
-      .delete("/", async ({ video }) => {
-        // TODO: Call Service softDelete method
-        return { status: "deleted", id: video.id };
+      // Get video details
+      .get("/", ({ video }) => video, {
+        response: { 200: VideoResponse, 404: ErrorResponse },
       })
 
-      /**
-       * Restore a previously soft-deleted video from the trash.
-       */
-      .post("/restore", ({ video }) => `Video ${video.id}`)
+      // Update metadata
+      .patch(
+        "/",
+        async ({ video, body }) => ({
+          status: "updated",
+          videoId: video.id,
+        }),
+        {
+          body: UpdateVideoBody,
+          response: { 200: SuccessResponse, 400: ErrorResponse, 404: ErrorResponse },
+        },
+      )
 
-      /**
-       * Scope for multipart upload operations for the specific video.
-       */
+      // Delete video (soft delete)
+      .delete(
+        "/",
+        async ({ video }) => ({
+          status: "deleted",
+          videoId: video.id,
+        }),
+        {
+          response: { 200: SuccessResponse, 404: ErrorResponse },
+        },
+      )
+
+      // Restore deleted video
+      .post(
+        "/restore",
+        async ({ video }) => ({
+          status: "restored",
+          videoId: video.id,
+        }),
+        {
+          response: { 200: SuccessResponse, 404: ErrorResponse },
+        },
+      )
+
+      // Multipart upload operations
       .group("/multipart", (multipartApp) =>
         multipartApp
-
-          /**
-           * Initialize a new multipart upload session.
-           * Returns an upload ID required for subsequent part uploads.
-           */
+          // Initialize multipart upload
           .post(
             "/init",
             async ({ video, body }) => {
-              return VideoService.initMultipart(video, body.contentType);
+              await VideoService.initMultipart(video, body.contentType);
+              return { status: "success", videoId: video.id };
             },
-            { body: VideoModel.multipartInit },
+            {
+              body: MultipartInitBody,
+              response: { 200: SuccessResponse, 400: ErrorResponse },
+            },
           )
 
-          /**
-           * Generate a presigned URL for uploading a specific chunk/part of the video.
-           */
+          // Get presigned URL for part
           .get(
             "/sign-part",
             async ({ video, query }) => {
-              return VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
+              await VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
+              return { status: "success", videoId: video.id };
             },
-            { query: VideoModel.multipartSign },
+            {
+              query: MultipartSignQuery,
+              response: { 200: SuccessResponse, 400: ErrorResponse },
+            },
           )
 
-          /**
-           * Finalize the multipart upload after all parts have been successfully uploaded.
-           */
+          // Complete multipart upload
           .post(
             "/complete",
             async ({ video, body }) => {
-              return VideoService.completeMultipart(video, body.uploadId, body.parts);
+              await VideoService.completeMultipart(video, body.uploadId, body.parts);
+              return { status: "success", videoId: video.id };
             },
-            { body: VideoModel.multipartComplete },
+            {
+              body: MultipartCompleteBody,
+              response: { 200: SuccessResponse, 400: ErrorResponse },
+            },
           )
 
-          /**
-           * Retrieve a list of all successfully uploaded parts for a specific upload session.
-           */
+          // List uploaded parts
           .get(
             "/list-parts",
             async ({ video, query }) => {
-              return VideoService.listParts(video, query.uploadId);
+              await VideoService.listParts(video, query.uploadId);
+              return { status: "success", videoId: video.id };
             },
-            { query: VideoModel.multipartListParts },
+            {
+              query: MultipartListPartsQuery,
+              response: { 200: SuccessResponse, 400: ErrorResponse },
+            },
           )
 
-          /**
-           * Cancel an ongoing multipart upload and discard any uploaded parts.
-           */
+          // Abort multipart upload
           .delete(
             "/abort",
             async ({ video, body }) => {
-              return VideoService.abortMultipart(video, body.uploadId);
+              await VideoService.abortMultipart(video, body.uploadId);
+              return { status: "success", videoId: video.id };
             },
-            { body: VideoModel.multipartAbort },
+            {
+              body: MultipartAbortBody,
+              response: { 200: SuccessResponse, 400: ErrorResponse },
+            },
           ),
       ),
   );

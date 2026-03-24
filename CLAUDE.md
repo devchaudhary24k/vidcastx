@@ -105,3 +105,48 @@ From `.github/copilot-instructions.md`:
 - Opening braces on the same line
 - Catch specific errors, not generic ones
 - Log error messages and stack traces
+
+## API Best Practices (Elysia)
+
+Recent improvements to `apps/api` aligned with Elysia skill best practices:
+
+### Schema & Validation
+
+- **TypeBox** (`t.*`) for all request/response schemas (auto-generates OpenAPI docs)
+- `drizzle-typebox` derives schemas from database tables, single source of truth
+- All routes have request AND response schemas with proper HTTP status codes
+- Centralized error handling via `server.ts` `onError` hook
+
+### Error Handling
+
+- Guards return `status()` instead of throwing errors
+- Validation errors return 400 with field-level messages
+- Consistent error shape: `{ error: string }`
+- Proper status codes: 400 (validation), 401 (auth), 403 (forbidden), 404 (not found), 500 (server)
+
+### Architecture & Organization
+
+- All Elysia instances have `name` property for logging and deduplication
+- Organization validation at v1 router level (shared middleware, not duplicated)
+- Auth macro uses `resolve` pattern for type-safe user/session injection
+- Named async functions for all handlers (better debugging + OTel spans)
+
+### Plugins & Performance
+
+- `@elysiajs/server-timing` for dev performance profiling
+- `@elysiajs/openapi` with response schemas for auto-generated API docs
+- OpenTelemetry instrumentation with named functions for better tracing
+- Removed unused `@elysiajs/cron` from dependencies
+
+### Security
+
+- M2M (machine-to-machine) authentication via JWT + rate limiting
+- `/internal/token` endpoint rate-limited to 10 requests/minute per IP
+- Separate `/internal` controller for worker communication
+- Status updates from transcoder validated and logged
+
+### Type Safety (Eden Treaty)
+
+- API exports `export type App = typeof server` for client type generation
+- Dashboard can use Eden Treaty for fully type-safe API calls
+- See `apps/api/EDEN_SETUP.md` for integration guide
