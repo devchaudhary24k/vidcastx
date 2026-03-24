@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import merge from "lodash.merge";
 
+import { env } from "./env";
+
 type MetadataGenerator = Omit<Metadata, "description" | "title"> & {
   title: string;
   description: string;
@@ -15,8 +17,8 @@ const author: Metadata["authors"] = {
 
 const publisher = "Pixelact Studios";
 const twitterHandle = "@pixelactstudios";
-const protocol = process.env.ENVIRONMENT === "production" ? "https" : "http";
-const productionUrl = process.env.PRODUCTION_URL;
+const protocol = env.ENVIRONMENT === "production" ? "https" : "http";
+const productionUrl = env.PRODUCTION_URL;
 
 export const createMetadata = ({ title, description, image, ...properties }: MetadataGenerator): Metadata => {
   const parsedTitle = title === applicationName ? applicationName : `${title} | ${applicationName}`;

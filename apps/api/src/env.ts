@@ -11,6 +11,7 @@ export const env = createEnv({
   extends: [databaseEnv, redisEnv, storageEnv, authEnv, transcoderEnv],
 
   server: {
+    PORT: z.coerce.number().default(3001),
     JWT_SECRET: z.string(),
   },
 
