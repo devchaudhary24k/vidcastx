@@ -2,7 +2,10 @@ import { Elysia } from "elysia";
 
 import { auth } from "@vidcastx/auth";
 
-// user middleware (compute user and session and pass to routes)
+/**
+ * BetterAuth middleware: mounts auth handlers and provides auth macro.
+ * Routes using .guard({ auth: true }) get type-safe user/session injection.
+ */
 export const betterAuth = new Elysia({ name: "better-auth" }).mount(auth.handler).macro({
   auth: {
     async resolve({ status, request: { headers } }) {
@@ -10,7 +13,7 @@ export const betterAuth = new Elysia({ name: "better-auth" }).mount(auth.handler
         headers,
       });
 
-      if (!session) return status(401);
+      if (!session) return status(401, { error: "Unauthorized" });
 
       return {
         user: session.user,

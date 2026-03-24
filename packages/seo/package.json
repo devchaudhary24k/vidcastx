@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./metadata": "./src/metadata.ts",
-    "./json-ld": "./src/json-ld.tsx"
+    "./json-ld": "./src/json-ld.tsx",
+    "./env": "./src/env.ts"
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
@@ -25,9 +26,11 @@
     "eslint": "^10.0.2"
   },
   "dependencies": {
+    "@t3-oss/env-core": "^0.13.10",
     "lodash.merge": "^4.6.2",
     "next": "16.1.6",
     "react": "19.2.4",
-    "schema-dts": "^1.1.5"
+    "schema-dts": "^1.1.5",
+    "zod": "^4.3.6"
   }
 }

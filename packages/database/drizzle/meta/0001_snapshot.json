@@ -1,6 +1,6 @@
 {
-  "id": "bd9f017f-a70d-41eb-9ffe-4ad74cd5bb1a",
-  "prevId": "9a83bf90-75b5-4e5b-88b0-9398eb34f17a",
+  "id": "47edc42c-d213-4739-92c5-7a673504b031",
+  "prevId": "3057cda7-3493-4323-a862-1479308f8b87",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -839,7 +839,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'waiting_upload'"
+          "default": "'draft'"
         },
         "error_reason": {
           "name": "error_reason",
@@ -873,6 +873,12 @@
         },
         "master_access_url": {
           "name": "master_access_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "playback_url": {
+          "name": "playback_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -4690,7 +4696,7 @@
     "public.video_status": {
       "name": "video_status",
       "schema": "public",
-      "values": ["waiting_upload", "processing", "ready", "failed"]
+      "values": ["draft", "uploaded", "queued", "dispatch", "processing", "ready", "failed"]
     },
     "public.visibility": {
       "name": "visibility",

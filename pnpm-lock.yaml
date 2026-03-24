@@ -48,9 +48,6 @@ importers:
       '@elysiajs/cors':
         specifier: ^1.4.1
         version: 1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))
-      '@elysiajs/cron':
-        specifier: ^1.4.1
-        version: 1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))
       '@elysiajs/jwt':
         specifier: ^1.4.1
         version: 1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))
@@ -84,6 +81,9 @@ importers:
       better-auth:
         specifier: ^1.5.3
         version: 1.5.3(@better-auth/drizzle-adapter@1.5.3(@better-auth/core@1.5.3(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.2.1)(kysely@0.28.11)(nanostores@1.1.1))(@better-auth/utils@0.3.1)(drizzle-orm@0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(bun-types@1.3.10)(kysely@0.28.11)(pg@8.19.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(bun-types@1.3.10)(kysely@0.28.11)(pg@8.19.0))(next@16.1.6(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pg@8.19.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      drizzle-typebox:
+        specifier: ^0.1.1
+        version: 0.1.1(@sinclair/typebox@0.34.48)(drizzle-orm@0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(bun-types@1.3.10)(kysely@0.28.11)(pg@8.19.0))
       elysia:
         specifier: latest
         version: 1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
@@ -124,6 +124,9 @@ importers:
       '@hugeicons/react':
         specifier: ^1.1.5
         version: 1.1.5(react@19.2.4)
+      '@t3-oss/env-core':
+        specifier: ^0.13.10
+        version: 0.13.10(typescript@5.9.3)(zod@4.3.6)
       '@tanstack/react-form':
         specifier: ^1.28.4
         version: 1.28.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -448,6 +451,9 @@ importers:
 
   packages/seo:
     dependencies:
+      '@t3-oss/env-core':
+        specifier: ^0.13.10
+        version: 0.13.10(typescript@5.9.3)(zod@4.3.6)
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
@@ -460,6 +466,9 @@ importers:
       schema-dts:
         specifier: ^1.1.5
         version: 1.1.5
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@types/lodash.merge':
         specifier: ^4.6.9
@@ -1132,11 +1141,6 @@ packages:
 
   '@elysiajs/cors@1.4.1':
     resolution: {integrity: sha512-lQfad+F3r4mNwsxRKbXyJB8Jg43oAOXjRwn7sKUL6bcOW3KjUqUimTS+woNpO97efpzjtDE0tEjGk9DTw8lqTQ==}
-    peerDependencies:
-      elysia: '>= 1.4.0'
-
-  '@elysiajs/cron@1.4.1':
-    resolution: {integrity: sha512-Y+jqXtMJ+m17QzNWlWc09ugd1Fn1Wh7lqE+y9qSW8eiQZEqsRADXWmbLuXRSRaSC5dkfOyRSiwNCp6n8L/yuqA==}
     peerDependencies:
       elysia: '>= 1.4.0'
 
@@ -4313,10 +4317,6 @@ packages:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
     engines: {node: '>=12.0.0'}
 
-  croner@6.0.7:
-    resolution: {integrity: sha512-k3Xx3Rcclfr60Yx4TmvsF3Yscuiql8LSvYLaphTsaq5Hk8La4Z/udmUANMOTKpgGGroI2F6/XOr9cU9OFkYluQ==}
-    engines: {node: '>=6.0'}
-
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -4567,6 +4567,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-typebox@0.1.1:
+    resolution: {integrity: sha512-eNIDe+EOCB96/bbRHOPbrC+bsuCXFd2H0/96Fl0cJkY+NKnu2qLTnGI6ILXPbyu82Yr1tsShlzDypw+VeCDqaQ==}
+    peerDependencies:
+      '@sinclair/typebox': '>=0.17.6'
+      drizzle-orm: '>=0.23.13'
 
   drizzle-zod@0.8.3:
     resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
@@ -7260,11 +7266,6 @@ snapshots:
 
   '@elysiajs/cors@1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))':
     dependencies:
-      elysia: 1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
-
-  '@elysiajs/cron@1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))':
-    dependencies:
-      croner: 6.0.7
       elysia: 1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
 
   '@elysiajs/eden@1.4.8(elysia@1.4.27(@sinclair/typebox@0.34.48)(exact-mirror@0.2.7(@sinclair/typebox@0.34.48))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))':
@@ -10187,8 +10188,6 @@ snapshots:
     dependencies:
       luxon: 3.7.2
 
-  croner@6.0.7: {}
-
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -10351,6 +10350,11 @@ snapshots:
       bun-types: 1.3.10
       kysely: 0.28.11
       pg: 8.19.0
+
+  drizzle-typebox@0.1.1(@sinclair/typebox@0.34.48)(drizzle-orm@0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(bun-types@1.3.10)(kysely@0.28.11)(pg@8.19.0)):
+    dependencies:
+      '@sinclair/typebox': 0.34.48
+      drizzle-orm: 0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(bun-types@1.3.10)(kysely@0.28.11)(pg@8.19.0)
 
   drizzle-zod@0.8.3(drizzle-orm@0.45.1(@opentelemetry/api@1.9.0)(@types/pg@8.18.0)(bun-types@1.3.10)(kysely@0.28.11)(pg@8.19.0))(zod@4.3.6):
     dependencies:

@@ -14,7 +14,6 @@
     "@bogeychan/elysia-logger": "^0.1.10",
     "@elysiajs/bearer": "^1.4.3",
     "@elysiajs/cors": "^1.4.1",
-    "@elysiajs/cron": "^1.4.1",
     "@elysiajs/jwt": "^1.4.1",
     "@elysiajs/openapi": "^1.4.14",
     "@elysiajs/opentelemetry": "^1.4.10",
@@ -26,6 +25,7 @@
     "@vidcastx/redis": "workspace:^",
     "@vidcastx/storage": "workspace:^",
     "better-auth": "^1.5.3",
+    "drizzle-typebox": "^0.1.1",
     "elysia": "latest",
     "jose": "^6.2.1",
     "zod": "^4.3.6"
