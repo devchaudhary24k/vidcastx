@@ -16,7 +16,7 @@ import {
   VideoIdParam,
   VideoListResponse,
   VideoResponse,
-} from "./model-typebox";
+} from "./model";
 import { VideoService } from "./service";
 
 /**
@@ -45,7 +45,7 @@ export const videoController = new Elysia({
   // List videos (paginated)
   .get(
     "/",
-    async ({ query, orgId }) => ({
+    async ({ query }) => ({
       page: query.page || 1,
       limit: query.limit || 10,
       total: 0,
@@ -89,7 +89,7 @@ export const videoController = new Elysia({
       // Update metadata
       .patch(
         "/",
-        async ({ video, body }) => ({
+        async ({ video, body: _body }) => ({
           status: "updated",
           videoId: video.id,
         }),
