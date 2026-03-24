@@ -1,4 +1,3 @@
-import type { UppyFile } from "@uppy/core";
 import { uploadActions } from "@dashboard/features/videos/stores/upload-store";
 import client from "@dashboard/lib/api";
 import AwsS3 from "@uppy/aws-s3";
@@ -42,15 +41,15 @@ uppy.use(AwsS3, {
     const { uploadId, partNumber } = partData;
     if (!uploadId) throw new Error("Missing uploadId");
 
-    const { data: url } = await client.api.v1.videos({ id: videoId }).multipart["sign-part"].get({
+    const { data } = await client.api.v1.videos({ id: videoId }).multipart["sign-part"].get({
       query: {
         uploadId,
         partNumber: partNumber,
       },
     });
 
-    if (!url) throw new Error("Failed to sign part");
-    return { url };
+    if (!data) throw new Error("Failed to sign part");
+    return { url: data.url };
   },
 
   completeMultipartUpload: async (file, { uploadId, parts }) => {
@@ -60,7 +59,7 @@ uppy.use(AwsS3, {
       ETag: part.ETag!,
     }));
 
-    const { data } = await client.api.v1.videos({ id: videoId }).multipart.complete.post({
+    await client.api.v1.videos({ id: videoId }).multipart.complete.post({
       uploadId,
       parts: formattedPart,
     });
@@ -68,7 +67,7 @@ uppy.use(AwsS3, {
     return { location: "" };
   },
 
-  abortMultipartUpload: async (file, { uploadId, key }) => {
+  abortMultipartUpload: async (file, { uploadId }) => {
     if (!uploadId) throw new Error("Missing uploadId");
     const videoId = file.meta.videoId as string;
 
@@ -78,7 +77,7 @@ uppy.use(AwsS3, {
     return;
   },
 
-  listParts: async (file, { uploadId, key }) => {
+  listParts: async (file, { uploadId }) => {
     if (!uploadId) throw new Error("Missing uploadId");
     const videoId = file.meta.videoId as string;
 

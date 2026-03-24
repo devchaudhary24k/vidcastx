@@ -8,8 +8,11 @@ import {
   MultipartAbortBody,
   MultipartCompleteBody,
   MultipartInitBody,
+  MultipartInitResponse,
   MultipartListPartsQuery,
+  MultipartPartsResponse,
   MultipartSignQuery,
+  MultipartSignResponse,
   PaginationQuery,
   SuccessResponse,
   UpdateVideoBody,
@@ -60,13 +63,14 @@ export const videoController = new Elysia({
   // Create draft video
   .post(
     "/",
-    async ({ body, user, orgId }) => {
+    async ({ body, user, orgId, status }) => {
       const video = await VideoService.createDraft(user.id, orgId, body);
+      if (!video) return status(500, { error: "Failed to create video" });
       return { status: "created", data: video };
     },
     {
       body: CreateVideoBody,
-      response: { 200: CreateVideoResponse, 400: ErrorResponse },
+      response: { 200: CreateVideoResponse, 400: ErrorResponse, 500: ErrorResponse },
     },
   )
 
@@ -130,12 +134,11 @@ export const videoController = new Elysia({
           .post(
             "/init",
             async ({ video, body }) => {
-              await VideoService.initMultipart(video, body.contentType);
-              return { status: "success", videoId: video.id };
+              return await VideoService.initMultipart(video, body.contentType);
             },
             {
               body: MultipartInitBody,
-              response: { 200: SuccessResponse, 400: ErrorResponse },
+              response: { 200: MultipartInitResponse, 400: ErrorResponse },
             },
           )
 
@@ -143,12 +146,12 @@ export const videoController = new Elysia({
           .get(
             "/sign-part",
             async ({ video, query }) => {
-              await VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
-              return { status: "success", videoId: video.id };
+              const url = await VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
+              return { url };
             },
             {
               query: MultipartSignQuery,
-              response: { 200: SuccessResponse, 400: ErrorResponse },
+              response: { 200: MultipartSignResponse, 400: ErrorResponse },
             },
           )
 
@@ -169,12 +172,11 @@ export const videoController = new Elysia({
           .get(
             "/list-parts",
             async ({ video, query }) => {
-              await VideoService.listParts(video, query.uploadId);
-              return { status: "success", videoId: video.id };
+              return await VideoService.listParts(video, query.uploadId);
             },
             {
               query: MultipartListPartsQuery,
-              response: { 200: SuccessResponse, 400: ErrorResponse },
+              response: { 200: MultipartPartsResponse, 400: ErrorResponse },
             },
           )
 

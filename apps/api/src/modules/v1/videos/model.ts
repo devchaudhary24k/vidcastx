@@ -12,9 +12,10 @@ import { videos } from "@vidcastx/database/schema/video-schema";
 const _videoSelect = createSelectSchema(videos);
 export const VideoResponse = t.Omit(_videoSelect, ["masterAccessUrl", "metadata"]);
 
-// Create draft video — filename is API-only (used to derive S3 key/extension), not stored in DB
+// Create draft video — filename and contentType are API-only, not stored in DB
 export const CreateVideoBody = t.Object({
   filename: t.String({ minLength: 1 }),
+  contentType: t.String({ pattern: "^video/" }),
   title: t.Optional(t.String({ minLength: 3, maxLength: 200 })),
   folderId: t.Optional(t.Nullable(t.String())),
   description: t.Optional(t.String()),
@@ -90,3 +91,23 @@ export const SuccessResponse = t.Object({
   status: t.String(),
   videoId: t.String(),
 });
+
+// Multipart init response
+export const MultipartInitResponse = t.Object({
+  uploadId: t.String(),
+  key: t.String(),
+});
+
+// Multipart sign-part response
+export const MultipartSignResponse = t.Object({
+  url: t.String(),
+});
+
+// Multipart list-parts response
+export const MultipartPartsResponse = t.Array(
+  t.Object({
+    PartNumber: t.Optional(t.Number()),
+    ETag: t.Optional(t.String()),
+    Size: t.Optional(t.Number()),
+  }),
+);
