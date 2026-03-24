@@ -1,5 +1,5 @@
 CREATE TYPE "public"."asset_type" AS ENUM('hls_playlist', 'thumbnail', 'preview_gif', 'audio_track', 'subtitle_track', 'storyboard', 'source_file');--> statement-breakpoint
-CREATE TYPE "public"."video_status" AS ENUM('draft', 'uploaded', 'queued', 'dispatch', 'processing', 'ready', 'failed');--> statement-breakpoint
+CREATE TYPE "public"."video_status" AS ENUM('draft', 'uploaded', 'queued', 'dispatched', 'processing', 'ready', 'failed');--> statement-breakpoint
 CREATE TYPE "public"."visibility" AS ENUM('public', 'private', 'unlisted');--> statement-breakpoint
 CREATE TYPE "public"."ai_job_status" AS ENUM('pending', 'processing', 'completed', 'failed');--> statement-breakpoint
 CREATE TYPE "public"."ai_job_type" AS ENUM('transcribe', 'translate', 'dub', 'clean_mode', 'generate_metadata');--> statement-breakpoint

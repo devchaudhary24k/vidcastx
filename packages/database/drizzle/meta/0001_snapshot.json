@@ -1,6 +1,6 @@
 {
-  "id": "47edc42c-d213-4739-92c5-7a673504b031",
-  "prevId": "3057cda7-3493-4323-a862-1479308f8b87",
+  "id": "b646f5bd-ecef-47e9-a033-39e0f90153e4",
+  "prevId": "4f2baf7e-7089-4946-bc67-efdaa8e0d831",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -4696,7 +4696,7 @@
     "public.video_status": {
       "name": "video_status",
       "schema": "public",
-      "values": ["draft", "uploaded", "queued", "dispatch", "processing", "ready", "failed"]
+      "values": ["draft", "uploaded", "queued", "dispatched", "processing", "ready", "failed"]
     },
     "public.visibility": {
       "name": "visibility",
