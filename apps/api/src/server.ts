@@ -9,6 +9,7 @@ import { auth } from "@vidcastx/auth";
 
 import { env } from "./env";
 import internalController from "./modules/internal";
+import { dispatcherCronPlugin } from "./modules/internal/cron";
 import v1Router from "./modules/v1";
 
 const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router).use(internalController);
@@ -58,6 +59,7 @@ const server = new Elysia({ name: "api-server" })
     return status(500, { error: "Internal server error" });
   })
   .use(apiRouter)
+  .use(dispatcherCronPlugin)
   .mount(auth.handler)
   .listen(env.PORT);
 
