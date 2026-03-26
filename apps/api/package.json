@@ -2,8 +2,8 @@
   "name": "api",
   "version": "1.0.50",
   "scripts": {
-    "dev": "bun run with-env -- bun run --watch src/index.ts",
-    "build": "bun run with-env -- bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/index.ts",
+    "dev": "bun run with-env -- bun run --watch src/server.ts",
+    "build": "bun run with-env -- bun build --compile --minify-whitespace --minify-syntax --target bun --outfile dist/server src/server.ts",
     "check-types": "bun run with-env -- tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore",

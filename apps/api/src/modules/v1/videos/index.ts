@@ -92,67 +92,71 @@ const videoItemController = new Elysia({
     },
   )
 
-  // Initialize multipart upload
-  .post(
-    "/multipart/init",
-    async ({ video, body }) => {
-      return await VideoService.initMultipart(video, body.contentType);
-    },
-    {
-      body: MultipartInitBody,
-      response: { 200: MultipartInitResponse, 400: ErrorResponse },
-    },
-  )
+  // Multipart upload operations
+  .group("/multipart", (app) =>
+    app
+      // Initialize multipart upload
+      .post(
+        "/init",
+        async ({ video, body }) => {
+          return await VideoService.initMultipart(video, body.contentType);
+        },
+        {
+          body: MultipartInitBody,
+          response: { 200: MultipartInitResponse, 400: ErrorResponse },
+        },
+      )
 
-  // Get presigned URL for part
-  .get(
-    "/multipart/sign-part",
-    async ({ video, query }) => {
-      const url = await VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
-      return { url };
-    },
-    {
-      query: MultipartSignQuery,
-      response: { 200: MultipartSignResponse, 400: ErrorResponse },
-    },
-  )
+      // Get presigned URL for part
+      .get(
+        "/sign-part",
+        async ({ video, query }) => {
+          const url = await VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
+          return { url };
+        },
+        {
+          query: MultipartSignQuery,
+          response: { 200: MultipartSignResponse, 400: ErrorResponse },
+        },
+      )
 
-  // Complete multipart upload
-  .post(
-    "/multipart/complete",
-    async ({ video, body }) => {
-      await VideoService.completeMultipart(video, body.uploadId, body.parts);
-      return { status: "success", videoId: video.id };
-    },
-    {
-      body: MultipartCompleteBody,
-      response: { 200: SuccessResponse, 400: ErrorResponse },
-    },
-  )
+      // Complete multipart upload
+      .post(
+        "/complete",
+        async ({ video, body }) => {
+          await VideoService.completeMultipart(video, body.uploadId, body.parts);
+          return { status: "success", videoId: video.id };
+        },
+        {
+          body: MultipartCompleteBody,
+          response: { 200: SuccessResponse, 400: ErrorResponse },
+        },
+      )
 
-  // List uploaded parts
-  .get(
-    "/multipart/list-parts",
-    async ({ video, query }) => {
-      return await VideoService.listParts(video, query.uploadId);
-    },
-    {
-      query: MultipartListPartsQuery,
-      response: { 200: MultipartPartsResponse, 400: ErrorResponse },
-    },
-  )
+      // List uploaded parts
+      .get(
+        "/list-parts",
+        async ({ video, query }) => {
+          return await VideoService.listParts(video, query.uploadId);
+        },
+        {
+          query: MultipartListPartsQuery,
+          response: { 200: MultipartPartsResponse, 400: ErrorResponse },
+        },
+      )
 
-  // Abort multipart upload
-  .delete(
-    "/multipart/abort",
-    async ({ video, body }) => {
-      await VideoService.abortMultipart(video, body.uploadId);
-      return { status: "success", videoId: video.id };
-    },
-    {
-      body: MultipartAbortBody,
-      response: { 200: SuccessResponse, 400: ErrorResponse },
-    },
+      // Abort multipart upload
+      .delete(
+        "/abort",
+        async ({ video, body }) => {
+          await VideoService.abortMultipart(video, body.uploadId);
+          return { status: "success", videoId: video.id };
+        },
+        {
+          body: MultipartAbortBody,
+          response: { 200: SuccessResponse, 400: ErrorResponse },
+        },
+      ),
   );
 
 /**

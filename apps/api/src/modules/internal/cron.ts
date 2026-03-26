@@ -9,7 +9,7 @@ export const dispatcherCronPlugin = new Elysia().use(
     name: "fairness-dispatcher",
     pattern: "*/5 * * * * *",
     async run() {
-      const [result, err] = await tryCatch(QueueDispatcher.dispatchFairly());
+      const [, err] = await tryCatch(QueueDispatcher.dispatchFairly());
       if (err) console.error("[CRON ERROR] Failed to execute dispatcher interval:", err);
     },
   }),
