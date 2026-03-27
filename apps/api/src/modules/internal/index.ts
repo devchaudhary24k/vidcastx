@@ -113,20 +113,20 @@ export default new Elysia({
    * Protected scope: requires a valid M2M bearer token.
    * Uses resolve (not beforeHandle) so `machine` is injected into context.
    */
-  .resolve(async ({ bearer, m2mJwt, error }) => {
+  .resolve(async ({ bearer, m2mJwt, status }) => {
     if (!bearer) {
-      return error(401, { error: "Missing bearer token" });
+      return status(401, { error: "Missing bearer token" });
     }
 
     const raw = await m2mJwt.verify(bearer);
     if (!raw) {
-      return error(403, { error: "Invalid or expired token" });
+      return status(403, { error: "Invalid or expired token" });
     }
 
     const payload = raw as unknown as M2MPayload;
 
     if (payload.role !== "internal-worker") {
-      return error(403, { error: "Invalid or expired token" });
+      return status(403, { error: "Invalid or expired token" });
     }
 
     return { machine: payload.machine };
