@@ -1,7 +1,8 @@
-import { uploadActions } from "@dashboard/features/videos/stores/upload-store";
-import client from "@dashboard/lib/api";
+import client from "@app/lib/api";
 import AwsS3 from "@uppy/aws-s3";
 import Uppy from "@uppy/core";
+
+import { uploadActions } from "../features/videos/stores/upload-store";
 
 type UppyMeta = {
   videoId: string;

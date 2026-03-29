@@ -1,4 +1,4 @@
-import type { App } from "@server/server";
+import type { App } from "@server/router";
 import { treaty } from "@elysiajs/eden";
 
 const client = treaty<App>("http://localhost:4000");

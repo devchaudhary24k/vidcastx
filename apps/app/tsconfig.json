@@ -7,8 +7,11 @@
     "module": "ESNext",
     "baseUrl": ".",
     "paths": {
-      "#/*": ["./src/*"],
-      "@/*": ["./src/*"]
+      "#app/*": ["./src/*"],
+      "@app/*": ["./src/*"],
+      "@vidcastx/ui/*": ["../../packages/ui/src/*"],
+      "@server/*": ["../api/src/*"],
+      "@transcoder/*": ["../../workers/transcoder/src/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
