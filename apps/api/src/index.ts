@@ -8,11 +8,8 @@ import { Elysia } from "elysia";
 import { auth } from "@vidcastx/auth";
 
 import { env } from "./env";
-import internalController from "./modules/internal";
 import { dispatcherCronPlugin } from "./modules/internal/cron";
-import v1Router from "./modules/v1";
-
-const apiRouter = new Elysia({ prefix: "/api" }).use(v1Router).use(internalController);
+import { apiRouter } from "./router";
 
 const server = new Elysia({ name: "api-server" })
   .use(opentelemetry())
@@ -69,4 +66,3 @@ console.log(`🦊 API server is running at ${server.server?.hostname}:${server.s
  * Export full server type for Eden Treaty (end-to-end type safety)
  * Use in dashboard: import type { App } from '@api'; const api = treaty<App>(url);
  */
-export type App = typeof server;
