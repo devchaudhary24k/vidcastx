@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm with-env next dev --port 4000",
-    "build": "pnpm with-env next build",
-    "start": "pnpm with-env next start",
+    "build": "SKIP_ENV_VALIDATION=1 next build",
+    "start": "next start",
     "lint": "eslint",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "check-types": "tsc --noEmit",

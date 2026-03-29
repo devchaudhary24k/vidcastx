@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "dev": "pnpm with-env tsx watch src/index.ts",
-    "build": "pnpm with-env tsup src/index.ts",
-    "start": "pnpm with-env node dist/index.js",
+    "build": "SKIP_ENV_VALIDATION=1 tsup src/index.ts",
+    "start": "node dist/index.js",
     "lint": "eslint",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "check-types": "tsc --noEmit",

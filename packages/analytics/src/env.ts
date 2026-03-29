@@ -4,14 +4,11 @@ import { z } from "zod";
 export const env = createEnv({
   server: {},
 
-  shared: {
-    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  },
-
   clientPrefix: "NEXT_PUBLIC_",
   client: {
-    NEXT_PUBLIC_API_URL: z.url(),
-    NEXT_PUBLIC_CDN_URL: z.url(),
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().startsWith("phc_"),
+    NEXT_PUBLIC_POSTHOG_HOST: z.url(),
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().startsWith("G-").optional(),
   },
 
   runtimeEnv: process.env,
