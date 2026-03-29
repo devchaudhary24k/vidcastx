@@ -1,5 +1,7 @@
-FIXES
+# FEATS/FIXES
 
-- [ ] Upload progress must fade out
-- [ ] Cancel must also change state in upload progress
-- [ ] Cleanup state/file when upload complete
+- [ ] Setup Testing
+- [ ] Decoupe auth packages from frontend
+- [ ] List videos in frontend
+- [ ] Setup Streaming
+- [ ] Migrate to tanstack start
