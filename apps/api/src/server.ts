@@ -19,29 +19,29 @@ const server = new Elysia({ name: "api-server" })
   .use(openapi({ references: fromTypes() }))
   .use(logger())
   .use(serverTiming()) // Auto-disabled in production
-  .use(
-    cors({
-      origin: ({ headers }) => {
-        const allowedOrigins =
-          env.NODE_ENV === "production"
-            ? ["https://vidcastx.daymlabs.com"]
-            : ["https://vidcastx.daymlabs.com", "http://localhost:3000"];
-        const origin = headers.get("origin");
-        return !origin || allowedOrigins.includes(origin);
-      },
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-      credentials: true,
-      maxAge: 300,
-    }),
-  )
+  // .use(
+  //   cors({
+  //     origin: ({ headers }) => {
+  //       const allowedOrigins =
+  //         env.NODE_ENV === "production"
+  //           ? ["https://vidcastx.daymlabs.com"]
+  //           : ["https://vidcastx.daymlabs.com", "http://localhost:3000"];
+  //       const origin = headers.get("origin");
+  //       return !origin || allowedOrigins.includes(origin);
+  //     },
+  //     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+  //     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  //     credentials: true,
+  //     maxAge: 300,
+  //   }),
+  // )
   // Centralized error handling — registered before routes so it catches all of them
   .onError(({ code, error, status }) => {
     // Schema validation failed (body, query, params, headers)
     if (code === "VALIDATION") {
       const first =
         "all" in error && Array.isArray(error.all) ? (error.all[0] as { message?: string } | undefined) : undefined;
-      return status(400, { error: first?.message ?? "Validation failed" });
+      return status(400, { error: first?.message ?? "Validatiion failed" });
     }
 
     // Body could not be parsed (malformed JSON, wrong content-type, etc.)
