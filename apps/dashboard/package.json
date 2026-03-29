@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm with-env next dev --port 3000",
+    "dev": "pnpm with-env next dev --port 4000",
     "build": "pnpm with-env next build",
     "start": "pnpm with-env next start",
     "lint": "eslint",
