@@ -21,9 +21,9 @@
     "@workspace/database": "workspace:^",
     "@workspace/seo": "workspace:^",
     "@workspace/ui": "workspace:*",
-    "better-auth": "^1.4.5",
+    "better-auth": "^1.4.9",
     "lucide-react": "^0.556.0",
-    "next": "16.0.7",
+    "next": "16.1.7",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
