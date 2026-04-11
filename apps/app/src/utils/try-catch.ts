@@ -1,12 +1,12 @@
 type SuccessResult<T> = readonly [T, null];
-type ErrorResult<E = Error> = readonly [null, E];
-type Result<T, E = Error> = SuccessResult<T> | ErrorResult<E>;
+type ErrorResult<TError = Error> = readonly [null, TError];
+type Result<T, TError = Error> = SuccessResult<T> | ErrorResult<TError>;
 
-export async function tryCatch<T, E = Error>(promise: Promise<T>): Promise<Result<T, E>> {
+export async function tryCatch<T, TError = Error>(promise: Promise<T>): Promise<Result<T, TError>> {
   try {
     const data = await promise;
     return [data, null] as const;
   } catch (error) {
-    return [null, error as E] as const;
+    return [null, error as TError] as const;
   }
 }

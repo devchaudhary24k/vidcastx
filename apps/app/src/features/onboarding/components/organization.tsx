@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { AvatarUploader } from "@dashboard/components/avatar-uploader";
-import { createOrganization } from "@dashboard/features/onboarding/api/create-organization";
 import { useForm, useStore } from "@tanstack/react-form";
+import { AvatarUploader } from "#app/components/avatar-uploader";
+import { createOrganization } from "#app/features/onboarding/api/create-organization";
 import { ArrowRight, Fingerprint } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -64,7 +64,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then((r) => {});
+            form.handleSubmit().then(() => {});
           }}
           className="space-y-6"
         >

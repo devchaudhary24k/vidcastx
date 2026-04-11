@@ -1,6 +1,3 @@
-"use client";
-
-import * as React from "react";
 import { Search } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";

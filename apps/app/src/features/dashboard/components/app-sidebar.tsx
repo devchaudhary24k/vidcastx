@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { useState } from "react";
 import {
@@ -17,7 +15,7 @@ import {
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from "@vidcastx/ui/components/sidebar";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import type { Organization, SidebarData, UserData } from "./types";
+import type { SidebarData, UserData } from "./types";
 import { CommandMenu } from "./command-menu";
 import { NavMain } from "./nav-main";
 import { NavSearch } from "./nav-search";

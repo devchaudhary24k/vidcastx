@@ -1,6 +1,6 @@
 import { useState } from "react";
-import client from "@dashboard/lib/api";
-import { uppy } from "@dashboard/lib/uppy-client";
+import client from "#app/lib/api";
+import { uppy } from "#app/lib/uppy-client";
 
 export const useVideoUpload = () => {
   const [isCreatingDraft, setIsCreatingDraft] = useState(false);

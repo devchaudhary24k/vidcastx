@@ -1,8 +1,6 @@
-"use client";
-
+import type { UseFormReturn } from "react-hook-form";
 import * as React from "react";
 import { CloudUpload, X } from "lucide-react";
-import { type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@vidcastx/ui/components/button";

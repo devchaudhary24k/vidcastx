@@ -1,4 +1,4 @@
-import { auth } from "@dashboard/lib/auth";
+import { auth } from "#app/lib/auth";
 
 export const updateUser = async (data: {
   firstName: string;

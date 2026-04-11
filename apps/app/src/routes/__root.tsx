@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Toaster } from "sonner";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import TanStackQueryProvider from "../integrations/tanstack-query/root-provider";
@@ -47,6 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="font-sans [overflow-wrap:anywhere] antialiased selection:bg-[rgba(79,184,178,0.24)]">
         <TanStackQueryProvider>
           {children}
+          <Toaster richColors position="bottom-right" />
           <TanStackDevtools
             config={{
               position: "bottom-right",

@@ -1,5 +1,3 @@
-"use client";
-
 import { BellIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";

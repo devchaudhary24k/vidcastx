@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { AvatarUploader } from "@dashboard/components/avatar-uploader";
-import { updateUser } from "@dashboard/features/onboarding/api/update-user";
-import { useUser } from "@dashboard/lib/use-user";
 import { useForm } from "@tanstack/react-form";
+import { AvatarUploader } from "#app/components/avatar-uploader";
+import { updateUser } from "#app/features/onboarding/api/update-user";
+import { useUser } from "#app/lib/use-user";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -53,7 +53,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then((r) => {});
+            form.handleSubmit().then(() => {});
           }}
           className="space-y-6"
         >

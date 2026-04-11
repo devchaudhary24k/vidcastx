@@ -1,11 +1,11 @@
 import React from "react";
-import { inviteMembers } from "@dashboard/features/onboarding/api/invite-members";
 import { useForm } from "@tanstack/react-form";
+import { inviteMembers } from "#app/features/onboarding/api/invite-members";
 import { Mail, Plus, Shield, Sparkles, Trash2, UserPlus } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@vidcastx/ui/components/field";
+import { FieldError } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@vidcastx/ui/components/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@vidcastx/ui/components/table";
@@ -44,7 +44,7 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then((r) => {});
+            form.handleSubmit().then(() => {});
           }}
           className="space-y-8"
         >

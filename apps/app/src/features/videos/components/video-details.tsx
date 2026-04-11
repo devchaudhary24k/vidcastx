@@ -1,14 +1,12 @@
-"use client";
-
+import type { UseFormReturn } from "react-hook-form";
 import { FileText, Video } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@vidcastx/ui/components/form";
 import { Input } from "@vidcastx/ui/components/input";
 import { Textarea } from "@vidcastx/ui/components/textarea";
 
-import { VideoUploadFormValues } from "../schemas";
+import type { VideoUploadFormValues } from "../schemas";
 
 interface VideoDetailsProps {
   form: UseFormReturn<VideoUploadFormValues>;

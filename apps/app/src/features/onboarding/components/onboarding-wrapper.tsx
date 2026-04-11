@@ -1,6 +1,5 @@
-"use client";
-
 import React, { useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 
 import { Step1BasicInfo } from "./basic-information";
 import { Step4Billing } from "./billing";
@@ -9,6 +8,7 @@ import { OnboardingSidebar } from "./onboarding-sidebar";
 import { Step2Organization } from "./organization";
 
 export const OnboardingWrapper: React.FC = () => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
@@ -23,8 +23,10 @@ export const OnboardingWrapper: React.FC = () => {
     } else if (currentStep < 5) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      // Handle final submission
-      alert("Onboarding Complete! Redirecting...");
+      // Onboarding complete — invalidate router to re-check session, then redirect
+      router.invalidate().then(() => {
+        router.navigate({ to: "/dashboard" });
+      });
     }
   };
 

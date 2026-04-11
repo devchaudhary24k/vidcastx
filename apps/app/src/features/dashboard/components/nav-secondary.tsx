@@ -1,5 +1,4 @@
-import * as React from "react";
-import { type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
 import { cn } from "@vidcastx/ui/lib/utils";

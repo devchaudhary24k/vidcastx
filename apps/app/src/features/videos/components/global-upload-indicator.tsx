@@ -1,14 +1,10 @@
-"use client";
-
-import type { UploadItem as UploadItemType } from "@dashboard/features/videos/stores/upload-store";
+import type { UploadItem as UploadItemType } from "#app/features/videos/stores/upload-store";
 import { useEffect, useRef } from "react";
-import { uploadActions, uploadStore } from "@dashboard/features/videos/stores/upload-store";
-import { uppy } from "@dashboard/lib/uppy-client";
 import { useStore } from "@tanstack/react-store";
-import { X } from "lucide-react";
+import { uploadStore } from "#app/features/videos/stores/upload-store";
+import { uppy } from "#app/lib/uppy-client";
 import { toast } from "sonner";
 
-import { Button } from "@vidcastx/ui/components/button";
 import { Progress } from "@vidcastx/ui/components/progress";
 
 export function GlobalUploadIndicator() {

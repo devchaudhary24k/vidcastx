@@ -1,6 +1,6 @@
 import React from "react";
-import { updateBilling } from "@dashboard/features/onboarding/api/update-billing";
 import { useForm } from "@tanstack/react-form";
+import { updateBilling } from "#app/features/onboarding/api/update-billing";
 import { ArrowRight, Lock } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -41,7 +41,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then((r) => {});
+            form.handleSubmit().then(() => {});
           }}
           className="space-y-6"
         >

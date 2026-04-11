@@ -274,7 +274,7 @@ const authOptions = {
     },
   },
 
-  trustedOrigins: ["http://localhost:4000"],
+  trustedOrigins: ["http://localhost:4000", "http://localhost:3000"],
 
   plugins: [
     openAPI(),

@@ -1,9 +1,6 @@
-"use client";
-
 import * as React from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useRouter } from "@tanstack/react-router";
 import { ChevronLeft, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -56,7 +53,7 @@ export function VideoUploadForm() {
 
       if (videoId) {
         // Redirect on success
-        router.push("/dashboard/projects");
+        router.navigate({ to: "/dashboard/projects" });
       }
     } catch (error) {
       // Error is handled in the hook's toast
@@ -76,7 +73,7 @@ export function VideoUploadForm() {
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 p-6">
       <div className="flex flex-col gap-2">
         <Link
-          href="/dashboard/projects"
+          to="/dashboard/projects"
           className="text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 text-sm font-medium transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -132,7 +129,7 @@ export function VideoUploadForm() {
                   variant="outline"
                   size="lg"
                   className="w-full"
-                  onClick={() => router.back()}
+                  onClick={() => router.history.back()}
                   disabled={isUploading}
                 >
                   Cancel

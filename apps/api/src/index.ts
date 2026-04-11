@@ -16,22 +16,19 @@ const server = new Elysia({ name: "api-server" })
   .use(openapi({ references: fromTypes() }))
   .use(logger())
   .use(serverTiming()) // Auto-disabled in production
-  // .use(
-  //   cors({
-  //     origin: ({ headers }) => {
-  //       const allowedOrigins =
-  //         env.NODE_ENV === "production"
-  //           ? ["https://vidcastx.daymlabs.com"]
-  //           : ["https://vidcastx.daymlabs.com", "http://localhost:3000"];
-  //       const origin = headers.get("origin");
-  //       return !origin || allowedOrigins.includes(origin);
-  //     },
-  //     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
-  //     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  //     credentials: true,
-  //     maxAge: 300,
-  //   }),
-  // )
+  .use(
+    cors({
+      origin: ({ headers }) => {
+        const allowedOrigins = env.NODE_ENV === "production" ? ["https://vidcastx.daymlabs.com"] : "*";
+        const origin = headers.get("origin");
+        return !origin || allowedOrigins.includes(origin);
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+      credentials: true,
+      maxAge: 300,
+    }),
+  )
   // Centralized error handling — registered before routes so it catches all of them
   .onError(({ code, error, status }) => {
     // Schema validation failed (body, query, params, headers)
@@ -61,8 +58,3 @@ const server = new Elysia({ name: "api-server" })
   .listen(env.PORT);
 
 console.log(`🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`);
-
-/**
- * Export full server type for Eden Treaty (end-to-end type safety)
- * Use in dashboard: import type { App } from '@api'; const api = treaty<App>(url);
- */

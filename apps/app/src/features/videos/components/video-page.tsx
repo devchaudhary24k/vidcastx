@@ -1,7 +1,5 @@
-"use client";
-
 import * as React from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { LayoutGrid, List as ListIcon, Plus, Search } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -47,7 +45,7 @@ export function VideoList() {
             </Button>
           </div>
           <Button asChild>
-            <Link href="/dashboard/projects/new">
+            <Link to="/dashboard/studio/new">
               <Plus className="mr-2 h-4 w-4" />
               Upload Video
             </Link>

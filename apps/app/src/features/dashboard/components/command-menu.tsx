@@ -1,8 +1,6 @@
-"use client";
-
 import * as React from "react";
 import { useEffect, useMemo } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 import {
   CommandDialog,
@@ -25,7 +23,6 @@ const flattenSidebarData = (sidebarData: SidebarData): SearchItem[] => {
   const mainItems: SearchItem[] = [];
   const subItems: SearchItem[] = [];
 
-  // Flatten navMain
   sidebarData.navMain.forEach((mainItem) => {
     mainItems.push({
       id: mainItem.title.toLowerCase().replace(/\s/g, "-"),
@@ -44,7 +41,6 @@ const flattenSidebarData = (sidebarData: SidebarData): SearchItem[] => {
     });
   });
 
-  // Flatten navAdmin
   sidebarData.navAdmin.forEach((adminItem) => {
     mainItems.push({
       id: adminItem.title.toLowerCase().replace(/\s/g, "-"),
@@ -87,7 +83,7 @@ export function CommandMenu({ open, setOpen, data }: CommandMenuProps) {
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
           {searchItems.map((item) => (
-            <Link href={item.link} key={item.id}>
+            <Link to={item.link} key={item.id}>
               <CommandItem
                 className="py-2!"
                 value={item.title}

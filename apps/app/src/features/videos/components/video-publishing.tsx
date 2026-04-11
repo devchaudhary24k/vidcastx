@@ -1,8 +1,6 @@
-"use client";
-
+import type { UseFormReturn } from "react-hook-form";
 import { format } from "date-fns";
 import { CalendarIcon, Globe, Lock, Upload } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Calendar } from "@vidcastx/ui/components/calendar";
@@ -19,7 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@vidcastx/ui/components
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@vidcastx/ui/components/select";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import { VideoUploadFormValues } from "../schemas";
+import type { VideoUploadFormValues } from "../schemas";
 
 interface VideoPublishingProps {
   form: UseFormReturn<VideoUploadFormValues>;

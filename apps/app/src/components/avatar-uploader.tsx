@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useRef, useState } from "react";
-import { Camera, Pencil, Trash2, Upload } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";
 

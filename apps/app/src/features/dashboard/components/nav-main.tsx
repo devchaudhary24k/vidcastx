@@ -1,9 +1,6 @@
-"use client";
-
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@vidcastx/ui/components/collapsible";
@@ -37,7 +34,8 @@ export function NavMain({
   label?: string;
 }) {
   const { state } = useSidebar();
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const isCollapsed = state === "collapsed";
   const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
 
@@ -100,7 +98,7 @@ export function NavMain({
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton asChild isActive={isSubActive}>
                               <Link
-                                href={subItem.url}
+                                to={subItem.url}
                                 className={cn(
                                   "flex items-center rounded-md px-4 py-1.5 text-sm font-medium",
                                   subItem.disabled && "pointer-events-none opacity-50",
@@ -129,7 +127,7 @@ export function NavMain({
                   isCollapsed && "justify-center",
                 )}
               >
-                <Link href={item.url}>
+                <Link to={item.url}>
                   <item.icon className="size-4" />
                   {!isCollapsed && <span className="ml-2 text-sm font-medium">{item.title}</span>}
                 </Link>

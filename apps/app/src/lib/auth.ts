@@ -1,10 +1,10 @@
+import type { auth as authServer } from "@vidcastx/auth";
+import { env } from "#app/env";
 import { inferAdditionalFields, inferOrgAdditionalFields, organizationClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
-import { type auth as authServer } from "@vidcastx/auth";
-
 export const auth = createAuthClient({
-  baseURL: "http://localhost:4000",
+  baseURL: env.VITE_API_URL,
   plugins: [
     organizationClient({
       schema: inferOrgAdditionalFields<typeof authServer>(),
@@ -12,3 +12,5 @@ export const auth = createAuthClient({
     inferAdditionalFields<typeof authServer>(),
   ],
 });
+
+export type AuthSession = typeof authServer.$Infer.Session;
