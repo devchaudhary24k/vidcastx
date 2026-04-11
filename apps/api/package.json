@@ -8,6 +8,8 @@
     "check-types": "bun run with-env -- tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
     "clean": "git clean -xdf .cache .next .dist .turbo node_modules",
     "with-env": "dotenv -e ../../.env --"
   },
