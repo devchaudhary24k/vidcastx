@@ -5,8 +5,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "dev:dashboard": "turbo watch dev -F dashboard...",
-    "dev:marketing": "turbo watch dev -F marketing...",
+    "dev:app": "turbo watch dev -F app...",
+    "dev:api": "turbo watch dev -F api...",
     "start": "turbo start",
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",

@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "pnpm with-env vite dev --port 3000",
+    "dev": "pnpm with-env vite dev --port 4000",
     "build": "SKIP_ENV_VALIDATION=1 vite build",
     "preview": "vite preview",
     "test": "vitest run",

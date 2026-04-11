@@ -14,7 +14,8 @@ All commands are run from the repository root unless noted.
 
 ```bash
 pnpm dev                  # Run all apps in dev mode
-pnpm dev:dashboard        # Run dashboard and its dependencies only
+pnpm dev:app              # Run apps/app and its dependencies only
+pnpm dev:api              # Run apps/api and its dependencies only
 ```
 
 ### Build & Type Check
@@ -53,9 +54,9 @@ docker compose up -d      # Start PostgreSQL, Redis, MinIO locally
 
 ### Monorepo Layout
 
-- **`apps/api`** — Elysia (Bun) REST API server. Routes live in `src/modules/v1/`. Uses cluster workers (`src/index.ts`) for multi-core utilization.
-- **`apps/app`** — TanStack Start (Vite + SSR) frontend. The active creator studio — all new feature work lands here.
-- **`apps/dashboard`** — Legacy Next.js 16 frontend, being phased out. Used as a visual reference for parity; do not start new features here.
+- **`apps/api`** — Elysia (Bun) REST API server, port `3001`. Routes live in `src/modules/v1/`. Uses cluster workers (`src/index.ts`) for multi-core utilization.
+- **`apps/app`** — TanStack Start (Vite + SSR) frontend, port `4000`. The active creator studio — all new feature work lands here.
+- **`archived/dashboard`** — Legacy Next.js 16 frontend. Lives in `archived/` and is **not** part of the pnpm workspace; preserved as a visual parity reference only. Do not start new features here.
 - **`workers/transcoder`** — FFmpeg-based background video encoding worker.
 - **`packages/database`** — Drizzle ORM schemas and migrations. All schema files are in `src/schema/`.
 - **`packages/auth`** — Better-Auth configuration shared between API and the frontend apps.
@@ -87,7 +88,7 @@ Drizzle ORM on PostgreSQL (with pgvector for embeddings). Entity IDs use nanoid 
 
 ### Frontend (apps/app — TanStack Start)
 
-The active frontend lives in `apps/app`. `apps/dashboard` is the legacy Next.js app and is read-only as a parity reference.
+The active frontend lives in `apps/app`. The legacy Next.js app has been moved to `archived/dashboard` and is no longer part of the pnpm workspace — kept only as a visual parity reference.
 
 - File-based routing under `apps/app/src/routes/`
 - Reads via route `loader` / `beforeLoad` or `createServerFn()`; mutations go straight from the client to Elysia (no app-server hop)
@@ -152,7 +153,7 @@ Recent improvements to `apps/api` aligned with Elysia skill best practices:
 ### Type Safety (Eden Treaty)
 
 - API exports `export type App = typeof server` for client type generation
-- Dashboard can use Eden Treaty for fully type-safe API calls
+- `apps/app` consumes the API via Eden Treaty for fully type-safe calls
 - See `apps/api/EDEN_SETUP.md` for integration guide
 
 ## Workflow Orchestration
