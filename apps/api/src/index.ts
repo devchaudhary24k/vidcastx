@@ -19,9 +19,10 @@ const server = new Elysia({ name: "api-server" })
   .use(
     cors({
       origin: ({ headers }) => {
-        const allowedOrigins = env.NODE_ENV === "production" ? ["https://vidcastx.daymlabs.com"] : "*";
         const origin = headers.get("origin");
-        return !origin || allowedOrigins.includes(origin);
+        if (!origin) return true;
+        if (env.NODE_ENV !== "production") return true;
+        return ["https://vidcastx.daymlabs.com"].includes(origin);
       },
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
