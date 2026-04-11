@@ -7,13 +7,37 @@
       "Bash(docker compose up *)",
       "Bash(docker compose down)",
       "Bash(docker compose logs *)",
-      "Bash(git status)",
-      "Bash(git diff *)",
-      "Bash(git log *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
       "Bash(git blame *)",
-      "Bash(git show *)",
-      "Bash(git branch *)"
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(git stash list*)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(node -e *)",
+      "Bash(npx tsc --noEmit*)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git clean -fd*)",
+      "Bash(git branch -D*)",
+      "Bash(pnpm db:push*)",
+      "Bash(pnpm run db:push*)",
+      "Bash(pnpm db:reset*)",
+      "Bash(pnpm run db:reset*)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*DROP TABLE*)",
+      "Bash(*TRUNCATE*)"
+    ]
   }
 }
