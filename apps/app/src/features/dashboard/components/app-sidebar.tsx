@@ -15,7 +15,7 @@ import {
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from "@vidcastx/ui/components/sidebar";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import type { SidebarData, UserData } from "./types";
+import type { Organization, SidebarData, UserData } from "./types";
 import { CommandMenu } from "./command-menu";
 import { NavMain } from "./nav-main";
 import { NavSearch } from "./nav-search";
@@ -158,10 +158,12 @@ const data: SidebarData = {
 
 export function AppSidebar({
   user,
+  organizations,
   activeOrganizationId,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   user: UserData;
+  organizations: Organization[];
   activeOrganizationId: string;
 }) {
   const { state } = useSidebar();
@@ -180,7 +182,7 @@ export function AppSidebar({
               : "flex-row items-center justify-between",
           )}
         >
-          <TeamSwitcher activeOrganizationId={activeOrganizationId} />
+          <TeamSwitcher organizations={organizations} activeOrganizationId={activeOrganizationId} />
         </SidebarHeader>
         <SidebarContent className="gap-4 px-2 py-4">
           <NavSearch onClick={() => setCommandMenuOpen(true)} />

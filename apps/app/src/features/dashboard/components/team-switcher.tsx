@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { getOrganizationsAction } from "#app/features/dashboard/api/actions";
 import { auth } from "#app/lib/auth";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -20,17 +18,17 @@ import type { Organization } from "./types";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import { Logo } from "./logo";
 
-export function TeamSwitcher({ activeOrganizationId }: { activeOrganizationId: string }) {
+export function TeamSwitcher({
+  organizations,
+  activeOrganizationId,
+}: {
+  organizations: Organization[];
+  activeOrganizationId: string;
+}) {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  const { data: organizations = [] } = useQuery({
-    queryKey: ["organizations"],
-    queryFn: () => getOrganizationsAction(),
-  });
-
-  const activeOrganization =
-    organizations.find((org: Organization) => org.id === activeOrganizationId) || organizations[0];
+  const activeOrganization = organizations.find((org) => org.id === activeOrganizationId) || organizations[0];
 
   const handleSwitchOrganization = async (org: Organization) => {
     if (org.id === activeOrganizationId) return;
@@ -80,7 +78,7 @@ export function TeamSwitcher({ activeOrganizationId }: { activeOrganizationId: s
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">Organizations</DropdownMenuLabel>
-            {organizations.map((org: Organization, index: number) => (
+            {organizations.map((org, index) => (
               <DropdownMenuItem key={org.id} onClick={() => handleSwitchOrganization(org)} className="gap-2 p-2">
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   {org.logo ? (

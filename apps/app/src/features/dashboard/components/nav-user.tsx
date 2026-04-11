@@ -1,6 +1,8 @@
+import type { ThemeMode } from "#app/lib/use-theme";
 import { useRouter } from "@tanstack/react-router";
 import { auth } from "#app/lib/auth";
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from "lucide-react";
+import { useTheme } from "#app/lib/use-theme";
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Monitor, Moon, Sparkles, Sun } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";
 import {
@@ -13,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
+import { ToggleGroup, ToggleGroupItem } from "@vidcastx/ui/components/toggle-group";
 
 export function NavUser({
   user,
@@ -25,6 +28,7 @@ export function NavUser({
 }) {
   const router = useRouter();
   const { isMobile } = useSidebar();
+  const { mode, setTheme } = useTheme();
 
   return (
     <SidebarMenu>
@@ -86,6 +90,34 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <div className="px-2 py-1.5">
+              <p className="text-muted-foreground mb-1.5 text-xs">Theme</p>
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                size="sm"
+                value={mode}
+                onValueChange={(value) => {
+                  if (value) setTheme(value as ThemeMode);
+                }}
+                className="w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ToggleGroupItem value="light" aria-label="Light theme" className="flex-1 gap-1.5">
+                  <Sun className="size-3.5" />
+                  Light
+                </ToggleGroupItem>
+                <ToggleGroupItem value="dark" aria-label="Dark theme" className="flex-1 gap-1.5">
+                  <Moon className="size-3.5" />
+                  Dark
+                </ToggleGroupItem>
+                <ToggleGroupItem value="auto" aria-label="System theme" className="flex-1 gap-1.5">
+                  <Monitor className="size-3.5" />
+                  Auto
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() =>

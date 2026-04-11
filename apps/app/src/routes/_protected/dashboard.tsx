@@ -28,7 +28,7 @@ function DashboardLayout() {
 
   return (
     <SidebarProvider>
-      <AppSidebar user={user} activeOrganizationId={activeOrganizationId} />
+      <AppSidebar user={user} organizations={organizations} activeOrganizationId={activeOrganizationId} />
       <SidebarInset>
         <Header />
         <main className="flex flex-1 flex-col gap-4 p-4 pt-0">

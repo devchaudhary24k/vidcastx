@@ -54,14 +54,15 @@ docker compose up -d      # Start PostgreSQL, Redis, MinIO locally
 ### Monorepo Layout
 
 - **`apps/api`** — Elysia (Bun) REST API server. Routes live in `src/modules/v1/`. Uses cluster workers (`src/index.ts`) for multi-core utilization.
-- **`apps/dashboard`** — Next.js 16 creator studio and admin panel.
+- **`apps/app`** — TanStack Start (Vite + SSR) frontend. The active creator studio — all new feature work lands here.
+- **`apps/dashboard`** — Legacy Next.js 16 frontend, being phased out. Used as a visual reference for parity; do not start new features here.
 - **`workers/transcoder`** — FFmpeg-based background video encoding worker.
 - **`packages/database`** — Drizzle ORM schemas and migrations. All schema files are in `src/schema/`.
-- **`packages/auth`** — Better-Auth configuration shared between API and dashboard.
+- **`packages/auth`** — Better-Auth configuration shared between API and the frontend apps.
 - **`packages/queue`** — BullMQ job definitions shared between API and transcoder worker.
 - **`packages/storage`** — AWS S3 abstraction layer.
 - **`packages/redis`** — Shared ioredis client.
-- **`packages/ui`** — Shadcn/Radix component library.
+- **`packages/ui`** — Shadcn/Radix component library and the single source of truth for theme tokens.
 - **`tooling/`** — Shared ESLint, Prettier, and TypeScript configurations.
 
 ### API Design (Elysia)
@@ -84,14 +85,17 @@ Drizzle ORM on PostgreSQL (with pgvector for embeddings). Entity IDs use nanoid 
 4. Transcoder worker picks up job, runs FFmpeg, produces HLS output
 5. Video status progresses: `draft → uploaded → queued → dispatch → processing → ready → failed`
 
-### Frontend Patterns (Dashboard)
+### Frontend (apps/app — TanStack Start)
 
-- React Server Components with Next.js App Router
-- TanStack React Query for data fetching/caching
-- React Hook Form + TanStack React Form for forms
-- TanStack React Store for global state
-- Uppy for file uploads
-- API calls go through a proxy defined in `apps/dashboard/src/utils/proxy.ts`
+The active frontend lives in `apps/app`. `apps/dashboard` is the legacy Next.js app and is read-only as a parity reference.
+
+- File-based routing under `apps/app/src/routes/`
+- Reads via route `loader` / `beforeLoad` or `createServerFn()`; mutations go straight from the client to Elysia (no app-server hop)
+- Forms: `@tanstack/react-form` + Zod, schemas in each feature's `validator/`
+- Server cache: TanStack Query; global client state: zustand under each feature's `stores/`; URL state: nuqs
+- File uploads: Uppy with S3 multipart
+- shadcn theme tokens and the `border-border` base layer live in `packages/ui/src/styles/globals.css` — never re-import `tailwindcss` after it
+- Full conventions live in `.claude/rules/frontend.md` and `.claude/rules/features.md`
 
 ### Environment Variables
 
@@ -150,3 +154,61 @@ Recent improvements to `apps/api` aligned with Elysia skill best practices:
 - API exports `export type App = typeof server` for client type generation
 - Dashboard can use Eden Treaty for fully type-safe API calls
 - See `apps/api/EDEN_SETUP.md` for integration guide
+
+## Workflow Orchestration
+
+### 1. Plan-Mode Default
+
+- Enter plan mode for any non-trivial task — 3+ steps or any architectural decision.
+- If a plan starts going sideways, stop and re-plan instead of pushing through.
+- Use plan mode for verification steps, not only for building.
+- Write detailed specs upfront to reduce ambiguity downstream.
+
+### 2. Subagents
+
+- Offload research, exploration, and parallel analysis to subagents to keep the main context window clean.
+- For complex problems, throw more compute at them via parallel subagents.
+- One focused task per subagent.
+
+### 3. Self-Improvement Loop
+
+- After any correction from the user, update `tasks/lessons.md` with the pattern.
+- Write rules for yourself that prevent the same mistake from happening again.
+- Iterate on these lessons ruthlessly until the mistake rate drops.
+- Review `tasks/lessons.md` at the start of every session for the relevant project.
+
+### 4. Verification Before Done
+
+- Never mark a task complete without proving it works.
+- Diff behavior between `main` and your changes when relevant.
+- Ask "would a staff engineer approve this?" before declaring done.
+- Run tests, check logs, demonstrate correctness — don't infer it.
+
+### 5. Demand Elegance (Balanced)
+
+- For non-trivial changes, pause and ask "is there a more elegant way?"
+- If a fix feels hacky, redo it with the framing "knowing everything I know now, implement the elegant solution."
+- Skip this for simple, obvious fixes — don't over-engineer.
+- Challenge your own work before presenting it.
+
+### 6. Autonomous Bug Fixing
+
+- When given a bug report, just fix it — don't ask for hand-holding.
+- Point at logs, errors, and failing tests, then resolve them.
+- Zero context switching should be required from the user.
+- Go fix failing CI tests without being told how.
+
+## Task Management
+
+1. **Plan First** — write the plan to `tasks/todo.md` as checkable items.
+2. **Verify the Plan** — check in with the user before starting implementation.
+3. **Track Progress** — mark items complete as you go.
+4. **Explain Changes** — high-level summary at each step.
+5. **Document Results** — add the review to `tasks/todo.md`.
+6. **Capture Lessons** — update `tasks/lessons.md` after every correction.
+
+## Core Principles
+
+- **Simplicity First** — make every change as simple as possible. Touch the minimum code needed.
+- **No Laziness** — find root causes. No temporary fixes. Senior-engineer standards.
+- **Minimal Impact** — changes should only touch what's necessary. Don't introduce regressions on the way to a fix.
