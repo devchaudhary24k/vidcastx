@@ -1,26 +1,24 @@
-import type { UseFormReturn } from "react-hook-form";
 import * as React from "react";
 import { CloudUpload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Card, CardContent } from "@vidcastx/ui/components/card";
-import { FormControl, FormField, FormItem, FormMessage } from "@vidcastx/ui/components/form";
+import { Field, FieldError } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import type { VideoUploadFormValues } from "../schemas";
+import type { VideoUploadForm } from "../hooks/use-video-upload-form";
 import { ACCEPTED_VIDEO_TYPES, MAX_FILE_SIZE } from "../schemas";
 
 interface VideoDropzoneProps {
-  form: UseFormReturn<VideoUploadFormValues>;
+  form: VideoUploadForm;
   previewUrl: string | null;
   setPreviewUrl: (url: string | null) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  onFileSelect?: (file: File) => void;
 }
 
-export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef, onFileSelect }: VideoDropzoneProps) {
+export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef }: VideoDropzoneProps) {
   const [isDragging, setIsDragging] = React.useState(false);
 
   const handleFile = (file: File) => {
@@ -35,16 +33,11 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef, o
 
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
-    form.setValue("title", file.name.split(".")[0] || "Untitled");
+    form.setFieldValue("title", file.name.split(".")[0] || "Untitled");
 
-    // Manually set the file in react-hook-form
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
-    form.setValue("file", dataTransfer.files);
-
-    if (onFileSelect) {
-      onFileSelect(file);
-    }
+    form.setFieldValue("file", dataTransfer.files);
   };
 
   const onDragOver = (e: React.DragEvent) => {
@@ -81,7 +74,7 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef, o
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-    form.resetField("file");
+    form.setFieldValue("file", undefined);
   };
 
   return (
@@ -98,12 +91,11 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef, o
       onDrop={!previewUrl ? onDrop : undefined}
     >
       <CardContent className="p-0">
-        <FormField
-          control={form.control}
-          name="file"
-          render={({ field: { onChange, value, ...field } }) => (
-            <FormItem className="space-y-0">
-              <FormControl>
+        <form.Field name="file">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid} className="space-y-0">
                 <div className="w-full">
                   {!previewUrl ? (
                     <div
@@ -145,19 +137,21 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef, o
                     </div>
                   )}
                   <Input
-                    {...field}
                     ref={fileInputRef}
+                    name={field.name}
                     type="file"
                     accept={ACCEPTED_VIDEO_TYPES.join(",")}
+                    aria-invalid={isInvalid}
                     className="hidden"
+                    onBlur={field.handleBlur}
                     onChange={handleFileInputChange}
                   />
                 </div>
-              </FormControl>
-              <FormMessage className="px-6 pb-4 text-center" />
-            </FormItem>
-          )}
-        />
+                {isInvalid && <FieldError errors={field.state.meta.errors} className="px-6 pb-4 text-center" />}
+              </Field>
+            );
+          }}
+        </form.Field>
       </CardContent>
     </Card>
   );

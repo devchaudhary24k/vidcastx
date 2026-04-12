@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -58,7 +59,7 @@ export function TeamSwitcher({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-background text-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+              <div className="bg-background text-foreground flex aspect-square size-8 items-center justify-center">
                 {activeOrganization.logo ? (
                   <img src={activeOrganization.logo} alt={activeOrganization.name} className="size-4" />
                 ) : (
@@ -72,15 +73,17 @@ export function TeamSwitcher({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="mb-4 w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="mb-4 w-(--anchor-width) min-w-56"
             align="start"
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}
           >
-            <DropdownMenuLabel className="text-muted-foreground text-xs">Organizations</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-muted-foreground text-xs">Organizations</DropdownMenuLabel>
+            </DropdownMenuGroup>
             {organizations.map((org, index) => (
               <DropdownMenuItem key={org.id} onClick={() => handleSwitchOrganization(org)} className="gap-2 p-2">
-                <div className="flex size-6 items-center justify-center rounded-sm border">
+                <div className="flex size-6 items-center justify-center border">
                   {org.logo ? (
                     <img src={org.logo} alt={org.name} className="size-4 shrink-0" />
                   ) : (
@@ -94,7 +97,7 @@ export function TeamSwitcher({
             <DropdownMenuSeparator />
             <CreateOrganizationDialog>
               <DropdownMenuItem className="gap-2 p-2" onSelect={(e) => e.preventDefault()}>
-                <div className="bg-background flex size-6 items-center justify-center rounded-md border">
+                <div className="bg-background flex size-6 items-center justify-center border">
                   <Plus className="size-4" />
                 </div>
                 <div className="text-muted-foreground font-medium">Add organization</div>

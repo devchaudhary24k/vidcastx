@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "new-york",
-  "rsc": true,
+  "style": "base-lyra",
+  "rsc": false,
   "tsx": true,
   "tailwind": {
     "config": "",
@@ -9,12 +9,15 @@
     "baseColor": "neutral",
     "cssVariables": true
   },
-  "iconLibrary": "lucide",
+  "iconLibrary": "hugeicons",
   "aliases": {
     "components": "@vidcastx/ui/components",
     "utils": "@vidcastx/ui/lib/utils",
     "hooks": "@vidcastx/ui/hooks",
     "lib": "@vidcastx/ui/lib",
     "ui": "@vidcastx/ui/components"
-  }
+  },
+  "rtl": false,
+  "menuColor": "default",
+  "menuAccent": "subtle"
 }

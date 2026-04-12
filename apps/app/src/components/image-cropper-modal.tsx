@@ -44,7 +44,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({ isOpen, on
         <DialogHeader>
           <DialogTitle>Edit Profile Photo</DialogTitle>
         </DialogHeader>
-        <div className="relative h-64 w-full overflow-hidden rounded-md bg-slate-900">
+        <div className="relative h-64 w-full overflow-hidden bg-slate-900">
           {imageSrc && (
             <Cropper
               image={imageSrc}

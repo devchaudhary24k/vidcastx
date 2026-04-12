@@ -54,7 +54,7 @@ export function NavMain({
 
   return (
     <SidebarMenu>
-      {label && !isCollapsed && <div className="text-muted-foreground mb-2 px-2 text-xs font-medium">{label}</div>}
+      {label && !isCollapsed && <div className="text-muted-foreground mb-1 px-2 text-xs font-medium">{label}</div>}
       {items.map((item) => {
         const isOpen = !isCollapsed && openCollapsible === item.title;
         const hasSubRoutes = !!item.items?.length;
@@ -70,45 +70,32 @@ export function NavMain({
                 onOpenChange={(open) => setOpenCollapsible(open ? item.title : null)}
                 className="w-full"
               >
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    isActive={isOpen}
-                    className={cn(
-                      "flex w-full items-center rounded-lg px-2 transition-colors",
-                      isCollapsed && "justify-center",
-                    )}
-                  >
-                    <item.icon className="size-4" />
-                    {!isCollapsed && <span className="ml-2 flex-1 text-sm font-medium">{item.title}</span>}
-                    {!isCollapsed && (
-                      <span className="ml-auto">
-                        {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
-                      </span>
-                    )}
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
+                <CollapsibleTrigger
+                  render={
+                    <SidebarMenuButton tooltip={item.title} isActive={isOpen}>
+                      <item.icon />
+                      {!isCollapsed && <span className="flex-1 truncate">{item.title}</span>}
+                      {!isCollapsed && <span className="ml-auto">{isOpen ? <ChevronUp /> : <ChevronDown />}</span>}
+                    </SidebarMenuButton>
+                  }
+                />
 
                 {!isCollapsed && (
                   <CollapsibleContent>
-                    <SidebarMenuSub className="my-1 ml-3.5">
+                    <SidebarMenuSub>
                       {item.items?.map((subItem) => {
                         const isSubActive = pathname === subItem.url || pathname.startsWith(`${subItem.url}/`);
                         return (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild isActive={isSubActive}>
-                              <Link
-                                to={subItem.url}
-                                className={cn(
-                                  "flex items-center rounded-md px-4 py-1.5 text-sm font-medium",
-                                  subItem.disabled && "pointer-events-none opacity-50",
-                                )}
-                              >
-                                <span>{subItem.title}</span>
-                                {subItem.badge && (
-                                  <span className="text-muted-foreground ml-auto text-xs">{subItem.badge}</span>
-                                )}
-                              </Link>
+                            <SidebarMenuSubButton
+                              isActive={isSubActive}
+                              className={cn(subItem.disabled && "pointer-events-none opacity-50")}
+                              render={<Link to={subItem.url} />}
+                            >
+                              <span className="truncate">{subItem.title}</span>
+                              {subItem.badge && (
+                                <span className="text-muted-foreground ml-auto text-xs">{subItem.badge}</span>
+                              )}
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         );
@@ -118,19 +105,9 @@ export function NavMain({
                 )}
               </Collapsible>
             ) : (
-              <SidebarMenuButton
-                tooltip={item.title}
-                asChild
-                isActive={isActive}
-                className={cn(
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center rounded-lg px-2 transition-colors",
-                  isCollapsed && "justify-center",
-                )}
-              >
-                <Link to={item.url}>
-                  <item.icon className="size-4" />
-                  {!isCollapsed && <span className="ml-2 text-sm font-medium">{item.title}</span>}
-                </Link>
+              <SidebarMenuButton tooltip={item.title} isActive={isActive} render={<Link to={item.url} />}>
+                <item.icon />
+                {!isCollapsed && <span className="truncate">{item.title}</span>}
               </SidebarMenuButton>
             )}
           </SidebarMenuItem>

@@ -32,10 +32,7 @@ export const Route = createFileRoute("/_protected")({
         <div className="space-y-4 text-center">
           <h1 className="text-2xl font-bold">Something went wrong</h1>
           <p className="text-muted-foreground">{error.message}</p>
-          <button
-            onClick={() => router.invalidate()}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
-          >
+          <button onClick={() => router.invalidate()} className="bg-primary text-primary-foreground px-4 py-2 text-sm">
             Try again
           </button>
         </div>
