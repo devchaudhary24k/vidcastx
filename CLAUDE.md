@@ -56,7 +56,6 @@ docker compose up -d      # Start PostgreSQL, Redis, MinIO locally
 
 - **`apps/api`** — Elysia (Bun) REST API server, port `4001`. Routes live in `src/modules/v1/`. Uses cluster workers (`src/index.ts`) for multi-core utilization.
 - **`apps/app`** — TanStack Start (Vite + SSR) frontend, port `4000`. The active creator studio — all new feature work lands here.
-- **`archived/dashboard`** — Legacy Next.js 16 frontend. Lives in `archived/` and is **not** part of the pnpm workspace; preserved as a visual parity reference only. Do not start new features here.
 - **`workers/transcoder`** — FFmpeg-based background video encoding worker.
 - **`packages/database`** — Drizzle ORM schemas and migrations. All schema files are in `src/schema/`.
 - **`packages/auth`** — Better-Auth configuration shared between API and the frontend apps.
@@ -88,7 +87,7 @@ Drizzle ORM on PostgreSQL (with pgvector for embeddings). Entity IDs use nanoid 
 
 ### Frontend (apps/app — TanStack Start)
 
-The active frontend lives in `apps/app`. The legacy Next.js app has been moved to `archived/dashboard` and is no longer part of the pnpm workspace — kept only as a visual parity reference.
+The active frontend lives in `apps/app`.
 
 - File-based routing under `apps/app/src/routes/`
 - Reads via route `loader` / `beforeLoad` or `createServerFn()`; mutations go straight from the client to Elysia (no app-server hop)

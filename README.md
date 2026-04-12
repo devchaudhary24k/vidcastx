@@ -122,9 +122,6 @@ vidcastx/
 │
 ├── tooling/        # Shared ESLint, Prettier, and TypeScript configs
 │
-├── archived/       # Code preserved for reference, NOT in the workspace
-│   └── dashboard/  # Legacy Next.js 16 dashboard (replaced by apps/app)
-│
 ├── docker-compose.yml
 ├── pnpm-workspace.yaml
 └── turbo.json
