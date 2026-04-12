@@ -9,7 +9,7 @@ export const videoUploadSchema = z.object({
   visibility: z.enum(["public", "private", "unlisted"]),
   scheduledAt: z.date().optional(),
   file: z
-    .custom<FileList>()
+    .custom<FileList | undefined>()
     .refine((files) => files?.length === 1, "Video file is required.")
     .refine((files) => {
       const file = files?.[0];

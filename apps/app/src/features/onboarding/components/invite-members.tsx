@@ -48,7 +48,7 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
           }}
           className="space-y-8"
         >
-          <div className="rounded-md border">
+          <div className="border">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">

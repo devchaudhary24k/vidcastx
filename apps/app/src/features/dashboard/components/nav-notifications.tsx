@@ -5,6 +5,7 @@ import { Button } from "@vidcastx/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -35,7 +36,9 @@ export function NotificationsPopover({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" className="my-6 w-80">
-        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         {notifications.map(({ id, avatar, fallback, text, time }) => (
           <DropdownMenuItem key={id} className="flex items-start gap-3">

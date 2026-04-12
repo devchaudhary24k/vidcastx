@@ -24,7 +24,7 @@ export function VideoList() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <div className="bg-muted flex items-center rounded-lg p-1">
+          <div className="bg-muted flex items-center p-1">
             <Button
               variant={view === "grid" ? "secondary" : "ghost"}
               size="sm"
@@ -54,7 +54,7 @@ export function VideoList() {
       </div>
 
       {/* Empty State / Content Placeholder */}
-      <div className="flex min-h-[400px] items-center justify-center rounded-xl border border-dashed p-8 text-center">
+      <div className="flex min-h-[400px] items-center justify-center border border-dashed p-8 text-center">
         <p className="text-muted-foreground text-sm">Your projects will appear here.</p>
       </div>
     </div>

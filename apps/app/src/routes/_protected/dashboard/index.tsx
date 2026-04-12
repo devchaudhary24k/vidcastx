@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
+
 export const Route = createFileRoute("/_protected/dashboard/")({
   component: DashboardPage,
 });
@@ -25,10 +27,14 @@ function DashboardPage() {
 
 function DashboardCard({ title, value, description }: { title: string; value: string; description: string }) {
   return (
-    <div className="bg-card text-card-foreground rounded-xl border p-6 shadow-sm">
-      <div className="text-muted-foreground text-sm font-medium">{title}</div>
-      <div className="mt-2 text-2xl font-bold">{value}</div>
-      <p className="text-muted-foreground text-xs">{description}</p>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-muted-foreground text-xs font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <CardDescription>{description}</CardDescription>
+      </CardContent>
+    </Card>
   );
 }
