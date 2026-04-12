@@ -4,8 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     REDIS_HOST: z.string(),
-    REDIS_PORT: z.number(),
-    REDIS_PASSWORD: z.string(),
+    REDIS_PORT: z.coerce.number(),
+    REDIS_PASSWORD: z.string().optional(),
   },
 
   shared: {
@@ -14,5 +14,5 @@ export const env = createEnv({
 
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
-  skipValidation: true,
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });

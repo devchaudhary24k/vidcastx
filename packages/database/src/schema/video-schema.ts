@@ -10,7 +10,7 @@ export const videoStatusEnum = pgEnum("video_status", [
   "draft",
   "uploaded",
   "queued",
-  "dispatch",
+  "dispatched",
   "processing",
   "ready",
   "failed",

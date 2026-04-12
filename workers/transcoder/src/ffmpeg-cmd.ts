@@ -27,7 +27,7 @@ interface StreamVariant {
  * High framerates will dynamically multiply these base bitrates.
  */
 const BASE_RESOLUTIONS = [
-  { namePrefix: "4K", height: 2160, baseBitrate: 15000 },
+  // { namePrefix: "4K", height: 2160, baseBitrate: 15000 },
   { namePrefix: "1080p", height: 1080, baseBitrate: 5000 },
   { namePrefix: "720p", height: 720, baseBitrate: 2800 },
   { namePrefix: "480p", height: 480, baseBitrate: 1400 },

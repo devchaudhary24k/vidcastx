@@ -1,0 +1,16 @@
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/_protected/dashboard/integrations/apps")({
+  component: ConnectedAppsPage,
+});
+
+function ConnectedAppsPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Connected Apps</h1>
+        <p className="text-muted-foreground">Manage your connected applications.</p>
+      </div>
+    </div>
+  );
+}

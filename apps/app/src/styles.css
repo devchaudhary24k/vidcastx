@@ -1,0 +1,8 @@
+@import "@vidcastx/ui/globals.css";
+
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}

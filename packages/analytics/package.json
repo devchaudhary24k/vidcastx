@@ -6,8 +6,7 @@
     "./google": "./src/google.ts",
     "./vercel": "./src/vercel.ts",
     "./index": "./src/index.tsx",
-    "./client-key": "./src/env/client.ts",
-    "./server-key": "./src/env/server.ts",
+    "./env": "./src/env.ts",
     "./astro": "./src/posthog/posthog.astro",
     "./posthog-client": "./src/posthog/client.tsx",
     "./posthog-server": "./src/posthog/server.ts"

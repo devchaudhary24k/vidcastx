@@ -16,11 +16,12 @@ onlyBuiltDependencies:
   - msgpackr-extract
   - sharp
   - unrs-resolver
+  - lightningcss
 
 overrides:
-  '@types/minimatch': 5.1.2
+  "@types/minimatch": 5.1.2
   ioredis: 5.10.0
 
 publicHoistPattern:
-  - '@ianvs/prettier-plugin-sort-imports'
+  - "@ianvs/prettier-plugin-sort-imports"
   - prettier-plugin-tailwindcss
