@@ -5,8 +5,7 @@ import { opentelemetry } from "@elysiajs/opentelemetry";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
 
-import { auth } from "@vidcastx/auth";
-
+import { auth } from "./auth/server";
 import { env } from "./env";
 import { dispatcherCronPlugin } from "./modules/internal/cron";
 import { apiRouter } from "./router";

@@ -1,4 +1,4 @@
-import type { Organization } from "@vidcastx/auth/types";
+import type { Organization } from "@vidcastx/auth";
 import type { LucideIcon } from "lucide-react";
 
 export type { Organization };
