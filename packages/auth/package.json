@@ -13,7 +13,7 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "with-env": "dotenv -e ../../.env --",
-    "generate": "pnpm with-env -- pnpx @better-auth/cli generate --config script/auth-cli.ts --output ../database/src/schema/auth-schema.ts"
+    "generate": "bun run with-env -- pnpm dlx @better-auth/cli generate --config script/auth-cli.ts --output ../database/src/schema/auth-schema.ts"
   },
   "prettier": "@vidcastx/prettier",
   "devDependencies": {
