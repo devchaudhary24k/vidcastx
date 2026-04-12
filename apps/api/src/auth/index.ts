@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 
-import { auth } from "@vidcastx/auth";
+import { auth } from "./server";
 
 /**
  * BetterAuth middleware: mounts auth handlers and provides auth macro.
