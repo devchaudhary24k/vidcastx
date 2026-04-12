@@ -44,11 +44,9 @@ export function VideoList() {
               <span className="sr-only">List view</span>
             </Button>
           </div>
-          <Button asChild>
-            <Link to="/dashboard/studio/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Upload Video
-            </Link>
+          <Button render={<Link to="/dashboard/studio/new" />}>
+            <Plus className="mr-2 h-4 w-4" />
+            Upload Video
           </Button>
         </div>
       </div>

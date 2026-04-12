@@ -27,7 +27,7 @@ const createOrgSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Only lowercase letters, numbers, and dashes"),
 });
 
-export function CreateOrganizationDialog({ children }: { children: React.ReactNode }) {
+export function CreateOrganizationDialog({ children }: { children: React.ReactElement }) {
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
 
@@ -56,7 +56,7 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactNo
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger render={children} />
       <DialogContent className="sm:max-w-[425px]">
         <form
           onSubmit={(e) => {
