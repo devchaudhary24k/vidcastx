@@ -54,7 +54,7 @@ docker compose up -d      # Start PostgreSQL, Redis, MinIO locally
 
 ### Monorepo Layout
 
-- **`apps/api`** — Elysia (Bun) REST API server, port `3001`. Routes live in `src/modules/v1/`. Uses cluster workers (`src/index.ts`) for multi-core utilization.
+- **`apps/api`** — Elysia (Bun) REST API server, port `4001`. Routes live in `src/modules/v1/`. Uses cluster workers (`src/index.ts`) for multi-core utilization.
 - **`apps/app`** — TanStack Start (Vite + SSR) frontend, port `4000`. The active creator studio — all new feature work lands here.
 - **`archived/dashboard`** — Legacy Next.js 16 frontend. Lives in `archived/` and is **not** part of the pnpm workspace; preserved as a visual parity reference only. Do not start new features here.
 - **`workers/transcoder`** — FFmpeg-based background video encoding worker.

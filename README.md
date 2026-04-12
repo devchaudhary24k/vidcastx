@@ -103,7 +103,7 @@ Out of the box you get organization-scoped auth, multipart resumable uploads, a 
 vidcastx/
 ├── apps/
 │   ├── app/        # TanStack Start frontend (port 4000) — the active creator studio
-│   ├── api/        # Elysia REST API on Bun (port 3001)
+│   ├── api/        # Elysia REST API on Bun (port 4001)
 │   └── studio/     # Drizzle Studio launcher
 │
 ├── packages/
@@ -135,7 +135,7 @@ vidcastx/
 ## Applications
 
 - **`apps/app`** — TanStack Start (Vite + SSR) frontend. The active creator studio. All new feature work lands here. Runs on **port 4000**. File-based routing under `src/routes/`, features under `src/features/<name>/`.
-- **`apps/api`** — Elysia REST API on Bun. v1 routes live in `src/modules/v1/`, internal admin endpoints under `src/modules/internal/`. Cluster workers (`src/index.ts`) for multi-core utilization. Runs on **port 3001**.
+- **`apps/api`** — Elysia REST API on Bun. v1 routes live in `src/modules/v1/`, internal admin endpoints under `src/modules/internal/`. Cluster workers (`src/index.ts`) for multi-core utilization. Runs on **port 4001**.
 - **`apps/studio`** — wrapper that launches `drizzle-kit studio` against the local database for browsing and editing rows.
 
 ---
@@ -213,8 +213,8 @@ pnpm dev
 This runs everything in parallel via Turbo. Once it's up:
 
 - Frontend: <http://localhost:4000>
-- API: <http://localhost:3001>
-- API OpenAPI docs: <http://localhost:3001/openapi>
+- API: <http://localhost:4001>
+- API OpenAPI docs: <http://localhost:4001/openapi>
 - MinIO console: <http://localhost:9001>
 
 You can also start subsets:
@@ -300,13 +300,13 @@ Each app/package validates env vars at startup using [`@t3-oss/env-core`](https:
 
 ### Frontend app (`apps/app`)
 
-- `VITE_API_URL` — base URL of the Elysia API (default `http://localhost:3001`)
+- `VITE_API_URL` — base URL of the Elysia API (default `http://localhost:4001`)
 - The frontend runs on **`:4000`** in development.
 
 ### Authentication (`packages/auth`)
 
 - `BETTER_AUTH_SECRET` — session signing secret
-- `BETTER_AUTH_URL` — base URL of the frontend (default `http://localhost:4000`)
+- `BETTER_AUTH_URL` — base URL of the API where Better Auth handlers are mounted (default `http://localhost:4001`)
 - `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` — GitHub OAuth
 - `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` — Discord OAuth
 
