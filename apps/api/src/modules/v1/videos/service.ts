@@ -1,4 +1,4 @@
-import { and, eq } from "@vidcastx/database";
+import { and, desc, eq, isNull, sql } from "@vidcastx/database";
 import { db } from "@vidcastx/database/client";
 import { videos } from "@vidcastx/database/schema/video-schema";
 import { generateId } from "@vidcastx/database/utils/id";
@@ -39,6 +39,29 @@ export class VideoService {
       .returning();
 
     return video;
+  }
+
+  /**
+   * List videos for an organization, excluding soft-deleted rows.
+   */
+  static async listByOrg(orgId: string, page: number, limit: number) {
+    const offset = (page - 1) * limit;
+    const where = and(eq(videos.orgId, orgId), isNull(videos.deletedAt));
+
+    const [rows, totalRow] = await Promise.all([
+      db.query.videos.findMany({
+        where,
+        orderBy: [desc(videos.createdAt)],
+        limit,
+        offset,
+      }),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(videos)
+        .where(where),
+    ]);
+
+    return { videos: rows, total: totalRow[0]?.count ?? 0 };
   }
 
   /**

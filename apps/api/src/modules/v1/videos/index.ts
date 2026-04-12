@@ -35,18 +35,18 @@ const videoItemController = new Elysia({
   .use(betterAuth)
   .guard({ auth: true, params: VideoIdParam })
   // Re-derive orgId from session (same logic as videoController)
-  .resolve(({ session, error }) => {
+  .resolve(({ session, status }) => {
     if (!session?.activeOrganizationId) {
-      return error(400, {
+      return status(400, {
         error: "No active organization. Please select an organization first.",
       });
     }
     return { orgId: session.activeOrganizationId };
   })
   // Video ownership middleware at the top level — injects video into context
-  .resolve(async ({ params, orgId, error }) => {
+  .resolve(async ({ params, orgId, status }) => {
     const video = await VideoService.getVideoIfOwner(params.id, orgId);
-    if (!video) return error(404, { error: "Video not found" });
+    if (!video) return status(404, { error: "Video not found" });
     return { video };
   })
 
@@ -55,7 +55,7 @@ const videoItemController = new Elysia({
     response: { 200: VideoResponse, 404: ErrorResponse },
   })
 
-  // Update metadata
+  //nUpdate metadata
   .patch(
     "/",
     async ({ video, body: _body }) => ({
@@ -170,9 +170,9 @@ export const videoController = new Elysia({
   .use(betterAuth)
   .guard({ auth: true })
   // Inject orgId — all video routes require an active organization
-  .resolve(({ session, error }) => {
+  .resolve(({ session, status }) => {
     if (!session?.activeOrganizationId) {
-      return error(400, {
+      return status(400, {
         error: "No active organization. Please select an organization first.",
       });
     }
@@ -182,12 +182,12 @@ export const videoController = new Elysia({
   // List videos (paginated)
   .get(
     "/",
-    async ({ query }) => ({
-      page: query.page || 1,
-      limit: query.limit || 10,
-      total: 0,
-      videos: [],
-    }),
+    async ({ query, orgId }) => {
+      const page = query.page || 1;
+      const limit = query.limit || 10;
+      const { videos, total } = await VideoService.listByOrg(orgId, page, limit);
+      return { page, limit, total, videos };
+    },
     {
       query: PaginationQuery,
       response: { 200: VideoListResponse, 400: ErrorResponse },

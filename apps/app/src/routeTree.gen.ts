@@ -25,6 +25,7 @@ import { Route as ProtectedDashboardDevelopersIndexRouteImport } from './routes/
 import { Route as ProtectedDashboardBillingIndexRouteImport } from './routes/_protected/dashboard/billing/index'
 import { Route as ProtectedDashboardAssetsIndexRouteImport } from './routes/_protected/dashboard/assets/index'
 import { Route as ProtectedDashboardAnalyticsIndexRouteImport } from './routes/_protected/dashboard/analytics/index'
+import { Route as ProtectedDashboardVideosVideoIdRouteImport } from './routes/_protected/dashboard/videos/$videoId'
 import { Route as ProtectedDashboardTeamRolesRouteImport } from './routes/_protected/dashboard/team/roles'
 import { Route as ProtectedDashboardTeamMembersRouteImport } from './routes/_protected/dashboard/team/members'
 import { Route as ProtectedDashboardStudioNewRouteImport } from './routes/_protected/dashboard/studio/new'
@@ -124,6 +125,12 @@ const ProtectedDashboardAnalyticsIndexRoute =
   ProtectedDashboardAnalyticsIndexRouteImport.update({
     id: '/analytics/',
     path: '/analytics/',
+    getParentRoute: () => ProtectedDashboardRoute,
+  } as any)
+const ProtectedDashboardVideosVideoIdRoute =
+  ProtectedDashboardVideosVideoIdRouteImport.update({
+    id: '/videos/$videoId',
+    path: '/videos/$videoId',
     getParentRoute: () => ProtectedDashboardRoute,
   } as any)
 const ProtectedDashboardTeamRolesRoute =
@@ -226,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/studio/new': typeof ProtectedDashboardStudioNewRoute
   '/dashboard/team/members': typeof ProtectedDashboardTeamMembersRoute
   '/dashboard/team/roles': typeof ProtectedDashboardTeamRolesRoute
+  '/dashboard/videos/$videoId': typeof ProtectedDashboardVideosVideoIdRoute
   '/dashboard/analytics/': typeof ProtectedDashboardAnalyticsIndexRoute
   '/dashboard/assets/': typeof ProtectedDashboardAssetsIndexRoute
   '/dashboard/billing/': typeof ProtectedDashboardBillingIndexRoute
@@ -255,6 +263,7 @@ export interface FileRoutesByTo {
   '/dashboard/studio/new': typeof ProtectedDashboardStudioNewRoute
   '/dashboard/team/members': typeof ProtectedDashboardTeamMembersRoute
   '/dashboard/team/roles': typeof ProtectedDashboardTeamRolesRoute
+  '/dashboard/videos/$videoId': typeof ProtectedDashboardVideosVideoIdRoute
   '/dashboard/analytics': typeof ProtectedDashboardAnalyticsIndexRoute
   '/dashboard/assets': typeof ProtectedDashboardAssetsIndexRoute
   '/dashboard/billing': typeof ProtectedDashboardBillingIndexRoute
@@ -287,6 +296,7 @@ export interface FileRoutesById {
   '/_protected/dashboard/studio/new': typeof ProtectedDashboardStudioNewRoute
   '/_protected/dashboard/team/members': typeof ProtectedDashboardTeamMembersRoute
   '/_protected/dashboard/team/roles': typeof ProtectedDashboardTeamRolesRoute
+  '/_protected/dashboard/videos/$videoId': typeof ProtectedDashboardVideosVideoIdRoute
   '/_protected/dashboard/analytics/': typeof ProtectedDashboardAnalyticsIndexRoute
   '/_protected/dashboard/assets/': typeof ProtectedDashboardAssetsIndexRoute
   '/_protected/dashboard/billing/': typeof ProtectedDashboardBillingIndexRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/dashboard/studio/new'
     | '/dashboard/team/members'
     | '/dashboard/team/roles'
+    | '/dashboard/videos/$videoId'
     | '/dashboard/analytics/'
     | '/dashboard/assets/'
     | '/dashboard/billing/'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/dashboard/studio/new'
     | '/dashboard/team/members'
     | '/dashboard/team/roles'
+    | '/dashboard/videos/$videoId'
     | '/dashboard/analytics'
     | '/dashboard/assets'
     | '/dashboard/billing'
@@ -379,6 +391,7 @@ export interface FileRouteTypes {
     | '/_protected/dashboard/studio/new'
     | '/_protected/dashboard/team/members'
     | '/_protected/dashboard/team/roles'
+    | '/_protected/dashboard/videos/$videoId'
     | '/_protected/dashboard/analytics/'
     | '/_protected/dashboard/assets/'
     | '/_protected/dashboard/billing/'
@@ -509,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardAnalyticsIndexRouteImport
       parentRoute: typeof ProtectedDashboardRoute
     }
+    '/_protected/dashboard/videos/$videoId': {
+      id: '/_protected/dashboard/videos/$videoId'
+      path: '/videos/$videoId'
+      fullPath: '/dashboard/videos/$videoId'
+      preLoaderRoute: typeof ProtectedDashboardVideosVideoIdRouteImport
+      parentRoute: typeof ProtectedDashboardRoute
+    }
     '/_protected/dashboard/team/roles': {
       id: '/_protected/dashboard/team/roles'
       path: '/team/roles'
@@ -618,6 +638,7 @@ interface ProtectedDashboardRouteChildren {
   ProtectedDashboardStudioNewRoute: typeof ProtectedDashboardStudioNewRoute
   ProtectedDashboardTeamMembersRoute: typeof ProtectedDashboardTeamMembersRoute
   ProtectedDashboardTeamRolesRoute: typeof ProtectedDashboardTeamRolesRoute
+  ProtectedDashboardVideosVideoIdRoute: typeof ProtectedDashboardVideosVideoIdRoute
   ProtectedDashboardAnalyticsIndexRoute: typeof ProtectedDashboardAnalyticsIndexRoute
   ProtectedDashboardAssetsIndexRoute: typeof ProtectedDashboardAssetsIndexRoute
   ProtectedDashboardBillingIndexRoute: typeof ProtectedDashboardBillingIndexRoute
@@ -649,6 +670,7 @@ const ProtectedDashboardRouteChildren: ProtectedDashboardRouteChildren = {
   ProtectedDashboardStudioNewRoute: ProtectedDashboardStudioNewRoute,
   ProtectedDashboardTeamMembersRoute: ProtectedDashboardTeamMembersRoute,
   ProtectedDashboardTeamRolesRoute: ProtectedDashboardTeamRolesRoute,
+  ProtectedDashboardVideosVideoIdRoute: ProtectedDashboardVideosVideoIdRoute,
   ProtectedDashboardAnalyticsIndexRoute: ProtectedDashboardAnalyticsIndexRoute,
   ProtectedDashboardAssetsIndexRoute: ProtectedDashboardAssetsIndexRoute,
   ProtectedDashboardBillingIndexRoute: ProtectedDashboardBillingIndexRoute,
