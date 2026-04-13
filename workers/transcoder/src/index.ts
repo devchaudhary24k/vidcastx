@@ -10,7 +10,7 @@ import { redis } from "@vidcastx/redis";
 import { downloadToPath, uploadFile } from "@vidcastx/storage";
 
 import { notifyApiStatus } from "./api";
-import { runFFmpegTranscode } from "./ffmpeg-cmd";
+import { generateHoverPreview, generatePoster, runFFmpegTranscode } from "./ffmpeg";
 
 console.log("Native HLS Transcoder Worker Started. Listening for jobs...");
 
@@ -38,7 +38,7 @@ const transcoderWorker = new Worker<TranscodeJobData>(
 
       // Transcode (Adaptive Bitrate HLS)
       console.log(`[Job ${job.id}] Transcoding to HLS via FFmpeg...`);
-      await runFFmpegTranscode({
+      const probe = await runFFmpegTranscode({
         inputPath,
         outputDir,
         onProgress: async (percent) => {
@@ -66,10 +66,39 @@ const transcoderWorker = new Worker<TranscodeJobData>(
         const uploadProgress = 90 * Math.floor(uploadedCount / outputFiles.length);
         await job.updateProgress(uploadProgress);
       }
+      // Generate poster + hover preview in parallel
+      console.log(`[Job ${job.id}] Generating poster + hover preview...`);
+      const posterPath = path.join(jobWorkspace, "poster.jpg");
+      const previewPath = path.join(jobWorkspace, "preview.webm");
+      const thumbnailKey = `thumbnails/${orgId}/${videoId}.jpg`;
+      const previewKey = `previews/${orgId}/${videoId}.webm`;
+
+      let uploadedThumbnailKey: string | undefined;
+      let uploadedPreviewKey: string | undefined;
+
+      try {
+        await Promise.all([generatePoster(inputPath, posterPath), generateHoverPreview(inputPath, previewPath)]);
+
+        await uploadFile(thumbnailKey, fs.createReadStream(posterPath), "image/jpeg");
+        uploadedThumbnailKey = thumbnailKey;
+
+        await uploadFile(previewKey, fs.createReadStream(previewPath), "video/webm");
+        uploadedPreviewKey = previewKey;
+      } catch (err) {
+        // Poster/preview failure should not fail the main transcode
+        console.error(`[Job ${job.id}] Poster/preview generation failed:`, err);
+      }
+
       console.log(`[Job ${job.id}] 💾 Notifying API of completion...`);
       const masterPlaylistKey = `processed/${orgId}/${videoId}/master.m3u8`;
 
-      await notifyApiStatus(videoId, "ready", { playbackUrl: masterPlaylistKey });
+      await notifyApiStatus(videoId, "ready", {
+        playbackKey: masterPlaylistKey,
+        thumbnailKey: uploadedThumbnailKey,
+        previewKey: uploadedPreviewKey,
+        duration: Math.round(probe.duration),
+        resolution: `${probe.height}p`,
+      });
 
       await job.updateProgress(100);
       return { status: "success", playbackUrl: masterPlaylistKey };

@@ -10,7 +10,14 @@ import { videos } from "@vidcastx/database/schema/video-schema";
 
 // Full video response (from database)
 const _videoSelect = createSelectSchema(videos);
-export const VideoResponse = t.Omit(_videoSelect, ["masterAccessUrl", "metadata"]);
+export const VideoResponse = t.Composite([
+  t.Omit(_videoSelect, ["masterAccessUrl", "metadata"]),
+  t.Object({
+    thumbnailUrl: t.Optional(t.Nullable(t.String())),
+    previewUrl: t.Optional(t.Nullable(t.String())),
+    playbackUrl: t.Optional(t.Nullable(t.String())),
+  }),
+]);
 
 // Create draft video — filename and contentType are API-only, not stored in DB
 export const CreateVideoBody = t.Object({

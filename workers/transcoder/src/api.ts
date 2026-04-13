@@ -11,7 +11,14 @@ const m2mClient = new MachineClient({
 export async function notifyApiStatus(
   videoId: string,
   status: "processing" | "ready" | "failed",
-  data?: { playbackUrl?: string; errorReason?: string },
+  data?: {
+    errorReason?: string;
+    thumbnailKey?: string;
+    previewKey?: string;
+    playbackKey?: string;
+    duration?: number;
+    resolution?: string;
+  },
 ) {
   try {
     await m2mClient.request(`/api/internal/videos/${videoId}/status`, {

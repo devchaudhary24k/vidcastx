@@ -137,9 +137,17 @@ export default new Elysia({
     "/videos/:id/status",
     async ({ params, body, machine }) => {
       console.log(`[M2M] Status update from ${machine} for video ${params.id}`);
+      if (body.thumbnailKey || body.previewKey || body.playbackKey) {
+        await VideoService.addProcessingAssets(params.id, {
+          thumbnailKey: body.thumbnailKey,
+          previewKey: body.previewKey,
+          playbackKey: body.playbackKey,
+        });
+      }
       return VideoService.updateProcessingStatus(params.id, body.status, {
-        playbackUrl: body.playbackUrl,
         errorReason: body.errorReason,
+        duration: body.duration,
+        resolution: body.resolution,
       });
     },
     {

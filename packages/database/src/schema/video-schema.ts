@@ -28,6 +28,8 @@ export const assetTypeEnum = pgEnum("asset_type", [
   "source_file",
 ]);
 
+export type AssetType = (typeof assetTypeEnum.enumValues)[number];
+
 export const videos = pgTable(
   "video",
   {
@@ -55,7 +57,6 @@ export const videos = pgTable(
     aspectRatio: text("aspect_ratio"), // The aspect ratio of the video
     frameCount: integer("frame_count"), // The frame count of the video
     masterAccessUrl: text("master_access_url"), // The master access URL for the video
-    playbackUrl: text("playback_url"), // The playback URL for the video
     metadata: jsonb("metadata").default({}), // Metadata associated with the video
     createdAt: timestamp("created_at").defaultNow().notNull(), // The timestamp when the video was created
     updatedAt: timestamp("updated_at")

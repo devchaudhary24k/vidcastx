@@ -1,6 +1,6 @@
 {
-  "id": "b646f5bd-ecef-47e9-a033-39e0f90153e4",
-  "prevId": "4f2baf7e-7089-4946-bc67-efdaa8e0d831",
+  "id": "c250dc7e-10cd-402a-9d5f-7a0af302c6c3",
+  "prevId": "534e53ed-4d20-41f4-bec1-25d0eea4e1ac",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -873,12 +873,6 @@
         },
         "master_access_url": {
           "name": "master_access_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "playback_url": {
-          "name": "playback_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false

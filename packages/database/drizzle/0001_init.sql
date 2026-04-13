@@ -127,7 +127,6 @@ CREATE TABLE "video" (
 	"aspect_ratio" text,
 	"frame_count" integer,
 	"master_access_url" text,
-	"playback_url" text,
 	"metadata" jsonb DEFAULT '{}'::jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,

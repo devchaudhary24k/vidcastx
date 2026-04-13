@@ -32,7 +32,11 @@ export const InternalModel = {
   // Video status update request
   updateProcessingStatus: t.Object({
     status: t.Union([t.Literal("processing"), t.Literal("ready"), t.Literal("failed")]),
-    playbackUrl: t.Optional(t.String()),
     errorReason: t.Optional(t.String()),
+    thumbnailKey: t.Optional(t.String()),
+    previewKey: t.Optional(t.String()),
+    playbackKey: t.Optional(t.String()),
+    duration: t.Optional(t.Number()),
+    resolution: t.Optional(t.String()),
   }),
 };

@@ -1,10 +1,11 @@
 import { and, desc, eq, isNull, sql } from "@vidcastx/database";
 import { db } from "@vidcastx/database/client";
-import { videos } from "@vidcastx/database/schema/video-schema";
+import { assets, videos } from "@vidcastx/database/schema/video-schema";
 import { generateId } from "@vidcastx/database/utils/id";
 import {
   abortMultipartUpload,
   completeMultipartUpload,
+  getDownloadUrl,
   initMultipartUpload,
   listParts,
   signMultipartPart,
@@ -54,6 +55,11 @@ export class VideoService {
         orderBy: [desc(videos.createdAt)],
         limit,
         offset,
+        with: {
+          assets: {
+            columns: { type: true, storageKey: true },
+          },
+        },
       }),
       db
         .select({ count: sql<number>`count(*)::int` })
@@ -61,7 +67,44 @@ export class VideoService {
         .where(where),
     ]);
 
-    return { videos: rows, total: totalRow[0]?.count ?? 0 };
+    const hydrated = await Promise.all(
+      rows.map(async (v) => {
+        const assetMap = new Map(v.assets.map((a) => [a.type, a]));
+        const thumb = assetMap.get("thumbnail");
+        const preview = assetMap.get("preview_gif");
+        const playback = assetMap.get("hls_playlist");
+        const [thumbnailUrl, previewUrl, playbackUrl] = await Promise.all([
+          thumb ? getDownloadUrl(thumb.storageKey) : Promise.resolve(null),
+          preview ? getDownloadUrl(preview.storageKey) : Promise.resolve(null),
+          playback ? getDownloadUrl(playback.storageKey) : Promise.resolve(null),
+        ]);
+        const { assets: _assets, ...rest } = v;
+        return { ...rest, thumbnailUrl, previewUrl, playbackUrl };
+      }),
+    );
+
+    return { videos: hydrated, total: totalRow[0]?.count ?? 0 };
+  }
+
+  /**
+   * Insert thumbnail + preview assets produced by the transcoder.
+   */
+  static async addProcessingAssets(
+    videoId: string,
+    items: { thumbnailKey?: string; previewKey?: string; playbackKey?: string },
+  ) {
+    const rows: (typeof assets.$inferInsert)[] = [];
+    if (items.thumbnailKey) {
+      rows.push({ videoId, type: "thumbnail", storageKey: items.thumbnailKey });
+    }
+    if (items.previewKey) {
+      rows.push({ videoId, type: "preview_gif", storageKey: items.previewKey });
+    }
+    if (items.playbackKey) {
+      rows.push({ videoId, type: "hls_playlist", storageKey: items.playbackKey });
+    }
+    if (rows.length === 0) return;
+    await db.insert(assets).values(rows);
   }
 
   /**
@@ -126,11 +169,20 @@ export class VideoService {
   static async updateProcessingStatus(
     videoId: string,
     status: "processing" | "ready" | "failed",
-    data?: { playbackUrl?: string; errorReason?: string },
+    data?: {
+      errorReason?: string;
+      duration?: number;
+      resolution?: string;
+    },
   ) {
     await db
       .update(videos)
-      .set({ status, playbackUrl: data?.playbackUrl, errorReason: data?.errorReason })
+      .set({
+        status,
+        errorReason: data?.errorReason,
+        duration: data?.duration,
+        resolution: data?.resolution,
+      })
       .where(eq(videos.id, videoId));
 
     console.log(`[Internal API] Video ${videoId} status updated to ${status}`);
