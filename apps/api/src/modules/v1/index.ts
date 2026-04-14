@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 
+import { folderController } from "./folders";
 import { userController } from "./user";
 import { videoController } from "./videos";
 
@@ -13,6 +14,7 @@ const v1Router = new Elysia({
   name: "v1-router",
 })
   .use(userController)
-  .use(videoController);
+  .use(videoController)
+  .use(folderController);
 
 export default v1Router;

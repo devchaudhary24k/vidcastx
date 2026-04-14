@@ -108,6 +108,27 @@ export class VideoService {
   }
 
   /**
+   * Update editable metadata on a video.
+   */
+  static async updateMetadata(
+    videoId: string,
+    orgId: string,
+    patch: Partial<{
+      title: string;
+      description: string | null;
+      visibility: "private" | "public";
+      scheduledAt: Date | null;
+      folderId: string | null;
+      pinned: boolean;
+    }>,
+  ) {
+    await db
+      .update(videos)
+      .set(patch)
+      .where(and(eq(videos.id, videoId), eq(videos.orgId, orgId)));
+  }
+
+  /**
    * Helper: Ensure user owns video
    * Used in the .derive() middleware to secure routes
    */

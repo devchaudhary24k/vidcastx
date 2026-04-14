@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Image as ImageIcon, Loader2 } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@vidcastx/ui/components/collapsible";
@@ -16,13 +16,12 @@ import {
 } from "@vidcastx/ui/components/dialog";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
-import { RadioGroup, RadioGroupItem } from "@vidcastx/ui/components/radio-group";
 import { Switch } from "@vidcastx/ui/components/switch";
 import { Textarea } from "@vidcastx/ui/components/textarea";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import type { FolderColor, FolderVisibility } from "../types/folder";
-import type { CreateFolderInput } from "../validator/folder-schema";
+import type { CreateFolderInput, FolderVisibility } from "../validator/folder-schema";
+import { DEFAULT_FOLDER_COLOR } from "../constants/folder-color-presets";
 import { CreateFolderSchema } from "../validator/folder-schema";
 import { FolderColorPicker } from "./folder-color-picker";
 import { folderVisibilityMeta } from "./folder-visibility-badge";
@@ -30,12 +29,13 @@ import { folderVisibilityMeta } from "./folder-visibility-badge";
 type CreateFolderDialogProps = {
   children: ReactElement;
   parentFolderName: string;
-  onCreate: (input: CreateFolderInput) => void;
+  onCreate: (input: CreateFolderInput) => void | Promise<void>;
+  isSubmitting?: boolean;
 };
 
-const VISIBILITY_OPTIONS: FolderVisibility[] = ["private", "unlisted", "public"];
+const VISIBILITY_OPTIONS: FolderVisibility[] = ["private", "public"];
 
-export function CreateFolderDialog({ children, parentFolderName, onCreate }: CreateFolderDialogProps) {
+export function CreateFolderDialog({ children, parentFolderName, onCreate, isSubmitting }: CreateFolderDialogProps) {
   const [open, setOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
@@ -43,16 +43,15 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate }: Cre
     defaultValues: {
       name: "",
       visibility: "private" as FolderVisibility,
-      color: "slate" as FolderColor,
+      color: DEFAULT_FOLDER_COLOR,
       coverImageUrl: null as string | null,
       description: null as string | null,
       pinned: false,
       defaultVideoPrivate: true,
-      passwordProtected: false,
     },
     validators: { onSubmit: CreateFolderSchema },
-    onSubmit: ({ value }) => {
-      onCreate(value);
+    onSubmit: async ({ value }) => {
+      await onCreate(value);
       setOpen(false);
       setAdvancedOpen(false);
       form.reset();
@@ -62,7 +61,7 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate }: Cre
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={children} />
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -95,77 +94,78 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate }: Cre
               )}
             </form.Field>
 
-            <form.Field name="visibility">
-              {(field) => (
-                <Field>
-                  <FieldLabel>Visibility</FieldLabel>
-                  <RadioGroup
-                    value={field.state.value}
-                    onValueChange={(v) => {
-                      const next = v as FolderVisibility;
-                      field.handleChange(next);
-                      if (next === "private") {
-                        form.setFieldValue("defaultVideoPrivate", true);
-                      }
-                    }}
-                    className="gap-2"
-                  >
-                    {VISIBILITY_OPTIONS.map((opt) => {
-                      const meta = folderVisibilityMeta(opt);
-                      const selected = field.state.value === opt;
-                      return (
-                        <label
-                          key={opt}
-                          className={cn(
-                            "flex cursor-pointer items-start gap-3 border p-3 transition-colors",
-                            selected ? "border-foreground bg-muted/30" : "border-input hover:bg-muted/20",
-                          )}
-                        >
-                          <RadioGroupItem value={opt} className="mt-0.5" />
-                          <div className="flex flex-1 items-start gap-2">
-                            <meta.Icon className="text-muted-foreground mt-0.5 size-4" />
-                            <div className="min-w-0">
-                              <div className="text-xs font-medium">{meta.label}</div>
-                              <div className="text-muted-foreground text-[11px]">{meta.description}</div>
-                            </div>
-                          </div>
-                        </label>
-                      );
-                    })}
-                  </RadioGroup>
-                </Field>
-              )}
-            </form.Field>
-
-            <form.Field name="color">
-              {(field) => (
-                <Field>
-                  <FieldLabel>Color</FieldLabel>
-                  <FolderColorPicker value={field.state.value} onChange={(color) => field.handleChange(color)} />
-                </Field>
-              )}
-            </form.Field>
-
             <form.Field name="coverImageUrl">
               {(field) => (
                 <Field>
                   <FieldLabel>Cover image</FieldLabel>
                   <div className="border-input flex items-center gap-3 border p-3">
-                    <div className="bg-muted flex size-12 items-center justify-center overflow-hidden">
+                    <div className="bg-muted flex size-16 items-center justify-center overflow-hidden">
                       {field.state.value ? (
                         <img src={field.state.value} alt="Cover preview" className="size-full object-cover" />
                       ) : (
-                        <span className="text-muted-foreground text-[10px] uppercase">None</span>
+                        <ImageIcon className="text-muted-foreground size-5" />
                       )}
                     </div>
-                    <Button type="button" variant="outline" size="sm" disabled>
-                      Upload image
-                    </Button>
-                    <span className="text-muted-foreground text-[10px]">Coming soon</span>
+                    <div className="flex flex-1 flex-col gap-1">
+                      <Button type="button" variant="outline" size="sm" disabled className="self-start">
+                        Upload image
+                      </Button>
+                      <span className="text-muted-foreground text-[11px]">Upload coming soon.</span>
+                    </div>
                   </div>
                 </Field>
               )}
             </form.Field>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <form.Field name="visibility">
+                {(field) => (
+                  <Field>
+                    <FieldLabel>Visibility</FieldLabel>
+                    <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Visibility">
+                      {VISIBILITY_OPTIONS.map((opt) => {
+                        const meta = folderVisibilityMeta(opt);
+                        const selected = field.state.value === opt;
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            role="radio"
+                            aria-checked={selected}
+                            onClick={() => {
+                              field.handleChange(opt);
+                              if (opt === "private") {
+                                form.setFieldValue("defaultVideoPrivate", true);
+                              }
+                            }}
+                            className={cn(
+                              "flex flex-col items-start gap-1 border p-3 text-left transition-colors",
+                              selected ? "border-foreground bg-muted/30" : "border-input hover:bg-muted/20",
+                            )}
+                          >
+                            <div className="flex items-center gap-1.5">
+                              <meta.Icon className="size-3.5" />
+                              <span className="text-xs font-medium">{meta.label}</span>
+                            </div>
+                            <span className="text-muted-foreground text-[11px]">{meta.description}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                )}
+              </form.Field>
+
+              <form.Field name="color">
+                {(field) => (
+                  <Field>
+                    <FieldLabel>Color</FieldLabel>
+                    <FolderColorPicker value={field.state.value} onChange={(color) => field.handleChange(color)} />
+                    <FieldError errors={field.state.meta.errors} />
+                  </Field>
+                )}
+              </form.Field>
+            </div>
 
             <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
               <CollapsibleTrigger
@@ -201,7 +201,7 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate }: Cre
                   {(field) => (
                     <ToggleRow
                       label="Pin to top"
-                      description="Keep this folder pinned above others."
+                      description="Show this folder in the pinned row above the main grid."
                       checked={field.state.value}
                       onChange={(v) => field.handleChange(v)}
                     />
@@ -227,17 +227,6 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate }: Cre
                     </form.Field>
                   )}
                 </form.Subscribe>
-
-                <form.Field name="passwordProtected">
-                  {(field) => (
-                    <ToggleRow
-                      label="Password protect"
-                      description="Require a password to view this folder. (Coming soon — UI preview only.)"
-                      checked={field.state.value}
-                      onChange={(v) => field.handleChange(v)}
-                    />
-                  )}
-                </form.Field>
               </CollapsibleContent>
             </Collapsible>
           </div>
@@ -247,9 +236,9 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate }: Cre
               Cancel
             </Button>
             <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
-                <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {([canSubmit, submitting]) => (
+                <Button type="submit" disabled={!canSubmit || submitting || isSubmitting}>
+                  {(submitting || isSubmitting) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create folder
                 </Button>
               )}

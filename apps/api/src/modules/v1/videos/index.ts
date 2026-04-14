@@ -55,13 +55,13 @@ const videoItemController = new Elysia({
     response: { 200: VideoResponse, 404: ErrorResponse },
   })
 
-  //nUpdate metadata
+  // Update metadata
   .patch(
     "/",
-    async ({ video, body: _body }) => ({
-      status: "updated",
-      videoId: video.id,
-    }),
+    async ({ video, body, orgId }) => {
+      await VideoService.updateMetadata(video.id, orgId, body);
+      return { status: "updated", videoId: video.id };
+    },
     {
       body: UpdateVideoBody,
       response: { 200: SuccessResponse, 400: ErrorResponse, 404: ErrorResponse },

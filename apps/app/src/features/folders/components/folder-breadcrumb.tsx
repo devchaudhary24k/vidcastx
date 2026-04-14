@@ -1,4 +1,5 @@
-import { Fragment, useMemo } from "react";
+import { Fragment } from "react";
+import { Link } from "@tanstack/react-router";
 
 import {
   Breadcrumb,
@@ -9,53 +10,44 @@ import {
   BreadcrumbSeparator,
 } from "@vidcastx/ui/components/breadcrumb";
 
-import type { Folder } from "../types/folder";
-
-type Crumb = { id: string | null; name: string };
+import type { FolderAncestor } from "../types";
 
 type FolderBreadcrumbProps = {
-  folders: Folder[];
-  currentFolderId: string | null;
-  onNavigate: (folderId: string | null) => void;
+  ancestors: FolderAncestor[];
   rootLabel?: string;
 };
 
-function buildCrumbs(folders: Folder[], currentId: string | null, rootLabel: string): Crumb[] {
-  const byId = new Map(folders.map((f) => [f.id, f]));
-  const trail: Crumb[] = [];
-  let cursor: string | null = currentId;
-  while (cursor) {
-    const folder = byId.get(cursor);
-    if (!folder) break;
-    trail.unshift({ id: folder.id, name: folder.name });
-    cursor = folder.parentId;
-  }
-  return [{ id: null, name: rootLabel }, ...trail];
-}
-
-export function FolderBreadcrumb({
-  folders,
-  currentFolderId,
-  onNavigate,
-  rootLabel = "All folders",
-}: FolderBreadcrumbProps) {
-  const crumbs = useMemo(() => buildCrumbs(folders, currentFolderId, rootLabel), [folders, currentFolderId, rootLabel]);
-
+export function FolderBreadcrumb({ ancestors, rootLabel = "All folders" }: FolderBreadcrumbProps) {
+  const atRoot = ancestors.length === 0;
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {crumbs.map((crumb, i) => {
-          const isLast = i === crumbs.length - 1;
+        <BreadcrumbItem>
+          {atRoot ? (
+            <BreadcrumbPage>{rootLabel}</BreadcrumbPage>
+          ) : (
+            <BreadcrumbLink render={<Link to="/dashboard/projects" className="hover:text-foreground" />}>
+              {rootLabel}
+            </BreadcrumbLink>
+          )}
+        </BreadcrumbItem>
+
+        {ancestors.map((crumb, i) => {
+          const isLast = i === ancestors.length - 1;
           return (
-            <Fragment key={crumb.id ?? "root"}>
-              {i > 0 && <BreadcrumbSeparator />}
+            <Fragment key={crumb.id}>
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage>{crumb.name}</BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink
                     render={
-                      <button type="button" onClick={() => onNavigate(crumb.id)} className="hover:text-foreground" />
+                      <Link
+                        to="/dashboard/projects/f/$folderId"
+                        params={{ folderId: crumb.id }}
+                        className="hover:text-foreground"
+                      />
                     }
                   >
                     {crumb.name}

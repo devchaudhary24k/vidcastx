@@ -7,6 +7,8 @@ import {
   Link as LinkIcon,
   MoreVertical,
   Pencil,
+  Pin,
+  PinOff,
   Share2,
   Trash2,
 } from "lucide-react";
@@ -21,7 +23,12 @@ import {
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
 
-export function VideoActionsMenu() {
+type VideoActionsMenuProps = {
+  pinned: boolean;
+  onTogglePin: () => void;
+};
+
+export function VideoActionsMenu({ pinned, onTogglePin }: VideoActionsMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -46,6 +53,10 @@ export function VideoActionsMenu() {
           <DropdownMenuItem>
             <FolderInput className="h-4 w-4" />
             Move to folder
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={onTogglePin}>
+            {pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+            {pinned ? "Unpin" : "Pin to top"}
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Copy className="h-4 w-4" />

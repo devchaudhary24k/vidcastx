@@ -29,7 +29,9 @@ export const CreateVideoBody = t.Object({
 });
 
 // Update video metadata
-export const UpdateVideoBody = t.Partial(t.Pick(_videoSelect, ["title", "description", "visibility", "scheduledAt"]));
+export const UpdateVideoBody = t.Partial(
+  t.Pick(_videoSelect, ["title", "description", "visibility", "scheduledAt", "folderId", "pinned"]),
+);
 
 // Pagination query
 export const PaginationQuery = t.Object({

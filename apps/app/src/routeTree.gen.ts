@@ -39,6 +39,7 @@ import { Route as ProtectedDashboardBillingInvoicesRouteImport } from './routes/
 import { Route as ProtectedDashboardAssetsTrashRouteImport } from './routes/_protected/dashboard/assets/trash'
 import { Route as ProtectedDashboardAssetsExportsRouteImport } from './routes/_protected/dashboard/assets/exports'
 import { Route as ProtectedDashboardAnalyticsReportsRouteImport } from './routes/_protected/dashboard/analytics/reports'
+import { Route as ProtectedDashboardProjectsFFolderIdRouteImport } from './routes/_protected/dashboard/projects/f/$folderId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -211,6 +212,12 @@ const ProtectedDashboardAnalyticsReportsRoute =
     path: '/analytics/reports',
     getParentRoute: () => ProtectedDashboardRoute,
   } as any)
+const ProtectedDashboardProjectsFFolderIdRoute =
+  ProtectedDashboardProjectsFFolderIdRouteImport.update({
+    id: '/projects/f/$folderId',
+    path: '/projects/f/$folderId',
+    getParentRoute: () => ProtectedDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/projects/': typeof ProtectedDashboardProjectsIndexRoute
   '/dashboard/studio/': typeof ProtectedDashboardStudioIndexRoute
   '/dashboard/team/': typeof ProtectedDashboardTeamIndexRoute
+  '/dashboard/projects/f/$folderId': typeof ProtectedDashboardProjectsFFolderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -272,6 +280,7 @@ export interface FileRoutesByTo {
   '/dashboard/projects': typeof ProtectedDashboardProjectsIndexRoute
   '/dashboard/studio': typeof ProtectedDashboardStudioIndexRoute
   '/dashboard/team': typeof ProtectedDashboardTeamIndexRoute
+  '/dashboard/projects/f/$folderId': typeof ProtectedDashboardProjectsFFolderIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -305,6 +314,7 @@ export interface FileRoutesById {
   '/_protected/dashboard/projects/': typeof ProtectedDashboardProjectsIndexRoute
   '/_protected/dashboard/studio/': typeof ProtectedDashboardStudioIndexRoute
   '/_protected/dashboard/team/': typeof ProtectedDashboardTeamIndexRoute
+  '/_protected/dashboard/projects/f/$folderId': typeof ProtectedDashboardProjectsFFolderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects/'
     | '/dashboard/studio/'
     | '/dashboard/team/'
+    | '/dashboard/projects/f/$folderId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/studio'
     | '/dashboard/team'
+    | '/dashboard/projects/f/$folderId'
   id:
     | '__root__'
     | '/'
@@ -400,6 +412,7 @@ export interface FileRouteTypes {
     | '/_protected/dashboard/projects/'
     | '/_protected/dashboard/studio/'
     | '/_protected/dashboard/team/'
+    | '/_protected/dashboard/projects/f/$folderId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -620,6 +633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardAnalyticsReportsRouteImport
       parentRoute: typeof ProtectedDashboardRoute
     }
+    '/_protected/dashboard/projects/f/$folderId': {
+      id: '/_protected/dashboard/projects/f/$folderId'
+      path: '/projects/f/$folderId'
+      fullPath: '/dashboard/projects/f/$folderId'
+      preLoaderRoute: typeof ProtectedDashboardProjectsFFolderIdRouteImport
+      parentRoute: typeof ProtectedDashboardRoute
+    }
   }
 }
 
@@ -647,6 +667,7 @@ interface ProtectedDashboardRouteChildren {
   ProtectedDashboardProjectsIndexRoute: typeof ProtectedDashboardProjectsIndexRoute
   ProtectedDashboardStudioIndexRoute: typeof ProtectedDashboardStudioIndexRoute
   ProtectedDashboardTeamIndexRoute: typeof ProtectedDashboardTeamIndexRoute
+  ProtectedDashboardProjectsFFolderIdRoute: typeof ProtectedDashboardProjectsFFolderIdRoute
 }
 
 const ProtectedDashboardRouteChildren: ProtectedDashboardRouteChildren = {
@@ -681,6 +702,8 @@ const ProtectedDashboardRouteChildren: ProtectedDashboardRouteChildren = {
   ProtectedDashboardProjectsIndexRoute: ProtectedDashboardProjectsIndexRoute,
   ProtectedDashboardStudioIndexRoute: ProtectedDashboardStudioIndexRoute,
   ProtectedDashboardTeamIndexRoute: ProtectedDashboardTeamIndexRoute,
+  ProtectedDashboardProjectsFFolderIdRoute:
+    ProtectedDashboardProjectsFFolderIdRoute,
 }
 
 const ProtectedDashboardRouteWithChildren =

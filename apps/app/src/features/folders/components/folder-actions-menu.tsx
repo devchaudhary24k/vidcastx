@@ -13,9 +13,11 @@ import {
 type FolderActionsMenuProps = {
   pinned: boolean;
   onOpen: () => void;
+  onTogglePin: () => void;
+  onDelete: () => void;
 };
 
-export function FolderActionsMenu({ pinned, onOpen }: FolderActionsMenuProps) {
+export function FolderActionsMenu({ pinned, onOpen, onTogglePin, onDelete }: FolderActionsMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -49,7 +51,7 @@ export function FolderActionsMenu({ pinned, onOpen }: FolderActionsMenuProps) {
             <Eye className="h-4 w-4" />
             Change visibility
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onSelect={onTogglePin}>
             {pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
             {pinned ? "Unpin" : "Pin to top"}
           </DropdownMenuItem>
@@ -66,9 +68,9 @@ export function FolderActionsMenu({ pinned, onOpen }: FolderActionsMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive">
+        <DropdownMenuItem variant="destructive" onSelect={onDelete}>
           <Trash2 className="h-4 w-4" />
-          Move to trash
+          Delete folder
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

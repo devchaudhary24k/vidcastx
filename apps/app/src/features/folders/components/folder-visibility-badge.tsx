@@ -1,9 +1,9 @@
-import { EyeOff, Globe, Lock } from "lucide-react";
+import { Globe, Lock } from "lucide-react";
 
 import { Badge } from "@vidcastx/ui/components/badge";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-import type { FolderVisibility } from "../types/folder";
+import type { FolderVisibility } from "../validator/folder-schema";
 
 type FolderVisibilityBadgeProps = {
   visibility: FolderVisibility;
@@ -13,8 +13,7 @@ type FolderVisibilityBadgeProps = {
 
 const META: Record<FolderVisibility, { label: string; description: string; Icon: typeof Lock }> = {
   private: { label: "Private", description: "Only you and invited members", Icon: Lock },
-  unlisted: { label: "Unlisted", description: "Anyone with the link", Icon: EyeOff },
-  public: { label: "Public", description: "Anyone on the internet", Icon: Globe },
+  public: { label: "Public", description: "Anyone with the link", Icon: Globe },
 };
 
 export function folderVisibilityMeta(visibility: FolderVisibility) {

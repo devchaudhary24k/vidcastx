@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { bigint, boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
@@ -16,7 +16,7 @@ export const videoStatusEnum = pgEnum("video_status", [
   "failed",
 ]);
 
-export const visibilityEnum = pgEnum("visibility", ["public", "private", "unlisted"]);
+export const visibilityEnum = pgEnum("visibility", ["public", "private"]);
 
 export const assetTypeEnum = pgEnum("asset_type", [
   "hls_playlist",
@@ -48,6 +48,7 @@ export const videos = pgTable(
     title: text("title").notNull().default("Untitled Video"), // The title of the video
     description: text("description"), // The description of the video
     visibility: visibilityEnum("visibility").default("private").notNull(), // The visibility of the video
+    pinned: boolean("pinned").notNull().default(false), // Whether the video is pinned to the top of its folder
     scheduledAt: timestamp("scheduled_at"), // The timestamp when the video is scheduled to be published
     publishedAt: timestamp("published_at"), // The timestamp when the video was published
     status: videoStatusEnum("status").default("draft").notNull(), // The status of the video
@@ -69,6 +70,9 @@ export const videos = pgTable(
     index("video_orgId_idx").on(table.orgId),
     index("video_status_idx").on(table.status),
     index("video_folderId_idx").on(table.folderId),
+    index("video_pinned_idx")
+      .on(table.orgId, table.pinned)
+      .where(sql`${table.pinned} = true`),
   ],
 );
 
