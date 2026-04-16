@@ -18,7 +18,7 @@
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/prettier": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
-    "typescript": "5.9.3"
+    "typescript": "^6.0.2"
   },
   "prettier": "@vidcastx/prettier"
 }

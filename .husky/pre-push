@@ -1,1 +1,2 @@
-npm run build
+# ─── Pre-push: full typecheck + lint gate ────────────
+pnpm check-types && pnpm lint

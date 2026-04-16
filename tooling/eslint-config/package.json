@@ -4,32 +4,32 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "clean": "git clean -xdf .cache .next .dist .turbo node_modules"
+    "clean": "git clean -xdf .cache .dist .turbo node_modules"
   },
   "exports": {
     "./base": "./base.js",
-    "./next-js": "./next.js",
-    "./react-internal": "./react-internal.js"
+    "./library": "./library.js",
+    "./react-internal": "./react-internal.js",
+    "./tanstack-app": "./tanstack-app.js",
+    "./elysia-api": "./elysia-api.js"
   },
   "dependencies": {
     "@eslint/js": "^10.0.1"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^16.1.6",
     "@types/node": "^25.3.3",
-    "@typescript-eslint/eslint-plugin": "^8.56.1",
-    "@typescript-eslint/parser": "^8.56.1",
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
     "@vidcastx/prettier": "workspace:*",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-only-warn": "^1.2.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-turbo": "^2.8.13",
     "globals": "^17.4.0",
-    "typescript": "5.9.3",
-    "typescript-eslint": "^8.56.1"
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.2"
   },
   "prettier": "@vidcastx/prettier"
 }

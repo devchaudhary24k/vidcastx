@@ -26,7 +26,7 @@ export async function probeVideo(filePath: string): Promise<ProbeResult> {
     ffprobe.stdout.on("data", (data) => (output += data.toString()));
 
     ffprobe.on("close", (code) => {
-      if (code !== 0) return reject(new Error("ffprobe failed to read video metadata"));
+      if (code !== 0) { reject(new Error("ffprobe failed to read video metadata")); return; }
 
       try {
         const meta = JSON.parse(output);

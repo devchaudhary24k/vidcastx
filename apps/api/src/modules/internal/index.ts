@@ -16,7 +16,7 @@ interface M2MPayload {
  * Limits to 10 requests per minute per IP
  */
 class RateLimiter {
-  private readonly attempts: Map<string, number[]> = new Map();
+  private readonly attempts = new Map<string, number[]>();
   private readonly limit = 10;
   private readonly windowMs = 60_000; // 1 minute
 

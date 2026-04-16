@@ -1,1 +1,2 @@
+# ─── Pre-commit: lint + format staged files ──────────
 npx lint-staged

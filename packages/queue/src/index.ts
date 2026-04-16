@@ -1,8 +1,8 @@
-import { Queue, QueueOptions } from "bullmq";
+import { Queue, type QueueOptions } from "bullmq";
 
 import { redis } from "@vidcastx/redis";
 
-import { QUEUES, TranscodeJobData, TranscriptionJobData } from "./types";
+import { QUEUES, type TranscodeJobData, type TranscriptionJobData } from "./types";
 
 const defaultOptions: QueueOptions = {
   connection: redis,

@@ -42,11 +42,11 @@ export class MachineClient {
       throw new Error(`Failed to authenticate ${this.clientId}: ${response.status} ${errText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { access_token: string; expires_in: number };
     this.accessToken = data.access_token;
     this.tokenExpirationTime = now + data.expires_in * 1000;
 
-    return this.accessToken!;
+    return this.accessToken;
   }
 
   /**

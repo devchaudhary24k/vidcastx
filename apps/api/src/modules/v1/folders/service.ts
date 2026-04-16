@@ -12,7 +12,7 @@ type FolderRow = Pick<
 
 type FolderSummaryRow = FolderRow & { videoCount: number; subfolderCount: number };
 
-type VideoSummaryRow = {
+interface VideoSummaryRow {
   id: string;
   title: string;
   folderId: string | null;
@@ -22,7 +22,7 @@ type VideoSummaryRow = {
   status: typeof videos.$inferSelect.status;
   createdAt: Date;
   updatedAt: Date;
-};
+}
 
 const folderSummaryCols = {
   id: folders.id,

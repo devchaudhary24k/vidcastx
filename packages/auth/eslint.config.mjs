@@ -1,4 +1,4 @@
-import { config } from "@vidcastx/eslint-config/react-internal";
+import { config } from "@vidcastx/eslint-config/library";
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [{ ignores: ["script/**"] }, ...config];

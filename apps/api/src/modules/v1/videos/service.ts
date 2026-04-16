@@ -179,7 +179,7 @@ export class VideoService {
 
   static async abortMultipart(video: Video, uploadId: string) {
     if (!video.masterAccessUrl) throw new Error("Video has no access URL");
-    await abortMultipartUpload(video.masterAccessUrl!, uploadId);
+    await abortMultipartUpload(video.masterAccessUrl, uploadId);
 
     await db.update(videos).set({ status: "failed", errorReason: "Upload aborted" }).where(eq(videos.id, video.id));
 

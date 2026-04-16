@@ -3,7 +3,7 @@ import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { TranscodeJobData } from "@vidcastx/queue/types";
-import { Job, Worker } from "bullmq";
+import { type Job, Worker } from "bullmq";
 
 import { QUEUES } from "@vidcastx/queue/types";
 import { redis } from "@vidcastx/redis";
