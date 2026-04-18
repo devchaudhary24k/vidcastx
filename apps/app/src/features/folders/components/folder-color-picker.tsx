@@ -6,10 +6,10 @@ import { cn } from "@vidcastx/ui/lib/utils";
 
 import { FOLDER_COLOR_PRESETS } from "../constants/folder-color-presets";
 
-type FolderColorPickerProps = {
+interface FolderColorPickerProps {
   value: string;
   onChange: (color: string) => void;
-};
+}
 
 export function FolderColorPicker({ value, onChange }: FolderColorPickerProps) {
   const [open, setOpen] = useState(false);
@@ -36,13 +36,21 @@ export function FolderColorPicker({ value, onChange }: FolderColorPickerProps) {
       <PopoverContent align="start" className="w-80 gap-3 p-3">
         <div className="text-muted-foreground text-[11px] font-medium">Current</div>
         <div className="flex items-center gap-2">
-          <Swatch color={value} selected onSelect={() => {}} />
+          <Swatch
+            color={value}
+            selected
+            onSelect={() => {
+              /* noop: already selected */
+            }}
+          />
           <label className="border-input hover:bg-muted/20 relative flex size-8 cursor-pointer items-center justify-center border">
             <input
               type="color"
               className="absolute inset-0 size-full cursor-pointer opacity-0"
               value={isPreset ? "#000000" : value}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={(e) => {
+                onChange(e.target.value);
+              }}
               aria-label="Custom color"
             />
             <Pencil className="text-muted-foreground size-3.5" />
@@ -69,7 +77,11 @@ export function FolderColorPicker({ value, onChange }: FolderColorPickerProps) {
   );
 }
 
-type SwatchProps = { color: string; selected: boolean; onSelect: () => void };
+interface SwatchProps {
+  color: string;
+  selected: boolean;
+  onSelect: () => void;
+}
 
 function Swatch({ color, selected, onSelect }: SwatchProps) {
   return (

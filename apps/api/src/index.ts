@@ -57,4 +57,4 @@ const server = new Elysia({ name: "api-server" })
   .mount(auth.handler)
   .listen(env.PORT);
 
-console.log(`🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`);
+console.warn(`🦊 API server is running at ${server.server?.hostname}:${server.server?.port}`);

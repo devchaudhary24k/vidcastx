@@ -22,7 +22,7 @@ export const useVideoUpload = () => {
         contentType: file.type,
       });
 
-      if (!draftResponse || !draftResponse.data) {
+      if (!draftResponse?.data) {
         throw new Error("Failed to create video draft");
       }
 

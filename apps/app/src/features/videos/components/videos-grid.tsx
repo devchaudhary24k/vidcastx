@@ -24,7 +24,7 @@ export function VideosGrid() {
     return <p className="text-destructive text-sm">{error.message}</p>;
   }
 
-  if (!data || data.videos.length === 0) {
+  if (data.videos.length === 0) {
     return <p className="text-muted-foreground text-sm">No videos yet. Upload one to get started.</p>;
   }
 

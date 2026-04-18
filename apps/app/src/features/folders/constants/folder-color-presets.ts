@@ -1,4 +1,4 @@
-export const FOLDER_COLOR_PRESETS: readonly string[] = [
+export const FOLDER_COLOR_PRESETS: [string, ...string[]] = [
   "#64748b", // slate
   "#71717a", // zinc
   "#ef4444", // red
@@ -19,9 +19,9 @@ export const FOLDER_COLOR_PRESETS: readonly string[] = [
   "#f59e0b", // amber
   "#f97316", // orange
   "#78716c", // stone
-] as const;
+];
 
-export const DEFAULT_FOLDER_COLOR = FOLDER_COLOR_PRESETS[0];
+export const DEFAULT_FOLDER_COLOR: string = FOLDER_COLOR_PRESETS[0];
 
 /**
  * Append an alpha channel (two hex digits) to a `#rrggbb` color so inline styles

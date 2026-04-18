@@ -97,7 +97,7 @@ export const uploadActions = {
   // Helper functions to remove upload
   removeUpload: (id: string) => {
     uploadStore.setState((state) => {
-      const { [id]: removed, ...restUploads } = state.uploads;
+      const { [id]: _removed, ...restUploads } = state.uploads;
 
       const isStillUploading = Object.values(restUploads).some((u) => u.status === "uploading");
 

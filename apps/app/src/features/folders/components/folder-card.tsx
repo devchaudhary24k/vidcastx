@@ -7,20 +7,26 @@ import { FolderActionsMenu } from "./folder-actions-menu";
 import { folderVisibilityMeta } from "./folder-visibility-badge";
 import { MediaCardShell } from "./media-card-shell";
 
-type FolderCardProps = {
+interface FolderCardProps {
   folder: FolderSummary;
   onOpen: (id: string) => void;
   onTogglePin: (folder: FolderSummary) => void;
   onDelete: (folder: FolderSummary) => void;
-};
+}
 
 function FolderCardImpl({ folder, onOpen, onTogglePin, onDelete }: FolderCardProps) {
   const { videoCount, subfolderCount, coverImageUrl, pinned, visibility, color, name } = folder;
   const visibilityMeta = folderVisibilityMeta(visibility);
 
-  const handleOpen = useCallback(() => onOpen(folder.id), [onOpen, folder.id]);
-  const handleTogglePin = useCallback(() => onTogglePin(folder), [onTogglePin, folder]);
-  const handleDelete = useCallback(() => onDelete(folder), [onDelete, folder]);
+  const handleOpen = useCallback(() => {
+    onOpen(folder.id);
+  }, [onOpen, folder.id]);
+  const handleTogglePin = useCallback(() => {
+    onTogglePin(folder);
+  }, [onTogglePin, folder]);
+  const handleDelete = useCallback(() => {
+    onDelete(folder);
+  }, [onDelete, folder]);
 
   const thumb = (
     <div className="relative aspect-video w-full overflow-hidden" style={{ backgroundColor: tintColor(color) }}>

@@ -39,9 +39,13 @@ export function useTheme() {
   useEffect(() => {
     if (mode !== "auto") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => applyMode("auto");
+    const onChange = () => {
+      applyMode("auto");
+    };
     media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
+    return () => {
+      media.removeEventListener("change", onChange);
+    };
   }, [mode]);
 
   function setTheme(next: ThemeMode) {

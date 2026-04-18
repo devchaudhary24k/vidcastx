@@ -20,7 +20,7 @@ const folderItemController = new Elysia({
   .use(betterAuth)
   .guard({ auth: true, params: FolderIdParam })
   .resolve(({ session, status }) => {
-    if (!session?.activeOrganizationId) {
+    if (!session.activeOrganizationId) {
       return status(400, { error: "No active organization. Please select an organization first." });
     }
     return { orgId: session.activeOrganizationId };
@@ -72,7 +72,7 @@ export const folderController = new Elysia({
   .use(betterAuth)
   .guard({ auth: true })
   .resolve(({ session, status }) => {
-    if (!session?.activeOrganizationId) {
+    if (!session.activeOrganizationId) {
       return status(400, { error: "No active organization. Please select an organization first." });
     }
     return { orgId: session.activeOrganizationId };

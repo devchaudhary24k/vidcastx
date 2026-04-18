@@ -67,7 +67,9 @@ export function NavMain({
             {hasSubRoutes ? (
               <Collapsible
                 open={isOpen}
-                onOpenChange={(open) => setOpenCollapsible(open ? item.title : null)}
+                onOpenChange={(open) => {
+                  setOpenCollapsible(open ? item.title : null);
+                }}
                 className="w-full"
               >
                 <CollapsibleTrigger

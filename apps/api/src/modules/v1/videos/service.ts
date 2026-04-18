@@ -13,11 +13,11 @@ import {
 
 type Video = typeof videos.$inferSelect;
 
-export class VideoService {
+export const VideoService = {
   /**
    * Create a Video Draft and generate the S3 Key
    */
-  static async createDraft(
+  async createDraft(
     userId: string,
     orgId: string,
     data: { filename: string; title?: string; folderId?: string | null },
@@ -32,20 +32,20 @@ export class VideoService {
         id: videoId,
         orgId,
         uploaderId: userId,
-        title: data.title || data.filename,
+        title: data.title ?? data.filename,
         status: "draft",
         masterAccessUrl: s3Key,
-        folderId: data.folderId || null,
+        folderId: data.folderId ?? null,
       })
       .returning();
 
     return video;
-  }
+  },
 
   /**
    * List videos for an organization, excluding soft-deleted rows.
    */
-  static async listByOrg(orgId: string, page: number, limit: number) {
+  async listByOrg(orgId: string, page: number, limit: number) {
     const offset = (page - 1) * limit;
     const where = and(eq(videos.orgId, orgId), isNull(videos.deletedAt));
 
@@ -84,12 +84,12 @@ export class VideoService {
     );
 
     return { videos: hydrated, total: totalRow[0]?.count ?? 0 };
-  }
+  },
 
   /**
    * Insert thumbnail + preview assets produced by the transcoder.
    */
-  static async addProcessingAssets(
+  async addProcessingAssets(
     videoId: string,
     items: { thumbnailKey?: string; previewKey?: string; playbackKey?: string },
   ) {
@@ -105,12 +105,12 @@ export class VideoService {
     }
     if (rows.length === 0) return;
     await db.insert(assets).values(rows);
-  }
+  },
 
   /**
    * Update editable metadata on a video.
    */
-  static async updateMetadata(
+  async updateMetadata(
     videoId: string,
     orgId: string,
     patch: Partial<{
@@ -126,68 +126,66 @@ export class VideoService {
       .update(videos)
       .set(patch)
       .where(and(eq(videos.id, videoId), eq(videos.orgId, orgId)));
-  }
+  },
 
   /**
    * Helper: Ensure user owns video
    * Used in the .derive() middleware to secure routes
    */
-  static async getVideoIfOwner(videoId: string, orgId: string) {
+  async getVideoIfOwner(videoId: string, orgId: string) {
     const video = await db.query.videos.findFirst({
       where: and(eq(videos.id, videoId), eq(videos.orgId, orgId)),
     });
-    return video || null;
-  }
+    return video ?? null;
+  },
 
   /**
    * Start the Multipart Upload on S3
    */
-  static async initMultipart(video: Video, contentType: string) {
-    const uploadId = await initMultipartUpload(video.masterAccessUrl!, contentType);
+  async initMultipart(video: Video, contentType: string) {
+    if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+    const uploadId = await initMultipartUpload(video.masterAccessUrl, contentType);
 
-    return { uploadId, key: video.masterAccessUrl! };
-  }
+    return { uploadId, key: video.masterAccessUrl };
+  },
 
   /**
    * Generate a Presigned URL for a specific chunk (Part)
    */
-  static async signPart(key: string, uploadId: string, partNumber: number) {
+  async signPart(key: string, uploadId: string, partNumber: number) {
     return await signMultipartPart(key, uploadId, partNumber);
-  }
+  },
 
-  static async completeMultipart(video: Video, uploadId: string, parts: { ETag: string; PartNumber: number }[]) {
-    await completeMultipartUpload(video.masterAccessUrl!, uploadId, parts);
+  async completeMultipart(video: Video, uploadId: string, parts: { ETag: string; PartNumber: number }[]) {
+    if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+    await completeMultipartUpload(video.masterAccessUrl, uploadId, parts);
 
     await db.update(videos).set({ status: "queued" }).where(eq(videos.id, video.id));
 
-    console.log(`[VideoService] Upload complete, video ${video.id} is queued for dispatch`);
+    console.warn(`[VideoService] Upload complete, video ${video.id} is queued for dispatch`);
 
     return { status: "success", videoId: video.id };
-  }
+  },
 
   /**
    * List parts of a multipart upload to resume it.
-   *
-   * @param video
-   * @param uploadId
-   * @returns
    */
-  static async listParts(video: Video, uploadId: string) {
+  async listParts(video: Video, uploadId: string) {
     if (!video.masterAccessUrl) throw new Error("Video has no access URL");
     return await listParts(video.masterAccessUrl, uploadId);
-  }
+  },
 
-  static async abortMultipart(video: Video, uploadId: string) {
+  async abortMultipart(video: Video, uploadId: string) {
     if (!video.masterAccessUrl) throw new Error("Video has no access URL");
     await abortMultipartUpload(video.masterAccessUrl, uploadId);
 
     await db.update(videos).set({ status: "failed", errorReason: "Upload aborted" }).where(eq(videos.id, video.id));
 
-    console.log(`[VideoService] Upload aborted for ${video.id}`);
+    console.warn(`[VideoService] Upload aborted for ${video.id}`);
     return { status: "success", videoId: video.id };
-  }
+  },
 
-  static async updateProcessingStatus(
+  async updateProcessingStatus(
     videoId: string,
     status: "processing" | "ready" | "failed",
     data?: {
@@ -206,7 +204,7 @@ export class VideoService {
       })
       .where(eq(videos.id, videoId));
 
-    console.log(`[Internal API] Video ${videoId} status updated to ${status}`);
+    console.warn(`[Internal API] Video ${videoId} status updated to ${status}`);
     return { success: true };
-  }
-}
+  },
+};

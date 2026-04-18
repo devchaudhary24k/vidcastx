@@ -22,10 +22,9 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
 
     if (hover && preview) {
       node.currentTime = 0;
-      const maybePromise = node.play();
-      if (maybePromise && typeof maybePromise.catch === "function") {
-        maybePromise.catch(() => {});
-      }
+      void node.play().catch((err: unknown) => {
+        console.warn("video preview failed to play", err);
+      });
     } else {
       node.pause();
       node.currentTime = 0;
@@ -35,7 +34,7 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
 
   const handlePointerEnter = () => {
     // Guard against coarse-pointer (touch) devices
-    if (typeof window !== "undefined" && window.matchMedia?.("(hover: none)").matches) return;
+    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches) return;
     setHover(true);
   };
 
@@ -43,7 +42,9 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
     <div
       className="bg-muted relative aspect-video w-full overflow-hidden"
       onPointerEnter={handlePointerEnter}
-      onPointerLeave={() => setHover(false)}
+      onPointerLeave={() => {
+        setHover(false);
+      }}
     >
       {poster ? (
         <img
@@ -65,7 +66,9 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
           loop
           playsInline
           preload="none"
-          onCanPlay={() => setPreviewReady(true)}
+          onCanPlay={() => {
+            setPreviewReady(true);
+          }}
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-200",
             hover && previewReady ? "opacity-100" : "opacity-0",

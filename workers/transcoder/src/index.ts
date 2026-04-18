@@ -3,7 +3,8 @@ import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { TranscodeJobData } from "@vidcastx/queue/types";
-import { type Job, Worker } from "bullmq";
+import type { Job } from "bullmq";
+import { Worker } from "bullmq";
 
 import { QUEUES } from "@vidcastx/queue/types";
 import { redis } from "@vidcastx/redis";
@@ -41,10 +42,10 @@ const transcoderWorker = new Worker<TranscodeJobData>(
       const probe = await runFFmpegTranscode({
         inputPath,
         outputDir,
-        onProgress: async (percent) => {
+        onProgress: (percent) => {
           // Scale FFmpeg progress (0-100) to the middle chunk of the worker progress (10-90%)
           const overallProgress = 10 + Math.floor(percent * 0.8);
-          await job.updateProgress(overallProgress);
+          void job.updateProgress(overallProgress);
         },
       });
 
@@ -102,14 +103,17 @@ const transcoderWorker = new Worker<TranscodeJobData>(
 
       await job.updateProgress(100);
       return { status: "success", playbackUrl: masterPlaylistKey };
-    } catch (err: any) {
-      console.error(`\n[Job ${job.id}] Failed:`, err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`\n[Job ${job.id}] Failed:`, message);
 
-      await notifyApiStatus(videoId, "failed", { errorReason: err.message });
+      await notifyApiStatus(videoId, "failed", { errorReason: message });
 
       throw err;
     } finally {
-      await fsp.rm(jobWorkspace, { recursive: true, force: true }).catch(() => {});
+      await fsp.rm(jobWorkspace, { recursive: true, force: true }).catch((e: unknown) => {
+        console.error(`[Job ${job.id}] Cleanup failed:`, e);
+      });
       console.log(`[Job ${job.id}] Cleaned up local workspace.`);
     }
   },

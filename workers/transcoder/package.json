@@ -27,7 +27,7 @@
     "@types/node": "^25.3.3",
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
-    "eslint": "^10.0.2",
+    "eslint": "^9.39.4",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"

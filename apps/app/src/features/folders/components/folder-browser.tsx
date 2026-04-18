@@ -16,9 +16,9 @@ import { CreateFolderDialog } from "./create-folder-dialog";
 import { FolderBreadcrumb } from "./folder-breadcrumb";
 import { MixedGrid } from "./mixed-grid";
 
-type FolderBrowserProps = {
+interface FolderBrowserProps {
   parentId: string | null;
-};
+}
 
 export function FolderBrowser({ parentId }: FolderBrowserProps) {
   const navigate = useNavigate();
@@ -107,7 +107,7 @@ export function FolderBrowser({ parentId }: FolderBrowserProps) {
         </div>
       )}
 
-      {isLoading && !data ? (
+      {isLoading ? (
         <div className="text-muted-foreground py-16 text-center text-sm">Loading…</div>
       ) : (
         <MixedGrid

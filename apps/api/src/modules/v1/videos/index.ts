@@ -36,7 +36,7 @@ const videoItemController = new Elysia({
   .guard({ auth: true, params: VideoIdParam })
   // Re-derive orgId from session (same logic as videoController)
   .resolve(({ session, status }) => {
-    if (!session?.activeOrganizationId) {
+    if (!session.activeOrganizationId) {
       return status(400, {
         error: "No active organization. Please select an organization first.",
       });
@@ -111,7 +111,8 @@ const videoItemController = new Elysia({
       .get(
         "/sign-part",
         async ({ video, query }) => {
-          const url = await VideoService.signPart(video.masterAccessUrl!, query.uploadId, query.partNumber);
+          if (!video.masterAccessUrl) throw new Error("Video has no access URL");
+          const url = await VideoService.signPart(video.masterAccessUrl, query.uploadId, query.partNumber);
           return { url };
         },
         {
@@ -171,7 +172,7 @@ export const videoController = new Elysia({
   .guard({ auth: true })
   // Inject orgId — all video routes require an active organization
   .resolve(({ session, status }) => {
-    if (!session?.activeOrganizationId) {
+    if (!session.activeOrganizationId) {
       return status(400, {
         error: "No active organization. Please select an organization first.",
       });
@@ -183,8 +184,8 @@ export const videoController = new Elysia({
   .get(
     "/",
     async ({ query, orgId }) => {
-      const page = query.page || 1;
-      const limit = query.limit || 10;
+      const page = query.page ?? 1;
+      const limit = query.limit ?? 10;
       const { videos, total } = await VideoService.listByOrg(orgId, page, limit);
       return { page, limit, total, videos };
     },

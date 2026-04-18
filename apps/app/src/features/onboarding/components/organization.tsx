@@ -64,7 +64,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then(() => {});
+            void form.handleSubmit();
           }}
           className="space-y-6"
         >
@@ -95,7 +95,9 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="Acme Inc."
                     aria-invalid={isInvalid}
                   />
@@ -121,7 +123,9 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
                       className="pl-9"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="acme-inc"
                       aria-invalid={isInvalid}
                     />

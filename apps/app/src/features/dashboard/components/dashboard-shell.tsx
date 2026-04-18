@@ -7,9 +7,9 @@ import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { Header } from "./header";
 
-type DashboardShellProps = {
+interface DashboardShellProps {
   children: ReactNode;
-};
+}
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const { session, organizations } = useRouteContext({ from: "/_protected/dashboard" });

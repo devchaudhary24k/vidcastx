@@ -5,7 +5,7 @@ export class MachineClient {
 
   // Internal Cache State
   private accessToken: string | null = null;
-  private tokenExpirationTime: number = 0;
+  private tokenExpirationTime = 0;
 
   constructor(config: { apiUrl: string; clientId: string; clientSecret: string }) {
     this.apiUrl = config.apiUrl;
@@ -26,7 +26,7 @@ export class MachineClient {
     }
 
     // CACHE MISS: Fetch new token
-    console.log(`[${this.clientId}] Requesting new M2M Access Token...`);
+    console.warn(`[${this.clientId}] Requesting new M2M Access Token...`);
 
     const response = await fetch(`${this.apiUrl}/api/internal/token`, {
       method: "POST",
@@ -60,11 +60,9 @@ export class MachineClient {
     const token = await this.getAccessToken();
 
     // Merge the Authorization header with any other headers passed in
-    const headers = {
-      "Content-Type": "application/json",
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    };
+    const headers = new Headers(options.headers);
+    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    headers.set("Authorization", `Bearer ${token}`);
 
     const response = await fetch(`${this.apiUrl}${endpoint}`, {
       ...options,

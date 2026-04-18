@@ -10,12 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
 
-type FolderActionsMenuProps = {
+interface FolderActionsMenuProps {
   pinned: boolean;
   onOpen: () => void;
   onTogglePin: () => void;
   onDelete: () => void;
-};
+}
 
 export function FolderActionsMenu({ pinned, onOpen, onTogglePin, onDelete }: FolderActionsMenuProps) {
   return (
@@ -27,7 +27,9 @@ export function FolderActionsMenu({ pinned, onOpen, onTogglePin, onDelete }: Fol
             size="icon"
             className="h-8 w-8 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
             aria-label="Folder actions"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           />
         }
       >

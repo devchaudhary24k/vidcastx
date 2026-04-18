@@ -5,11 +5,11 @@ import { cn } from "@vidcastx/ui/lib/utils";
 
 import type { FolderVisibility } from "../validator/folder-schema";
 
-type FolderVisibilityBadgeProps = {
+interface FolderVisibilityBadgeProps {
   visibility: FolderVisibility;
   className?: string;
   showLabel?: boolean;
-};
+}
 
 const META: Record<FolderVisibility, { label: string; description: string; Icon: typeof Lock }> = {
   private: { label: "Private", description: "Only you and invited members", Icon: Lock },

@@ -24,9 +24,7 @@ export const OnboardingWrapper: React.FC = () => {
       setCurrentStep((prev) => prev + 1);
     } else {
       // Onboarding complete — invalidate router to re-check session, then redirect
-      router.invalidate().then(() => {
-        router.navigate({ to: "/dashboard" });
-      });
+      void router.invalidate().then(() => router.navigate({ to: "/dashboard" }));
     }
   };
 

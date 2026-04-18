@@ -54,7 +54,9 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({ isOpen, on
               aspect={1}
               onCropChange={setCrop}
               onRotationChange={setRotation}
-              onCropComplete={(_, pixels) => setCroppedAreaPixels(pixels)}
+              onCropComplete={(_, pixels) => {
+                setCroppedAreaPixels(pixels);
+              }}
               onZoomChange={setZoom}
               cropShape="round"
               showGrid={false}
@@ -70,7 +72,10 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({ isOpen, on
               min={1}
               max={3}
               step={0.1}
-              onValueChange={(val) => setZoom(val[0] ?? 1)}
+              onValueChange={(val: number | readonly number[]) => {
+                const next = typeof val === "number" ? val : val[0];
+                setZoom(next ?? 1);
+              }}
               className="flex-1"
             />
             <ZoomIn className="text-muted-foreground h-4 w-4" />
@@ -91,7 +96,13 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({ isOpen, on
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save Photo</Button>
+          <Button
+            onClick={() => {
+              void handleSave();
+            }}
+          >
+            Save Photo
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -103,8 +114,12 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({ isOpen, on
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
+    image.addEventListener("load", () => {
+      resolve(image);
+    });
+    image.addEventListener("error", () => {
+      reject(new Error("Failed to load image"));
+    });
     image.setAttribute("crossOrigin", "anonymous"); // needed to avoid cross-origin issues on CodeSandbox
     image.src = url;
   });

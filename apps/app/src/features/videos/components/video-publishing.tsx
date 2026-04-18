@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@vidcastx/ui/lib/utils";
 
 import type { VideoUploadForm } from "../hooks/use-video-upload-form";
-import type { VideoUploadFormValues } from "../schemas";
 
 interface VideoPublishingProps {
   form: VideoUploadForm;
@@ -33,7 +32,9 @@ export function VideoPublishing({ form }: VideoPublishingProps) {
                 <Select
                   name={field.name}
                   value={field.state.value}
-                  onValueChange={(v) => field.handleChange(v as VideoUploadFormValues["visibility"])}
+                  onValueChange={(v) => {
+                    if (v) field.handleChange(v);
+                  }}
                 >
                   <SelectTrigger id={field.name} aria-invalid={isInvalid}>
                     <SelectValue placeholder="Select visibility" />
@@ -96,7 +97,9 @@ export function VideoPublishing({ form }: VideoPublishingProps) {
                     <Calendar
                       mode="single"
                       selected={field.state.value}
-                      onSelect={(date) => field.handleChange(date)}
+                      onSelect={(date) => {
+                        field.handleChange(date);
+                      }}
                       disabled={(date) => date < new Date()}
                       autoFocus
                     />

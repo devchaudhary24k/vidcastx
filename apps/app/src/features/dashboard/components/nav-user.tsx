@@ -107,7 +107,9 @@ export function NavUser({
                   }
                 }}
                 className="w-full"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
                 <ToggleGroupItem value="light" aria-label="Light theme" className="flex-1 gap-1.5">
                   <Sun className="size-3.5" />
@@ -125,15 +127,15 @@ export function NavUser({
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() =>
-                auth.signOut({
+              onClick={() => {
+                void auth.signOut({
                   fetchOptions: {
                     onSuccess() {
-                      router.navigate({ to: "/auth/login" });
+                      void router.navigate({ to: "/auth/login" });
                     },
                   },
-                })
-              }
+                });
+              }}
             >
               <LogOut />
               Log out

@@ -8,7 +8,7 @@ import { buildStreamVariants } from "./variants";
 interface TranscodeOptions {
   inputPath: string;
   outputDir: string;
-  onProgress?: (percent: number) => void | Promise<void>;
+  onProgress?: (percent: number) => void;
 }
 
 /**
@@ -100,15 +100,15 @@ export async function runFFmpegTranscode({
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn("ffmpeg", args);
 
-    ffmpeg.stderr.on("data", (data) => {
+    ffmpeg.stderr.on("data", (data: Buffer) => {
       const output = data.toString();
 
       if (output.includes("frame=") || output.includes("time=")) {
         process.stdout.write(`\r[FFmpeg Engine] ${output.trim()}`);
       }
 
-      const timeMatch = output.match(/time=(\d{2}):(\d{2}):(\d{2}\.\d+)/);
-      if (timeMatch && totalDuration > 0 && onProgress) {
+      const timeMatch = /time=(\d{2}):(\d{2}):(\d{2}\.\d+)/.exec(output);
+      if (timeMatch?.[1] && timeMatch[2] && timeMatch[3] && totalDuration > 0 && onProgress) {
         const hours = parseInt(timeMatch[1], 10);
         const minutes = parseInt(timeMatch[2], 10);
         const seconds = parseFloat(timeMatch[3]);

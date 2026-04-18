@@ -46,7 +46,7 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactEl
         toast.success("Organization created successfully");
         setOpen(false);
         form.reset();
-        router.invalidate();
+        void router.invalidate();
       } catch (error) {
         toast.error("Failed to create organization");
         console.error("Failed to create organization:", error);
@@ -62,7 +62,7 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactEl
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit();
+            void form.handleSubmit();
           }}
         >
           <DialogHeader>
@@ -78,7 +78,9 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactEl
                     id={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="Acme Corp"
                   />
                   <FieldError errors={field.state.meta.errors} />
@@ -93,7 +95,9 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactEl
                     id={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="acme-corp"
                   />
                   <FieldError errors={field.state.meta.errors} />
@@ -102,7 +106,13 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactEl
             </form.Field>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
               Cancel
             </Button>
             <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>

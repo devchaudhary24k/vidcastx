@@ -22,8 +22,8 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
       invites: [{ email: "", role: "editor" }],
     },
     validators: { onChange: inviteMembersSchema },
-    onSubmit: async ({ value }) => {
-      await inviteMembers(value);
+    onSubmit: ({ value }) => {
+      inviteMembers(value);
       onComplete();
     },
   });
@@ -44,7 +44,7 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then(() => {});
+            void form.handleSubmit();
           }}
           className="space-y-8"
         >
@@ -77,7 +77,9 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
                                         className="pl-9"
                                         value={subField.state.value}
                                         onBlur={subField.handleBlur}
-                                        onChange={(e) => subField.handleChange(e.target.value)}
+                                        onChange={(e) => {
+                                          subField.handleChange(e.target.value);
+                                        }}
                                         aria-invalid={isInvalid}
                                       />
                                     </div>
@@ -92,7 +94,9 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
                               {(subField) => (
                                 <Select
                                   value={subField.state.value}
-                                  onValueChange={(val) => subField.handleChange(val as any)}
+                                  onValueChange={(val) => {
+                                    subField.handleChange(val as "admin" | "editor" | "viewer");
+                                  }}
                                 >
                                   <SelectTrigger>
                                     <div className="flex items-center gap-2">
@@ -129,7 +133,9 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
                               type="button"
                               variant="ghost"
                               size="icon"
-                              onClick={() => field.removeValue(index)}
+                              onClick={() => {
+                                field.removeValue(index);
+                              }}
                               disabled={field.state.value.length === 1}
                               className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-70 transition-opacity group-hover:opacity-100"
                             >
@@ -145,7 +151,9 @@ export const Step5InviteMembers: React.FC<StepProps> = ({ onComplete }) => {
                             type="button"
                             variant="ghost"
                             className="text-muted-foreground hover:text-primary hover:border-primary/50 hover:bg-primary/5 h-12 w-full border border-dashed"
-                            onClick={() => field.pushValue({ email: "", role: "editor" })}
+                            onClick={() => {
+                              field.pushValue({ email: "", role: "editor" });
+                            }}
                           >
                             <Plus className="mr-2 h-4 w-4" />
                             Add another member

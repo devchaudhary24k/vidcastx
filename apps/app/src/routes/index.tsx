@@ -6,8 +6,10 @@ export const Route = createFileRoute("/")({
     const session = await getSession();
 
     if (session) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router's redirect() throws a special redirect object
       throw redirect({ to: "/dashboard" });
     } else {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router's redirect() throws a special redirect object
       throw redirect({ to: "/auth/login" });
     }
   },

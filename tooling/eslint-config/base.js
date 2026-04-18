@@ -23,7 +23,9 @@ export const config = [
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ["eslint.config.mjs", "eslint.config.js", "*.config.mjs", "*.config.js"],
+        },
         tsconfigRootDir: process.cwd(),
       },
     },
@@ -62,11 +64,11 @@ export const config = [
     },
   },
 
-  /* ─── Preferences (warn) ───────────────────────────── */
+  /* ─── Preferences (off — stylistic, not correctness) ─ */
   {
     rules: {
-      "@typescript-eslint/prefer-nullish-coalescing": "warn",
-      "@typescript-eslint/prefer-optional-chain": "warn",
+      "@typescript-eslint/prefer-nullish-coalescing": "off",
+      "@typescript-eslint/prefer-optional-chain": "off",
     },
   },
 

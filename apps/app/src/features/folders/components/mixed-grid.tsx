@@ -7,7 +7,7 @@ import type { FolderSummary, VideoSummary } from "../types";
 import { FolderCard } from "./folder-card";
 import { VideoCard } from "./video-card";
 
-type MixedGridProps = {
+interface MixedGridProps {
   folders: FolderSummary[];
   videos: VideoSummary[];
   pinnedFolders: FolderSummary[];
@@ -19,7 +19,7 @@ type MixedGridProps = {
   onDeleteFolder: (folder: FolderSummary) => void;
   onCreateFolder?: () => void;
   onUploadVideo?: () => void;
-};
+}
 
 const GRID_CLASSES = "grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
 

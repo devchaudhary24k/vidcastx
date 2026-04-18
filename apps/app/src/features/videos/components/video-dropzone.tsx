@@ -53,7 +53,7 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef }:
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
+    const file = e.dataTransfer.files[0];
     if (file) {
       handleFile(file);
     }

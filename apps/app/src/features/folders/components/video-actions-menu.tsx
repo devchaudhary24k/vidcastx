@@ -23,10 +23,10 @@ import {
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
 
-type VideoActionsMenuProps = {
+interface VideoActionsMenuProps {
   pinned: boolean;
   onTogglePin: () => void;
-};
+}
 
 export function VideoActionsMenu({ pinned, onTogglePin }: VideoActionsMenuProps) {
   return (
@@ -38,7 +38,9 @@ export function VideoActionsMenu({ pinned, onTogglePin }: VideoActionsMenuProps)
             size="icon"
             className="h-8 w-8 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
             aria-label="Video actions"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           />
         }
       >

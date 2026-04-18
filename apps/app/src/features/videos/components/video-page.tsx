@@ -20,7 +20,9 @@ export function VideoList() {
             placeholder="Search projects..."
             className="pl-9"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -29,7 +31,9 @@ export function VideoList() {
               variant={view === "grid" ? "secondary" : "ghost"}
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => setView("grid")}
+              onClick={() => {
+                setView("grid");
+              }}
             >
               <LayoutGrid className="h-4 w-4" />
               <span className="sr-only">Grid view</span>
@@ -38,7 +42,9 @@ export function VideoList() {
               variant={view === "list" ? "secondary" : "ghost"}
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => setView("list")}
+              onClick={() => {
+                setView("list");
+              }}
             >
               <ListIcon className="h-4 w-4" />
               <span className="sr-only">List view</span>

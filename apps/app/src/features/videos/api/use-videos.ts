@@ -19,11 +19,11 @@ export function useVideos({ page = 1, limit = 20 }: UseVideosParams = {}) {
       });
       if (error) {
         console.error("failed to load videos", error);
-        throw new Error(
-          typeof error.value === "object" && error.value && "error" in error.value
-            ? String(error.value.error)
-            : "Failed to load videos",
-        );
+        const msg =
+          typeof error.value === "object" && "error" in error.value && typeof error.value.error === "string"
+            ? error.value.error
+            : "Failed to load videos";
+        throw new Error(msg);
       }
       return data;
     },

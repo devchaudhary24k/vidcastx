@@ -49,15 +49,31 @@ const videoSummaryCols = {
   updatedAt: videos.updatedAt,
 };
 
-export class FolderService {
-  static async getByIdIfOwner(folderId: string, orgId: string): Promise<Folder | null> {
+async function getDescendantIds(folderId: string, orgId: string): Promise<string[]> {
+  const res = await db.execute<{ id: string }>(
+    sql`
+      WITH RECURSIVE descendants AS (
+        SELECT id FROM "folder" WHERE parent_id = ${folderId} AND org_id = ${orgId}
+        UNION ALL
+        SELECT f.id FROM "folder" f
+        JOIN descendants d ON f.parent_id = d.id
+        WHERE f.org_id = ${orgId}
+      )
+      SELECT id FROM descendants
+    `,
+  );
+  return res.rows.map((r) => r.id);
+}
+
+export const FolderService = {
+  async getByIdIfOwner(folderId: string, orgId: string): Promise<Folder | null> {
     const row = await db.query.folders.findFirst({
       where: and(eq(folders.id, folderId), eq(folders.orgId, orgId)),
     });
     return row ?? null;
-  }
+  },
 
-  static async getAncestors(folderId: string | null, orgId: string): Promise<FolderRow[]> {
+  async getAncestors(folderId: string | null, orgId: string): Promise<FolderRow[]> {
     if (!folderId) return [];
     const rows = await db.execute<
       Pick<
@@ -104,9 +120,9 @@ export class FolderService {
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
     }));
-  }
+  },
 
-  static async listChildFolders(orgId: string, parentId: string | null): Promise<FolderSummaryRow[]> {
+  async listChildFolders(orgId: string, parentId: string | null): Promise<FolderSummaryRow[]> {
     const rows = await db
       .select({
         ...folderSummaryCols,
@@ -119,9 +135,9 @@ export class FolderService {
       )
       .orderBy(desc(folders.updatedAt));
     return rows;
-  }
+  },
 
-  static async listChildVideos(orgId: string, parentId: string | null): Promise<VideoSummaryRow[]> {
+  async listChildVideos(orgId: string, parentId: string | null): Promise<VideoSummaryRow[]> {
     const rows = await db
       .select(videoSummaryCols)
       .from(videos)
@@ -134,9 +150,9 @@ export class FolderService {
       )
       .orderBy(desc(videos.createdAt));
     return rows;
-  }
+  },
 
-  static async browse(orgId: string, parentId: string | null) {
+  async browse(orgId: string, parentId: string | null) {
     const [folder, ancestors, children, childVideos] = await Promise.all([
       parentId ? FolderService.getByIdIfOwner(parentId, orgId) : Promise.resolve(null),
       FolderService.getAncestors(parentId, orgId),
@@ -157,9 +173,9 @@ export class FolderService {
       pinnedFolders,
       pinnedVideos,
     };
-  }
+  },
 
-  static async create(
+  async create(
     orgId: string,
     userId: string,
     input: {
@@ -194,9 +210,9 @@ export class FolderService {
       .returning();
     if (!folder) throw new Error("Failed to create folder");
     return folder;
-  }
+  },
 
-  static async update(
+  async update(
     folderId: string,
     orgId: string,
     patch: Partial<{
@@ -212,7 +228,7 @@ export class FolderService {
   ): Promise<Folder | null> {
     if (patch.parentId) {
       if (patch.parentId === folderId) throw new Error("Folder cannot be its own parent");
-      const descendants = await FolderService.getDescendantIds(folderId, orgId);
+      const descendants = await getDescendantIds(folderId, orgId);
       if (descendants.includes(patch.parentId)) throw new Error("Cannot move folder into its own descendant");
       const parent = await FolderService.getByIdIfOwner(patch.parentId, orgId);
       if (!parent) throw new Error("Parent folder not found");
@@ -223,29 +239,13 @@ export class FolderService {
       .where(and(eq(folders.id, folderId), eq(folders.orgId, orgId)))
       .returning();
     return updated ?? null;
-  }
+  },
 
-  static async delete(folderId: string, orgId: string): Promise<boolean> {
+  async delete(folderId: string, orgId: string): Promise<boolean> {
     const [deleted] = await db
       .delete(folders)
       .where(and(eq(folders.id, folderId), eq(folders.orgId, orgId)))
       .returning({ id: folders.id });
     return !!deleted;
-  }
-
-  private static async getDescendantIds(folderId: string, orgId: string): Promise<string[]> {
-    const res = await db.execute<{ id: string }>(
-      sql`
-        WITH RECURSIVE descendants AS (
-          SELECT id FROM "folder" WHERE parent_id = ${folderId} AND org_id = ${orgId}
-          UNION ALL
-          SELECT f.id FROM "folder" f
-          JOIN descendants d ON f.parent_id = d.id
-          WHERE f.org_id = ${orgId}
-        )
-        SELECT id FROM descendants
-      `,
-    );
-    return res.rows.map((r) => r.id);
-  }
-}
+  },
+};

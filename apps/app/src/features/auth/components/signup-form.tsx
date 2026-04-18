@@ -41,7 +41,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
 
       if (error) {
         form.setErrorMap({
-          onSubmit: { form: error.message || "Failed to create account", fields: {} },
+          onSubmit: { form: error.message ?? "Failed to create account", fields: {} },
         });
         return;
       }
@@ -62,7 +62,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              form.handleSubmit();
+              void form.handleSubmit();
             }}
           >
             <FieldGroup>
@@ -76,7 +76,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                       placeholder="John Doe"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                     />
                     <FieldError errors={field.state.meta.errors} />
                   </Field>
@@ -93,7 +95,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                       placeholder="m@example.com"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                     />
                     <FieldError errors={field.state.meta.errors} />
                   </Field>
@@ -110,7 +114,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                         type="password"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
                       />
                       <FieldError errors={field.state.meta.errors} />
                     </Field>
@@ -125,7 +131,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                         type="password"
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                        }}
                       />
                       <FieldError errors={field.state.meta.errors} />
                     </Field>
@@ -152,6 +160,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                       : null;
                   return (
                     <>
+                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- errorMap.onSubmit narrowing above */}
                       {submitError && (
                         <FieldDescription className="text-destructive text-sm font-medium">
                           {submitError}

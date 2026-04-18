@@ -21,8 +21,8 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
 
   const form = useForm({
     defaultValues: {
-      firstName: session?.user?.firstName || "",
-      lastName: session?.user?.lastName || "",
+      firstName: session?.user.firstName ?? "",
+      lastName: session?.user.lastName ?? "",
       recoveryEmail: "",
       avatarUrl: "",
     },
@@ -53,7 +53,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then(() => {});
+            void form.handleSubmit();
           }}
           className="space-y-6"
         >
@@ -81,7 +81,9 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="John"
                       aria-invalid={isInvalid}
                     />
@@ -102,7 +104,9 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="Doe"
                       aria-invalid={isInvalid}
                     />
@@ -125,7 +129,9 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
                     type="email"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="john.doe@backup.com"
                     aria-invalid={isInvalid}
                   />

@@ -23,14 +23,14 @@ interface CommandMenuProps {
   data: SidebarData;
 }
 
-type QuickAction = {
+interface QuickAction {
   id: string;
   title: string;
   subtitle?: string;
   icon: React.ElementType;
   link: string;
   shortcut?: string;
-};
+}
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
@@ -57,10 +57,10 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
 ];
 
-type FlatNav = {
+interface FlatNav {
   parent: NavItem;
   sub?: NonNullable<NavItem["items"]>[number];
-};
+}
 
 function flattenGroup(items: NavItem[]): FlatNav[] {
   const out: FlatNav[] = [];
@@ -84,7 +84,9 @@ export function CommandMenu({ open, setOpen, data }: CommandMenuProps) {
       }
     };
     document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
+    return () => {
+      document.removeEventListener("keydown", down);
+    };
   }, [setOpen]);
 
   const platform = useMemo(() => flattenGroup(data.navMain), [data.navMain]);
@@ -107,7 +109,9 @@ export function CommandMenu({ open, setOpen, data }: CommandMenuProps) {
               <CommandItem
                 key={action.id}
                 value={`quick ${action.title} ${action.subtitle ?? ""}`}
-                onSelect={() => go(action.link)}
+                onSelect={() => {
+                  go(action.link);
+                }}
               >
                 <action.icon className="text-muted-foreground size-4" />
                 <div className="flex flex-col">
@@ -148,15 +152,30 @@ export function CommandMenu({ open, setOpen, data }: CommandMenuProps) {
           <CommandSeparator />
 
           <CommandGroup heading="Preferences">
-            <CommandItem value="theme light" onSelect={() => setOpen(false)}>
+            <CommandItem
+              value="theme light"
+              onSelect={() => {
+                setOpen(false);
+              }}
+            >
               <Sun className="text-muted-foreground size-4" />
               <span>Switch to light theme</span>
             </CommandItem>
-            <CommandItem value="theme dark" onSelect={() => setOpen(false)}>
+            <CommandItem
+              value="theme dark"
+              onSelect={() => {
+                setOpen(false);
+              }}
+            >
               <Moon className="text-muted-foreground size-4" />
               <span>Switch to dark theme</span>
             </CommandItem>
-            <CommandItem value="log out sign out" onSelect={() => setOpen(false)}>
+            <CommandItem
+              value="log out sign out"
+              onSelect={() => {
+                setOpen(false);
+              }}
+            >
               <LogOut className="text-muted-foreground size-4" />
               <span>Log out</span>
             </CommandItem>

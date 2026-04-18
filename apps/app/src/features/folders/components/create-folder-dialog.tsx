@@ -26,12 +26,12 @@ import { CreateFolderSchema } from "../validator/folder-schema";
 import { FolderColorPicker } from "./folder-color-picker";
 import { folderVisibilityMeta } from "./folder-visibility-badge";
 
-type CreateFolderDialogProps = {
+interface CreateFolderDialogProps {
   children: ReactElement;
   parentFolderName: string;
   onCreate: (input: CreateFolderInput) => void | Promise<void>;
   isSubmitting?: boolean;
-};
+}
 
 const VISIBILITY_OPTIONS: FolderVisibility[] = ["private", "public"];
 
@@ -66,7 +66,7 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit();
+            void form.handleSubmit();
           }}
         >
           <DialogHeader>
@@ -86,7 +86,9 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
                     autoFocus
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="e.g. Launch videos"
                   />
                   <FieldError errors={field.state.meta.errors} />
@@ -160,7 +162,12 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
                 {(field) => (
                   <Field>
                     <FieldLabel>Color</FieldLabel>
-                    <FolderColorPicker value={field.state.value} onChange={(color) => field.handleChange(color)} />
+                    <FolderColorPicker
+                      value={field.state.value}
+                      onChange={(color) => {
+                        field.handleChange(color);
+                      }}
+                    />
                     <FieldError errors={field.state.meta.errors} />
                   </Field>
                 )}
@@ -188,7 +195,9 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
                         id={field.name}
                         value={field.state.value ?? ""}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value || null)}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value || null);
+                        }}
                         placeholder="What's this folder for?"
                         rows={3}
                       />
@@ -203,7 +212,9 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
                       label="Pin to top"
                       description="Show this folder in the pinned row above the main grid."
                       checked={field.state.value}
-                      onChange={(v) => field.handleChange(v)}
+                      onChange={(v) => {
+                        field.handleChange(v);
+                      }}
                     />
                   )}
                 </form.Field>
@@ -221,7 +232,9 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
                           }
                           checked={field.state.value}
                           disabled={visibility === "private"}
-                          onChange={(v) => field.handleChange(v)}
+                          onChange={(v) => {
+                            field.handleChange(v);
+                          }}
                         />
                       )}
                     </form.Field>
@@ -232,7 +245,13 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
               Cancel
             </Button>
             <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
@@ -250,13 +269,13 @@ export function CreateFolderDialog({ children, parentFolderName, onCreate, isSub
   );
 }
 
-type ToggleRowProps = {
+interface ToggleRowProps {
   label: string;
   description: string;
   checked: boolean;
   disabled?: boolean;
   onChange: (value: boolean) => void;
-};
+}
 
 function ToggleRow({ label, description, checked, disabled, onChange }: ToggleRowProps) {
   return (

@@ -13,13 +13,13 @@ import {
 } from "@vidcastx/ui/components/dropdown-menu";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-type Notification = {
+interface Notification {
   id: string;
   avatar: string;
   fallback: string;
   text: string;
   time: string;
-};
+}
 
 export function NotificationsPopover({
   notifications,

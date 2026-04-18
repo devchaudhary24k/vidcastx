@@ -24,8 +24,8 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
       country: "",
     },
     validators: { onChange: billingSchema },
-    onSubmit: async ({ value }) => {
-      await updateBilling(value);
+    onSubmit: ({ value }) => {
+      updateBilling(value);
       onComplete();
     },
   });
@@ -41,7 +41,7 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then(() => {});
+            void form.handleSubmit();
           }}
           className="space-y-6"
         >
@@ -56,7 +56,9 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="1234 Main St"
                     aria-invalid={isInvalid}
                   />
@@ -78,7 +80,9 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="New York"
                       aria-invalid={isInvalid}
                     />
@@ -99,7 +103,9 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="NY"
                       aria-invalid={isInvalid}
                     />
@@ -122,7 +128,9 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="10001"
                       aria-invalid={isInvalid}
                     />
@@ -143,7 +151,9 @@ export const Step4Billing: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="United States"
                       aria-invalid={isInvalid}
                     />

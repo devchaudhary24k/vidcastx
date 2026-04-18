@@ -12,10 +12,10 @@ import {
 
 import type { FolderAncestor } from "../types";
 
-type FolderBreadcrumbProps = {
+interface FolderBreadcrumbProps {
   ancestors: FolderAncestor[];
   rootLabel?: string;
-};
+}
 
 export function FolderBreadcrumb({ ancestors, rootLabel = "All folders" }: FolderBreadcrumbProps) {
   const atRoot = ancestors.length === 0;

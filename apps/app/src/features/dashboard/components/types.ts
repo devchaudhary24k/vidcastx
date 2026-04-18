@@ -3,13 +3,13 @@ import type { LucideIcon } from "lucide-react";
 
 export type { Organization };
 
-export type UserData = {
+export interface UserData {
   name: string;
   email: string;
   avatar: string;
-};
+}
 
-export type NavItem = {
+export interface NavItem {
   title: string;
   url: string;
   icon: LucideIcon;
@@ -20,18 +20,18 @@ export type NavItem = {
     disabled?: boolean;
     badge?: string;
   }[];
-};
+}
 
-export type SidebarData = {
+export interface SidebarData {
   user: UserData;
   navMain: NavItem[];
   navAdmin: NavItem[];
-};
+}
 
-export type SearchItem = {
+export interface SearchItem {
   id: string;
   title: string;
   link: string;
   icon?: LucideIcon | React.ElementType;
   type: "main-navigation" | "admin-navigation" | "secondary-navigation";
-};
+}

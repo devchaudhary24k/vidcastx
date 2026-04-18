@@ -8,6 +8,7 @@ export const Route = createFileRoute("/auth")({
 
     // Already authenticated — redirect to dashboard
     if (session) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router's redirect() throws a special redirect object
       throw redirect({ to: DEFAULT_LOGIN_REDIRECT });
     }
   },

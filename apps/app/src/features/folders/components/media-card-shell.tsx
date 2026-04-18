@@ -3,14 +3,14 @@ import { memo } from "react";
 
 import { cn } from "@vidcastx/ui/lib/utils";
 
-type MediaCardShellProps = {
+interface MediaCardShellProps {
   thumb: ReactNode;
   title: ReactNode;
   meta: ReactNode;
   actions?: ReactNode;
   onOpen?: () => void;
   className?: string;
-};
+}
 
 function MediaCardShellImpl({ thumb, title, meta, actions, onOpen, className }: MediaCardShellProps) {
   return (

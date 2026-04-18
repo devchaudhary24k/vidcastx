@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@vidcastx/ui/components/button";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-type PageHeaderProps = {
+interface PageHeaderProps {
   title: string;
   description?: string;
   badge?: ReactNode;
@@ -13,7 +13,7 @@ type PageHeaderProps = {
   backTo?: string;
   backLabel?: string;
   className?: string;
-};
+}
 
 export function PageHeader({
   title,

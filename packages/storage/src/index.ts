@@ -36,7 +36,9 @@ export const BUCKET_NAME = env.S3_BUCKET_NAME;
  * Helper to generate a presigned URL for a given command.
  * Expiration is set to 1 hour.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- AWS SDK v3 Command generic surface varies per command; any is the pragmatic boundary
 async function generatePresignedUrl(command: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- see above
   return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 }
 
@@ -256,9 +258,11 @@ export async function listParts(key: string, uploadId: string) {
   // We explicitly map the properties to prevent AWS SDK `Part` types from
   // leaking to other packages and causing TypeScript "non-portable" type
   // inference errors in the Elysia router (e.g., in apps/api).
-  return (response.Parts || []).map((part) => ({
-    PartNumber: part.PartNumber,
-    ETag: part.ETag,
-    Size: part.Size,
-  }));
+  return (response.Parts ?? []).map((part) => {
+    const out: { PartNumber?: number; ETag?: string; Size?: number } = {};
+    if (part.PartNumber !== undefined) out.PartNumber = part.PartNumber;
+    if (part.ETag !== undefined) out.ETag = part.ETag;
+    if (part.Size !== undefined) out.Size = part.Size;
+    return out;
+  });
 }

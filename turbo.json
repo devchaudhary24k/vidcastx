@@ -44,6 +44,8 @@
     "PRODUCTION_URL",
     "DATABASE_URL",
     "AYYO",
-    "NODE_ENV"
+    "NODE_ENV",
+    "SKIP_ENV_VALIDATION",
+    "API_URL"
   ]
 }

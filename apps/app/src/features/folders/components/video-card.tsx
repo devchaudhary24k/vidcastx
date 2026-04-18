@@ -5,11 +5,11 @@ import type { VideoSummary, VideoVisibility } from "../types";
 import { MediaCardShell } from "./media-card-shell";
 import { VideoActionsMenu } from "./video-actions-menu";
 
-type VideoCardProps = {
+interface VideoCardProps {
   video: VideoSummary;
   onOpen?: (id: string) => void;
   onTogglePin: (video: VideoSummary) => void;
-};
+}
 
 function formatDuration(seconds: number | null): string | null {
   if (!seconds || seconds <= 0) return null;
@@ -51,7 +51,9 @@ function VideoCardImpl({ video, onOpen, onTogglePin }: VideoCardProps) {
   };
 
   const handleOpen = useCallback(() => onOpen?.(id), [onOpen, id]);
-  const handleTogglePin = useCallback(() => onTogglePin(video), [onTogglePin, video]);
+  const handleTogglePin = useCallback(() => {
+    onTogglePin(video);
+  }, [onTogglePin, video]);
 
   const thumb = (
     <div className="bg-muted relative aspect-video w-full overflow-hidden" style={gradient}>
