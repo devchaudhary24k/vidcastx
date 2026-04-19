@@ -110,6 +110,35 @@ export const config = [
     },
   },
 
+  /* ─── process.env direct usage (env-safety.md) ─────── */
+  {
+    // Forbid `process.env.X` everywhere; validated env modules are exempt via
+    // the files override further down the chain.
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "MemberExpression[object.type='MemberExpression'][object.object.name='process'][object.property.name='env']",
+          message:
+            "Don't read process.env.X directly — import from the workspace env.ts (validated via @t3-oss/env-core). See .claude/rules/env-safety.md.",
+        },
+        {
+          selector: "MemberExpression[object.name='process'][property.name='env']",
+          message:
+            "Don't read process.env directly — import from the workspace env.ts. See .claude/rules/env-safety.md.",
+        },
+      ],
+    },
+  },
+  {
+    // env.ts is the one place that's allowed to read process.env.
+    files: ["**/env.ts", "**/env.mts", "**/env.cts", "**/env.js", "**/env.mjs", "**/env.cjs"],
+    rules: {
+      "no-restricted-syntax": "off",
+    },
+  },
+
   /* ─── Regexp safety ────────────────────────────────── */
   regexpPlugin.configs["flat/recommended"],
 

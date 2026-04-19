@@ -43,6 +43,44 @@ export const config = [
     },
   },
 
+  /* ─── Frontend ↔ backend boundary (frontend.md) ─────── */
+  {
+    // apps/app is UI only — no backend packages or runtimes may be imported.
+    // Type-only imports are permitted (allowTypeImports: true) since they
+    // erase at build time and don't pull backend code into the bundle.
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@vidcastx/database",
+              message: "Backend-only. Talk to the API via Eden Treaty (apps/app/src/lib/api.ts).",
+              allowTypeImports: true,
+            },
+            { name: "@vidcastx/queue", message: "Backend-only. Dispatch via API endpoint.", allowTypeImports: true },
+            {
+              name: "@vidcastx/storage",
+              message: "Backend-only. Request presigned URLs from the API.",
+              allowTypeImports: true,
+            },
+            { name: "@vidcastx/redis", message: "Backend-only.", allowTypeImports: true },
+            { name: "@vidcastx/m2m", message: "Backend-only.", allowTypeImports: true },
+            { name: "drizzle-orm", message: "Backend-only ORM.", allowTypeImports: true },
+            { name: "bullmq", message: "Backend-only queue.", allowTypeImports: true },
+            { name: "ioredis", message: "Backend-only." },
+            { name: "pg", message: "Backend-only." },
+            { name: "bun", message: "Backend-only runtime API." },
+          ],
+          patterns: [
+            { group: ["drizzle-orm/*"], message: "Backend-only ORM.", allowTypeImports: true },
+            { group: ["@aws-sdk/*"], message: "Backend-only SDK.", allowTypeImports: true },
+          ],
+        },
+      ],
+    },
+  },
+
   /* ─── Stylistic opinions we disagree with ──────────── */
   {
     rules: {

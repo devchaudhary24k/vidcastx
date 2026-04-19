@@ -3,10 +3,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 
 import type { AuthSession } from "#app/lib/auth";
+import { env } from "#app/env";
 import { tryCatch } from "#app/utils/try-catch";
 
 function getApiUrl() {
-  return process.env.API_URL ?? "http://localhost:4001";
+  return env.API_URL;
 }
 
 function getAuthHeaders(): Record<string, string> {

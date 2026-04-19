@@ -25,19 +25,76 @@
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~*)",
+      "Bash(rm -rf .)",
+      "Bash(rm -rf ./*)",
+      "Bash(rm -rf *)",
+      "Bash(find * -delete*)",
+      "Bash(find * -exec rm*)",
+
+      "Bash(printenv*)",
+      "Bash(env)",
+      "Bash(env|*)",
+      "Bash(cat ~/.ssh/*)",
+      "Bash(cat ~/.aws/*)",
+      "Bash(cat ~/.kube/*)",
+      "Bash(cat ~/.netrc*)",
+
       "Bash(git push --force*)",
       "Bash(git push -f*)",
+      "Bash(git push --no-verify*)",
+      "Bash(git commit --no-verify*)",
+      "Bash(git commit *-n *)",
+      "Bash(git commit -n)",
       "Bash(git reset --hard*)",
       "Bash(git clean -f*)",
       "Bash(git clean -fd*)",
       "Bash(git branch -D*)",
+      "Bash(git checkout -- .*)",
+      "Bash(git checkout .)",
+      "Bash(git restore .)",
+      "Bash(git restore --*)",
+      "Bash(git filter-branch*)",
+      "Bash(git filter-repo*)",
+      "Bash(git reflog expire*)",
+      "Bash(git update-ref -d*)",
+
       "Bash(pnpm db:push*)",
       "Bash(pnpm run db:push*)",
       "Bash(pnpm db:reset*)",
       "Bash(pnpm run db:reset*)",
       "Bash(*DROP DATABASE*)",
       "Bash(*DROP TABLE*)",
-      "Bash(*TRUNCATE*)"
+      "Bash(*TRUNCATE*)",
+      "Bash(psql *DELETE FROM*)",
+      "Bash(psql *UPDATE * SET*)",
+
+      "Bash(curl * | sh*)",
+      "Bash(curl * | bash*)",
+      "Bash(wget * | sh*)",
+      "Bash(wget * | bash*)",
+
+      "Bash(npm publish*)",
+      "Bash(pnpm publish*)",
+      "Bash(yarn publish*)",
+      "Bash(npm install -g*)",
+      "Bash(npm i -g*)",
+      "Bash(pnpm add -g*)",
+      "Bash(yarn global add*)",
+      "Bash(npm config set *_authToken*)",
+
+      "Bash(gh pr merge*)",
+      "Bash(gh pr close*)",
+      "Bash(gh release delete*)",
+      "Bash(gh workflow disable*)",
+      "Bash(gh workflow delete*)",
+      "Bash(gh auth logout*)",
+
+      "Bash(docker system prune*)",
+      "Bash(docker volume prune*)",
+      "Bash(docker volume rm*)",
+
+      "Bash(sudo *)",
+      "Bash(chmod -R*)"
     ]
   },
   "hooks": {
@@ -52,6 +109,36 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-push-protected.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-env-bash.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-missing-migration.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-rebase-shared.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-env-file-access.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/warn-shadcn-edit.sh"
           }
         ]
       },
