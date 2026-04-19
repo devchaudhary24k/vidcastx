@@ -1,0 +1,9 @@
+# Dependency management is handled by Renovate (see .github/renovate.json),
+# which targets `dev` and respects grouping/vulnerability rules. Dependabot
+# version updates are intentionally disabled here to avoid duplicate PRs
+# against the wrong base branch.
+#
+# GitHub's Dependabot SECURITY updates cannot be disabled via this file —
+# toggle them off at Repo Settings → Code security → Dependabot security updates.
+version: 2
+updates: []
