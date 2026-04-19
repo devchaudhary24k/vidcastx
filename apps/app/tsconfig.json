@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@vidcastx/typescript-config/app-bundler.json",
+  "include": ["**/*.ts", "**/*.tsx", "eslint.config.js", "prettier.config.js", "vite.config.js"],
+  "compilerOptions": {
+    /* ─── TanStack Start defaults (do not edit) ──────── */
+    "types": ["vite/client"],
+
+    /* ─── Workspace paths ────────────────────────────── */
+    "paths": {
+      "#app/*": ["./src/*"],
+      "@app/*": ["./src/*"],
+      "@vidcastx/ui/*": ["../../packages/ui/src/*"],
+      "@server/*": ["../api/src/*"],
+      "@transcoder/*": ["../../workers/transcoder/src/*"]
+    }
+  }
+}

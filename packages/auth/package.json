@@ -1,0 +1,35 @@
+{
+  "name": "@vidcastx/auth",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "check-types": "tsc --noEmit --emitDeclarationOnly false",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "with-env": "dotenv -e ../../.env --",
+    "generate": "bun run with-env -- pnpm dlx @better-auth/cli generate --config script/auth-cli.ts --output ../database/src/schema/auth-schema.ts"
+  },
+  "prettier": "@vidcastx/prettier",
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/prettier": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^9.39.4"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.5.3",
+    "@t3-oss/env-core": "^0.13.10",
+    "@vidcastx/database": "workspace:^",
+    "@vidcastx/redis": "workspace:^",
+    "better-auth": "^1.5.3",
+    "zod": "^4.3.6"
+  }
+}

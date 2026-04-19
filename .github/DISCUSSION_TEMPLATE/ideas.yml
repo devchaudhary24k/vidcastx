@@ -1,21 +1,35 @@
+title: "idea: "
+labels: ["idea", "needs-scoping"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to file a feature request. Please fill out this form as completely as possible.
+        Thanks for sharing an idea. Please search existing discussions first — your proposal may already be under consideration.
+
   - type: textarea
+    id: problem
     attributes:
-      label: Describe the feature you'd like to request
-      description: Please describe the feature as clear and concise as possible. Remember to add context as to why you believe this feature is needed.
+      label: Problem / motivation
+      description: What are you trying to accomplish? What's missing or painful today?
     validations:
       required: true
+
   - type: textarea
+    id: solution
     attributes:
-      label: Describe the solution you'd like to see
-      description: Please describe the solution you would like to see. Adding example usage is a good way to provide context.
+      label: Proposed solution
+      description: Describe the feature or change. Include example API / UI / config if relevant.
     validations:
       required: true
+
   - type: textarea
+    id: alternatives
     attributes:
-      label: Additional information
-      description: Add any other information related to the feature here. If your feature request is related to any issues or discussions, link them here.
+      label: Alternatives considered
+      description: Other approaches you thought about and why this one is better.
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Links, screenshots, related discussions / issues, prior art.

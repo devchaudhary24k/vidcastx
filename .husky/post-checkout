@@ -1,0 +1,24 @@
+# ─── Post-checkout: sync deps + flag migrations on branch switch ─
+# Args: $1 = prev HEAD, $2 = new HEAD, $3 = 1 for branch checkout, 0 for file.
+# Skip file-level checkouts.
+
+prev_head=$1
+new_head=$2
+is_branch=$3
+
+[ "$is_branch" = "1" ] || exit 0
+[ "$prev_head" = "$new_head" ] && exit 0
+
+changed=$(git diff --name-only "$prev_head" "$new_head")
+
+if echo "$changed" | grep -qE '(^|/)(package\.json|pnpm-lock\.yaml)$'; then
+  echo "⟳ Lockfile/package.json differ on this branch — running pnpm install"
+  pnpm install
+fi
+
+if echo "$changed" | grep -qE '^packages/database/src/schema/'; then
+  echo ""
+  echo "⚠  Database schema differs on this branch."
+  echo "   Run: pnpm db:migrate   (see .claude/rules/git-workflow.md)"
+  echo ""
+fi

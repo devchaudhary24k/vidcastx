@@ -1,37 +1,60 @@
 name: 🐞 Bug Report
 description: Create a bug report to help us improve
 title: "bug: "
-labels: ["🐞❔ unconfirmed bug"]
+labels: ["bug", "needs-triage"]
 body:
-  - type: textarea
+  - type: markdown
     attributes:
-      label: Provide environment information
+      value: |
+        Thanks for taking the time to file a bug report. Please search existing issues before opening a new one.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
       description: |
-        Run this command in your project root and paste the results in a code block:
-        ```bash
-        npx envinfo --system --binaries
-        ```
+        Run `npx envinfo --system --binaries` in your project root and paste the output here. Also mention the affected workspace (e.g. apps/api, apps/app, workers/transcoder).
+      render: bash
     validations:
       required: true
+
   - type: textarea
+    id: describe
     attributes:
       label: Describe the bug
-      description: A clear and concise description of the bug, as well as what you expected to happen when encountering it.
+      description: Clear and concise description of what's happening and what you expected instead.
     validations:
       required: true
+
   - type: input
+    id: reproduction
     attributes:
-      label: Link to reproduction
-      description: Please provide a link to a reproduction of the bug. Issues without a reproduction repo may be ignored.
+      label: Link to minimal reproduction
+      description: A public repo / Stackblitz / commit that reproduces the bug. Issues without a reproduction may be closed.
     validations:
       required: true
+
   - type: textarea
+    id: steps
     attributes:
-      label: To reproduce
-      description: Describe how to reproduce your bug. Steps, code snippets, reproduction repos etc.
+      label: Steps to reproduce
+      description: Numbered steps, exact commands, relevant code snippets.
+      value: |
+        1.
+        2.
+        3.
     validations:
       required: true
+
   - type: textarea
+    id: logs
     attributes:
-      label: Additional information
-      description: Add any other information related to the bug here, screenshots if applicable.
+      label: Logs / stack trace
+      description: Paste any relevant logs. If from the API, include the OTel trace ID if available.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, videos, anything else useful.

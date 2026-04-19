@@ -1,0 +1,35 @@
+{
+  "name": "transcoder",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "pnpm with-env tsx watch src/index.ts",
+    "build": "SKIP_ENV_VALIDATION=1 tsup src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "check-types": "tsc --noEmit",
+    "clean": "git clean -xdf .cache .next .dist .turbo node_modules",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "prettier": "@vidcastx/prettier",
+  "dependencies": {
+    "@t3-oss/env-core": "^0.13.10",
+    "@vidcastx/m2m": "workspace:^",
+    "@vidcastx/queue": "workspace:^",
+    "@vidcastx/redis": "workspace:^",
+    "@vidcastx/storage": "workspace:^",
+    "bullmq": "^5.70.1",
+    "dotenv-cli": "^11.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@vidcastx/eslint-config": "workspace:*",
+    "@vidcastx/typescript-config": "workspace:*",
+    "eslint": "^9.39.4",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}

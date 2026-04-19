@@ -1,5 +1,5 @@
-import fs from "fs";
-import { pipeline } from "stream/promises";
+import fs from "node:fs";
+import { pipeline } from "node:stream/promises";
 import type { CompletedPart } from "@aws-sdk/client-s3";
 import {
   AbortMultipartUploadCommand,
@@ -10,6 +10,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
+  ListPartsCommand,
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
@@ -23,19 +24,21 @@ export const s3Client = new S3Client({
   region: env.S3_REGION,
   endpoint: env.S3_ENDPOINT,
   credentials: {
-    accessKeyId: env.S3_ACCESS_KEY_ID!,
-    secretAccessKey: env.S3_SECRET_ACCESS_KEY!,
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
   },
-  forcePathStyle: env.S3_FORCE_PATH_STYLE === true,
+  forcePathStyle: env.S3_FORCE_PATH_STYLE,
 });
 
-export const BUCKET_NAME = env.S3_BUCKET_NAME!;
+export const BUCKET_NAME = env.S3_BUCKET_NAME;
 
 /**
  * Helper to generate a presigned URL for a given command.
  * Expiration is set to 1 hour.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- AWS SDK v3 Command generic surface varies per command; any is the pragmatic boundary
 async function generatePresignedUrl(command: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- see above
   return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 }
 
@@ -94,11 +97,7 @@ export async function downloadToPath(key: string, localPath: string) {
  * @param fileStream - The read stream of the local file.
  * @param contentType - Optional MIME type.
  */
-export async function uploadFile(
-  key: string,
-  fileStream: fs.ReadStream,
-  contentType?: string,
-) {
+export async function uploadFile(key: string, fileStream: fs.ReadStream, contentType?: string) {
   const upload = new Upload({
     client: s3Client,
     params: {
@@ -157,11 +156,7 @@ export async function initMultipartUpload(key: string, contentType: string) {
  * @param partNumber - The part number (index).
  * @returns A promise that resolves to the signed URL for the part.
  */
-export async function signMultipartPart(
-  key: string,
-  uploadId: string,
-  partNumber: number,
-) {
+export async function signMultipartPart(key: string, uploadId: string, partNumber: number) {
   return generatePresignedUrl(
     new UploadPartCommand({
       Bucket: BUCKET_NAME,
@@ -178,11 +173,7 @@ export async function signMultipartPart(
  * @param uploadId - The multipart upload session ID.
  * @param parts - Array of completed parts with ETags.
  */
-export async function completeMultipartUpload(
-  key: string,
-  uploadId: string,
-  parts: CompletedPart[],
-) {
+export async function completeMultipartUpload(key: string, uploadId: string, parts: CompletedPart[]) {
   return s3Client.send(
     new CompleteMultipartUploadCommand({
       Bucket: BUCKET_NAME,
@@ -246,4 +237,32 @@ export async function deleteFolder(prefix: string) {
   if (listedObjects.IsTruncated) {
     await deleteFolder(prefix);
   }
+}
+
+/**
+ * Lists parts of a multipart upload.
+ *
+ * @param key
+ * @param uploadId
+ * @returns
+ */
+export async function listParts(key: string, uploadId: string) {
+  const response = await s3Client.send(
+    new ListPartsCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      UploadId: uploadId,
+    }),
+  );
+
+  // We explicitly map the properties to prevent AWS SDK `Part` types from
+  // leaking to other packages and causing TypeScript "non-portable" type
+  // inference errors in the Elysia router (e.g., in apps/api).
+  return (response.Parts ?? []).map((part) => {
+    const out: { PartNumber?: number; ETag?: string; Size?: number } = {};
+    if (part.PartNumber !== undefined) out.PartNumber = part.PartNumber;
+    if (part.ETag !== undefined) out.ETag = part.ETag;
+    if (part.Size !== undefined) out.Size = part.Size;
+    return out;
+  });
 }

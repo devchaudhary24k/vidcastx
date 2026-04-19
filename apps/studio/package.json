@@ -2,6 +2,7 @@
   "name": "studio",
   "version": "1.0.0",
   "scripts": {
+    "dev": "pnpm run db:studio",
     "db:migrate": "cd ../../packages/database && pnpm with-env drizzle-kit migrate",
     "db:generate": "cd ../../packages/database && pnpm with-env drizzle-kit generate",
     "db:push": "cd ../../packages/database && pnpm with-env drizzle-kit push",
@@ -9,8 +10,8 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.3.3",
     "dotenv-cli": "^11.0.0",
-    "drizzle-kit": "^0.31.8"
+    "drizzle-kit": "^0.31.9"
   }
 }

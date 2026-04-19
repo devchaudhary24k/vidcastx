@@ -27,7 +27,12 @@ const config = {
     // Type imports from internal workspace packages.
     "<TYPES>^@workspace",
     // Normal internal workspace imports.
-    "^@workspace/(.*)$",
+    "^@vidcastx/(.*)$",
+    "",
+    // Type imports from app subpath aliases (e.g. #app/*).
+    "<TYPES>^#",
+    // App subpath aliases.
+    "^#",
     "",
     // Type imports using local/relative pathing.
     "<TYPES>^[.|..|~]",
@@ -47,11 +52,12 @@ const config = {
   arrowParens: "always", // Always wrap arrow function params.
   bracketSpacing: true, // Controls spacing inside object literals.
   bracketSameLine: false, // Puts closing bracket on its own line.
-  printWidth: 80, // Maximum line length before it wraps or reformats code
+  printWidth: 120, // Maximum line length before it wraps or reformats code
+  endOfLine: "lf", // Enforce LF line endings — prevents CRLF churn on cross-platform checkouts.
 
   // Import sorting behavior.
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"], // Enables parsing for advanced syntax.
-  importOrderTypeScriptVersion: "4.4.0", // Parser behavior aligned with TS 4.4.
+  importOrderTypeScriptVersion: "5.7.0", // Parser behavior aligned with modern TS (satisfies, const type params, etc).
 
   // File-specific overrides to handle template generators.
   overrides: [

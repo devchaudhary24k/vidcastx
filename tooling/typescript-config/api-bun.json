@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "API (Bun + Bundler)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    /* ─── Modules (bundler) ──────────────────────────── */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    /* ─── Runtime types ──────────────────────────────── */
+    "types": ["bun-types"],
+
+    /* ─── Emit ───────────────────────────────────────── */
+    "declaration": false,
+    "declarationMap": false
+  }
+}

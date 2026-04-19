@@ -1,9 +1,11 @@
 {
-  "name": "@workspace/typescript-config",
+  "name": "@vidcastx/typescript-config",
   "exports": {
     "./base.json": "./base.json",
-    "./nextjs.json": "./nextjs.json",
-    "./react-library.json": "./react-library.json"
+    "./library.json": "./library.json",
+    "./react-library.json": "./react-library.json",
+    "./app-bundler.json": "./app-bundler.json",
+    "./api-bun.json": "./api-bun.json"
   },
   "version": "0.0.0",
   "private": true,
@@ -12,6 +14,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1"
+    "@types/node": "^25.3.3"
   }
 }

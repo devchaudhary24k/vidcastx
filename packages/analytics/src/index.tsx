@@ -1,24 +1,22 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { clientKeys } from "./env/client";
+import { env } from "./env";
 import { GoogleAnalytics } from "./google";
 import { PostHogProvider } from "./posthog/client";
 import { VercelAnalytics } from "./vercel";
 
-type AnalyticsProviderProps = {
+interface AnalyticsProviderProps {
   readonly children: ReactNode;
-};
+}
 
-const { NEXT_PUBLIC_GA_MEASUREMENT_ID } = clientKeys();
+const { NEXT_PUBLIC_GA_MEASUREMENT_ID } = env;
 
 export const AnalyticsProvider = ({ children }: AnalyticsProviderProps) => {
   return (
     <PostHogProvider>
       {children}
       <VercelAnalytics />
-      {NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-        <GoogleAnalytics gaId={NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-      )}
+      {NEXT_PUBLIC_GA_MEASUREMENT_ID && <GoogleAnalytics gaId={NEXT_PUBLIC_GA_MEASUREMENT_ID} />}
     </PostHogProvider>
   );
 };

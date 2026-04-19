@@ -1,21 +1,42 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Default",
+  "display": "Base",
   "compilerOptions": {
+    /* ─── Language & Target ──────────────────────────── */
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "moduleDetection": "force",
+
+    /* ─── Modules ────────────────────────────────────── */
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+
+    /* ─── Emit ───────────────────────────────────────── */
     "declaration": true,
     "declarationMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".cache/tsbuildinfo",
+
+    /* ─── Interop & Safety ───────────────────────────── */
     "esModuleInterop": true,
-    "incremental": false,
+    "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "lib": ["es2022", "DOM", "DOM.Iterable"],
-    "module": "NodeNext",
-    "moduleDetection": "force",
-    "moduleResolution": "NodeNext",
-    "noUncheckedIndexedAccess": true,
-    "resolveJsonModule": true,
     "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+
+    /* ─── Strict Type Checking ───────────────────────── */
     "strict": true,
-    "target": "ES2022",
-    "outDir": "dist"
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+    "exactOptionalPropertyTypes": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "erasableSyntaxOnly": true
   }
 }

@@ -1,61 +1,122 @@
-import { z } from "zod";
+import { createSelectSchema } from "drizzle-typebox";
+import { t } from "elysia";
 
-// Default NanoID is 21 characters
-const nanoIdValidation = z
-  .string()
-  .length(21, "ID must be a valid NanoID (21 chars)")
-  .regex(/^[A-Za-z0-9_-]+$/, "ID contains invalid characters");
+import { videos } from "@vidcastx/database/schema/video-schema";
 
-export const VideoModel = {
-  // 1. Common Params (Client sends ID in URL)
-  params: z.object({
-    id: nanoIdValidation,
+/**
+ * Schemas derived from Drizzle table using drizzle-typebox
+ * These are the source of truth for validation and OpenAPI docs
+ */
+
+// Full video response (from database)
+const _videoSelect = createSelectSchema(videos);
+export const VideoResponse = t.Composite([
+  t.Omit(_videoSelect, ["masterAccessUrl", "metadata"]),
+  t.Object({
+    thumbnailUrl: t.Optional(t.Nullable(t.String())),
+    previewUrl: t.Optional(t.Nullable(t.String())),
+    playbackUrl: t.Optional(t.Nullable(t.String())),
   }),
+]);
 
-  // 2. Pagination Query
-  pagination: z.object({
-    page: z.coerce.number().min(1).default(1).optional(),
-    limit: z.coerce.number().min(1).max(100).default(10).optional(),
+// Create draft video — filename and contentType are API-only, not stored in DB
+export const CreateVideoBody = t.Object({
+  filename: t.String({ minLength: 1 }),
+  contentType: t.String({ pattern: "^video/" }),
+  title: t.Optional(t.String({ minLength: 3, maxLength: 200 })),
+  folderId: t.Optional(t.Nullable(t.String())),
+  description: t.Optional(t.String()),
+});
+
+// Update video metadata
+export const UpdateVideoBody = t.Partial(
+  t.Pick(_videoSelect, ["title", "description", "visibility", "scheduledAt", "folderId", "pinned"]),
+);
+
+// Pagination query
+export const PaginationQuery = t.Object({
+  page: t.Optional(t.Numeric({ minimum: 1, default: 1 })),
+  limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100, default: 10 })),
+});
+
+// Video ID param
+export const VideoIdParam = t.Object({
+  id: t.String({ pattern: "^vid_" }),
+});
+
+// Multipart upload init
+export const MultipartInitBody = t.Object({
+  contentType: t.String({ pattern: "^video/" }),
+});
+
+// Multipart sign part
+export const MultipartSignQuery = t.Object({
+  uploadId: t.String(),
+  partNumber: t.Numeric({ minimum: 1 }),
+});
+
+// Multipart complete
+export const MultipartCompleteBody = t.Object({
+  uploadId: t.String(),
+  parts: t.Array(
+    t.Object({
+      ETag: t.String(),
+      PartNumber: t.Numeric(),
+    }),
+  ),
+});
+
+// Multipart list parts
+export const MultipartListPartsQuery = t.Object({
+  uploadId: t.String(),
+});
+
+// Multipart abort
+export const MultipartAbortBody = t.Object({
+  uploadId: t.String(),
+});
+
+// List response
+export const VideoListResponse = t.Object({
+  page: t.Numeric(),
+  limit: t.Numeric(),
+  total: t.Numeric(),
+  videos: t.Array(VideoResponse),
+});
+
+// Create response
+export const CreateVideoResponse = t.Object({
+  status: t.Literal("created"),
+  data: VideoResponse,
+});
+
+// Error response
+export const ErrorResponse = t.Object({
+  error: t.String(),
+});
+
+// Generic success response
+export const SuccessResponse = t.Object({
+  status: t.String(),
+  videoId: t.String(),
+});
+
+// Multipart init response
+export const MultipartInitResponse = t.Object({
+  uploadId: t.String(),
+  key: t.String(),
+});
+
+// Multipart sign-part response
+export const MultipartSignResponse = t.Object({
+  url: t.String(),
+});
+
+// Multipart list-parts response
+export const MultipartPartsResponse = t.Array(
+  t.Object({
+    PartNumber: t.Optional(t.Number()),
+    ETag: t.Optional(t.String()),
+    Size: t.Optional(t.Number()),
   }),
-
-  // 3. Create Draft
-  create: z.object({
-    title: z.string().min(3).max(100).optional(),
-    filename: z.string().min(1),
-    contentType: z.string().regex(/^video\//, "Must be a video file"),
-    description: z.string().optional(),
-  }),
-
-  // 4. Update Metadata
-  update: z.object({
-    title: z.string().min(3).max(100).optional(),
-    description: z.string().optional(),
-    visibility: z.enum(["public", "private", "unlisted"]).optional(),
-    schedule: z.iso.datetime().optional(), // ISO Date string
-  }),
-
-  // =========================================
-  // MULTIPART UPLOAD MODELS
-  // =========================================
-
-  multipartInit: z.object({
-    contentType: z.string(),
-  }),
-
-  multipartSign: z.object({
-    uploadId: z.string(),
-    partNumber: z.coerce.number(),
-    // NOTE: We do NOT ask the client for 'key' anymore.
-    // We get the key securely from the 'video' object in the database.
-  }),
-
-  multipartComplete: z.object({
-    uploadId: z.string(),
-    parts: z.array(
-      z.object({
-        ETag: z.string(),
-        PartNumber: z.number(),
-      }),
-    ),
-  }),
-};
+);

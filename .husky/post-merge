@@ -1,0 +1,17 @@
+# ─── Post-merge: sync deps + flag pending migrations ─
+# Runs after `git merge` (and thus `git pull`). Arg $1 = 1 if squash.
+# Uses ORIG_HEAD..HEAD to see what the merge brought in.
+
+changed=$(git diff --name-only ORIG_HEAD HEAD)
+
+if echo "$changed" | grep -qE '(^|/)(package\.json|pnpm-lock\.yaml)$'; then
+  echo "⟳ Lockfile/package.json changed — running pnpm install"
+  pnpm install
+fi
+
+if echo "$changed" | grep -qE '^packages/database/src/schema/'; then
+  echo ""
+  echo "⚠  Database schema changed upstream."
+  echo "   Run: pnpm db:migrate   (see .claude/rules/git-workflow.md)"
+  echo ""
+fi

@@ -1,0 +1,10 @@
+{
+  "extends": "@vidcastx/typescript-config/library.json",
+  "compilerOptions": {
+    "paths": {
+      "@transcoder/*": ["./src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

@@ -28,7 +28,7 @@ services:
     image: redis:alpine
     container_name: vidcastx_redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
@@ -83,3 +83,4 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
+

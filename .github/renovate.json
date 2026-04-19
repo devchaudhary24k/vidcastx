@@ -4,45 +4,71 @@
     "config:recommended",
     ":maintainLockFilesWeekly",
     ":semanticCommits",
-    ":gitSignOff"
+    ":gitSignOff",
+    ":dependencyDashboard"
   ],
   "baseBranches": ["dev"],
   "updateInternalDeps": true,
   "rangeStrategy": "bump",
-  "dependencyDashboard": true,
   "timezone": "UTC",
+  "schedule": ["before 9am on monday"],
   "labels": ["dependencies", "renovate"],
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "prCreation": "not-pending",
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 4,
   "rebaseWhen": "auto",
   "platformAutomerge": true,
+  "dependencyDashboardTitle": "📦 Dependency Dashboard",
   "vulnerabilityAlerts": {
-    "enabled": true
+    "enabled": true,
+    "schedule": ["at any time"],
+    "labels": ["dependencies", "security"]
   },
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
+      "description": "Auto-merge safe non-breaking updates",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true,
       "automergeType": "pr"
     },
     {
-      "matchPackageNames": ["eslint", "prettier", "eslint-plugin*"],
-      "groupName": "linting stack"
-    },
-    {
-      "matchPackageNames": ["react", "react-dom", "react-scripts"],
-      "groupName": "react monorepo"
-    },
-    {
-      "matchPackagePatterns": ["^@workspace/", "^@vidcastx/"],
-      "enabled": false
-    },
-    {
+      "description": "Manual review for majors",
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "labels": ["dependencies", "major-update"]
+    },
+    {
+      "description": "Group the linting stack",
+      "matchPackageNames": ["eslint", "prettier", "/^eslint-plugin-/", "/^eslint-config-/", "/^@typescript-eslint\\//"],
+      "groupName": "linting stack"
+    },
+    {
+      "description": "Group React core",
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "groupName": "react monorepo"
+    },
+    {
+      "description": "Group TanStack",
+      "matchPackageNames": ["/^@tanstack\\//"],
+      "groupName": "tanstack"
+    },
+    {
+      "description": "Group Drizzle",
+      "matchPackageNames": ["drizzle-orm", "drizzle-kit", "drizzle-typebox", "drizzle-zod"],
+      "groupName": "drizzle"
+    },
+    {
+      "description": "Group Elysia",
+      "matchPackageNames": ["elysia", "/^@elysiajs\\//"],
+      "groupName": "elysia"
+    },
+    {
+      "description": "Ignore internal workspace packages",
+      "matchPackageNames": ["/^@vidcastx\\//"],
+      "enabled": false
     }
   ],
   "npm": {

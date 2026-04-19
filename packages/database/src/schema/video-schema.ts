@@ -1,37 +1,22 @@
-import { relations } from "drizzle-orm";
-import {
-  bigint,
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import { bigint, boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import { generateId } from "../utils/id";
 import { organization, user } from "./auth-schema";
 import { folders } from "./folder-schema";
-import {
-  transcripts,
-  videoChapters,
-  videoSummaries,
-} from "./transcript-schema";
+import { transcripts, videoChapters, videoSummaries } from "./transcript-schema";
 
 export const videoStatusEnum = pgEnum("video_status", [
-  "waiting_upload",
+  "draft",
+  "uploaded",
+  "queued",
+  "dispatched",
   "processing",
   "ready",
   "failed",
 ]);
 
-export const visibilityEnum = pgEnum("visibility", [
-  "public",
-  "private",
-  "unlisted",
-]);
+export const visibilityEnum = pgEnum("visibility", ["public", "private"]);
 
 export const assetTypeEnum = pgEnum("asset_type", [
   "hls_playlist",
@@ -42,6 +27,8 @@ export const assetTypeEnum = pgEnum("asset_type", [
   "storyboard",
   "source_file",
 ]);
+
+export type AssetType = (typeof assetTypeEnum.enumValues)[number];
 
 export const videos = pgTable(
   "video",
@@ -61,9 +48,10 @@ export const videos = pgTable(
     title: text("title").notNull().default("Untitled Video"), // The title of the video
     description: text("description"), // The description of the video
     visibility: visibilityEnum("visibility").default("private").notNull(), // The visibility of the video
+    pinned: boolean("pinned").notNull().default(false), // Whether the video is pinned to the top of its folder
     scheduledAt: timestamp("scheduled_at"), // The timestamp when the video is scheduled to be published
     publishedAt: timestamp("published_at"), // The timestamp when the video was published
-    status: videoStatusEnum("status").default("waiting_upload").notNull(), // The status of the video
+    status: videoStatusEnum("status").default("draft").notNull(), // The status of the video
     errorReason: text("error_reason"), // The reason for any errors
     duration: integer("duration"), // The duration of the video in seconds
     resolution: text("resolution"), // The resolution of the video
@@ -82,6 +70,9 @@ export const videos = pgTable(
     index("video_orgId_idx").on(table.orgId),
     index("video_status_idx").on(table.status),
     index("video_folderId_idx").on(table.folderId),
+    index("video_pinned_idx")
+      .on(table.orgId, table.pinned)
+      .where(sql`${table.pinned} = true`),
   ],
 );
 

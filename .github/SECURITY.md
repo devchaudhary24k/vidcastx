@@ -2,33 +2,60 @@
 
 ## Supported Versions
 
-We release security updates for the following versions:
-
-| Version | Supported |
-| ------- | --------- |
-| 0.1.x   | ✅ Yes    |
-
-Older versions are **not** actively maintained.
+VidcastX is pre-1.0. Security fixes target the `main` branch; downstream users are expected to pull the latest release. Once we tag `v1.0.0` this policy will be revised with a formal support window per major version.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please **do not** disclose it publicly. Instead, report it responsibly:
+**Please do not disclose vulnerabilities publicly before a fix is released.**
 
-- **Email:** chaudhary.dev.talan@gmail.com
-- **GitHub Security Advisories:** [Submit a private report](https://github.com/devchaudhary24k/vidcastx/security/advisories)
-- **Response Time:** We will acknowledge the report within **48 hours** and provide updates on remediation.
+Preferred channel:
 
-## Security Best Practices
+- **GitHub Private Security Advisories:** [Submit a private report](https://github.com/devchaudhary24k/vidcastx/security/advisories/new)
 
-To ensure the security of your application and its users:
+Alternative:
 
-- Always update to the **latest version** for security fixes.
-- Never share sensitive credentials or API keys in public issues.
-- Use strong authentication and enable **2FA** on your account.
-- Follow the **principle of least privilege** when granting access.
+- **Email:** chaudhary.dev.talan@gmail.com — PGP available on request.
+
+### What to include
+
+- Affected component (API route, worker, package, etc.)
+- Reproduction steps or proof-of-concept
+- Impact — what an attacker can do
+- Suggested fix, if any
+
+### Response times
+
+- **Acknowledgement:** within 48 hours of receipt.
+- **Triage + severity assessment:** within 5 business days.
+- **Fix ETA:** communicated after triage; depends on severity and complexity.
+- **Disclosure:** coordinated with the reporter; CVE requested for high / critical issues.
+
+## Scope
+
+In scope:
+
+- API endpoints under `apps/api`
+- Auth flows (Better-Auth, sessions, M2M tokens)
+- Frontend at `apps/app` (XSS, CSRF, leaked tokens)
+- Video pipeline (upload presign, transcoder worker)
+- Infra-as-code / workflow definitions under `.github/`
+
+Out of scope:
+
+- Self-hosted misconfigurations
+- Issues in dependencies already tracked publicly (report upstream)
+- DoS via brute force or volumetric attack
+- Findings against default-disabled features
+
+## Security Best Practices for Operators
+
+- Run behind TLS. Terminate at a load balancer or reverse proxy.
+- Enable **2FA** on your GitHub / hosting / DB provider accounts.
+- Rotate `AUTH_SECRET`, OAuth client secrets, and M2M tokens on a regular cadence.
+- Use least-privilege IAM for S3 / database / Redis.
+- Never commit `.env*` (enforced by `.gitignore` + `.claude/hooks/block-env-file-access.sh`).
+- Keep dependencies current — Renovate's `vulnerabilityAlerts` auto-opens security PRs; review and merge promptly.
 
 ## Responsible Disclosure
 
-We appreciate security researchers following responsible disclosure guidelines. If you identify a vulnerability, please give us time to patch it before publicly disclosing any details.
-
-Thank you for helping keep our platform secure! 🚀
+We credit researchers who follow this policy in the security advisory they surface. Thank you for keeping the ecosystem safe.
