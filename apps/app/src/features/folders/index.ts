@@ -2,7 +2,8 @@ export { CreateFolderDialog } from "./components/create-folder-dialog";
 export { FolderBreadcrumb } from "./components/folder-breadcrumb";
 export { FolderBrowser } from "./components/folder-browser";
 export { FolderCard } from "./components/folder-card";
-export { FolderVisibilityBadge, folderVisibilityMeta } from "./components/folder-visibility-badge";
+export { FolderVisibilityBadge } from "./components/folder-visibility-badge";
+export { folderVisibilityMeta } from "./constants/folder-visibility-meta";
 export { MixedGrid } from "./components/mixed-grid";
 export { VideoCard } from "./components/video-card";
 

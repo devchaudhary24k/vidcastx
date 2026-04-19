@@ -46,7 +46,7 @@ export async function runFFmpegTranscode({
   const args = ["-i", inputPath, "-y"];
   let varStreamMap = "";
 
-  streamVariants.forEach((variant, idx) => {
+  for (const [idx, variant] of streamVariants.entries()) {
     args.push("-map", "0:v:0");
     if (hasAudio) {
       args.push("-map", "0:a:0");
@@ -79,7 +79,7 @@ export async function runFFmpegTranscode({
 
     const audioMap = hasAudio ? `,a:${idx}` : "";
     varStreamMap += `v:${idx}${audioMap},name:${variant.name} `;
-  });
+  }
 
   args.push(
     "-f",
@@ -109,9 +109,9 @@ export async function runFFmpegTranscode({
 
       const timeMatch = /time=(\d{2}):(\d{2}):(\d{2}\.\d+)/.exec(output);
       if (timeMatch?.[1] && timeMatch[2] && timeMatch[3] && totalDuration > 0 && onProgress) {
-        const hours = parseInt(timeMatch[1], 10);
-        const minutes = parseInt(timeMatch[2], 10);
-        const seconds = parseFloat(timeMatch[3]);
+        const hours = Number.parseInt(timeMatch[1], 10);
+        const minutes = Number.parseInt(timeMatch[2], 10);
+        const seconds = Number.parseFloat(timeMatch[3]);
 
         const currentTime = hours * 3600 + minutes * 60 + seconds;
         let percent = Math.round((currentTime / totalDuration) * 100);

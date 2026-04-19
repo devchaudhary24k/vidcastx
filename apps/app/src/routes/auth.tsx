@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+
 import { DEFAULT_LOGIN_REDIRECT } from "#app/constants/route";
 import { getSession } from "#app/lib/auth.functions";
 

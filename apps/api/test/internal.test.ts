@@ -75,6 +75,15 @@ void mock.module("../src/env", () => ({
 const { default: internalController } = await import("../src/modules/internal");
 const api = treaty(internalController);
 
+async function getValidToken(): Promise<string> {
+  const { data } = await api.internal.token.post({
+    clientId: "worker-transcoder",
+    clientSecret: TEST_TRANSCODER_SECRET,
+  });
+  if (!data?.access_token) throw new Error("failed to obtain test token");
+  return data.access_token;
+}
+
 describe("Internal Controller — M2M Authentication", () => {
   describe("POST /internal/token", () => {
     it("grants token with valid credentials", async () => {
@@ -120,15 +129,6 @@ describe("Internal Controller — M2M Authentication", () => {
   });
 
   describe("PATCH /internal/videos/:id/status", () => {
-    async function getValidToken(): Promise<string> {
-      const { data } = await api.internal.token.post({
-        clientId: "worker-transcoder",
-        clientSecret: TEST_TRANSCODER_SECRET,
-      });
-      if (!data?.access_token) throw new Error("failed to obtain test token");
-      return data.access_token;
-    }
-
     it("updates video status with valid token", async () => {
       const token = await getValidToken();
 

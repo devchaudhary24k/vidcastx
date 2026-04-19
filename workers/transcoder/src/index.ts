@@ -85,9 +85,9 @@ const transcoderWorker = new Worker<TranscodeJobData>(
 
         await uploadFile(previewKey, fs.createReadStream(previewPath), "video/webm");
         uploadedPreviewKey = previewKey;
-      } catch (err) {
+      } catch (error) {
         // Poster/preview failure should not fail the main transcode
-        console.error(`[Job ${job.id}] Poster/preview generation failed:`, err);
+        console.error(`[Job ${job.id}] Poster/preview generation failed:`, error);
       }
 
       console.log(`[Job ${job.id}] 💾 Notifying API of completion...`);
@@ -103,16 +103,16 @@ const transcoderWorker = new Worker<TranscodeJobData>(
 
       await job.updateProgress(100);
       return { status: "success", playbackUrl: masterPlaylistKey };
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error(`\n[Job ${job.id}] Failed:`, message);
 
       await notifyApiStatus(videoId, "failed", { errorReason: message });
 
-      throw err;
+      throw error;
     } finally {
-      await fsp.rm(jobWorkspace, { recursive: true, force: true }).catch((e: unknown) => {
-        console.error(`[Job ${job.id}] Cleanup failed:`, e);
+      await fsp.rm(jobWorkspace, { recursive: true, force: true }).catch((error: unknown) => {
+        console.error(`[Job ${job.id}] Cleanup failed:`, error);
       });
       console.log(`[Job ${job.id}] Cleaned up local workspace.`);
     }

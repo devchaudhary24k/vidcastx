@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
-import { AvatarUploader } from "#app/components/avatar-uploader";
-import { updateUser } from "#app/features/onboarding/api/update-user";
-import { useUser } from "#app/lib/use-user";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
+
+import { AvatarUploader } from "#app/components/avatar-uploader";
+import { updateUser } from "#app/features/onboarding/api/update-user";
+import { useUser } from "#app/lib/use-user";
 
 import { basicInfoSchema } from "../validators/schema";
 

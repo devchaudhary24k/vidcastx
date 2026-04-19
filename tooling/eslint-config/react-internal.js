@@ -1,3 +1,4 @@
+import pluginA11y from "eslint-plugin-jsx-a11y";
 import pluginReact from "eslint-plugin-react";
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
@@ -25,6 +26,9 @@ export const config = [
     },
     settings: { react: { version: "detect" } },
   },
+
+  /* ─── Accessibility (jsx-a11y) ─────────────────────── */
+  pluginA11y.flatConfigs.recommended,
 
   /* ─── React Hooks ──────────────────────────────────── */
   {

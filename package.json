@@ -30,6 +30,7 @@
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/prettier": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
+    "eslint": "^9.39.4",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prettier": "^3.8.1",

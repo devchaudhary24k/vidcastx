@@ -1,6 +1,5 @@
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "@tanstack/react-router";
-import { emailSignIn, providerSignIn } from "#app/utils/provider-signin";
 import { z } from "zod";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -15,6 +14,8 @@ import {
 } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 import { cn } from "@vidcastx/ui/lib/utils";
+
+import { emailSignIn, providerSignIn } from "#app/utils/provider-signin";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),

@@ -1,7 +1,4 @@
-import type { Organization } from "@vidcastx/auth";
 import type { LucideIcon } from "lucide-react";
-
-export type { Organization };
 
 export interface UserData {
   name: string;
@@ -35,3 +32,5 @@ export interface SearchItem {
   icon?: LucideIcon | React.ElementType;
   type: "main-navigation" | "admin-navigation" | "secondary-navigation";
 }
+
+export { type Organization } from "@vidcastx/auth";

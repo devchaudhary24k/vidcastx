@@ -22,9 +22,9 @@ import { cn } from "@vidcastx/ui/lib/utils";
 
 import type { CreateFolderInput, FolderVisibility } from "../validator/folder-schema";
 import { DEFAULT_FOLDER_COLOR } from "../constants/folder-color-presets";
+import { folderVisibilityMeta } from "../constants/folder-visibility-meta";
 import { CreateFolderSchema } from "../validator/folder-schema";
 import { FolderColorPicker } from "./folder-color-picker";
-import { folderVisibilityMeta } from "./folder-visibility-badge";
 
 interface CreateFolderDialogProps {
   children: ReactElement;

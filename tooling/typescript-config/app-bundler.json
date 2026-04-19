@@ -7,7 +7,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
 
     /* ─── Emit ───────────────────────────────────────── */
     "noEmit": true,
@@ -16,7 +15,7 @@
 
     /* ─── React / DOM ────────────────────────────────── */
     "jsx": "react-jsx",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
 
     /* ─── Extra bundler-era safety ───────────────────── */
     "noUncheckedSideEffectImports": true

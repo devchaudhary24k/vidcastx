@@ -22,10 +22,11 @@ export const config = [
 
   /* ─── Server-specific loosenings ───────────────────── */
   {
+    // Scope require-await:off to route modules only — utilities still get linted.
+    // Elysia handlers often define async functions that don't `await` but match
+    // a route signature that demands Promise<T>. The runtime wraps them anyway.
+    files: ["src/modules/**/*.ts"],
     rules: {
-      // Elysia handlers often define async functions that don't `await` but
-      // match a route signature that demands Promise<T>. The runtime wraps
-      // them anyway — require-await is too aggressive here.
       "@typescript-eslint/require-await": "off",
     },
   },

@@ -1,5 +1,4 @@
 import { useRouter } from "@tanstack/react-router";
-import { auth } from "#app/lib/auth";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@vidcastx/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
+
+import { auth } from "#app/lib/auth";
 
 import type { Organization } from "./types";
 import { CreateOrganizationDialog } from "./create-organization-dialog";

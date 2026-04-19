@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { useRouteContext } from "@tanstack/react-router";
-import { GlobalUploadIndicator } from "#app/features/videos/components/global-upload-indicator";
 
 import { SidebarInset, SidebarProvider } from "@vidcastx/ui/components/sidebar";
+
+import { GlobalUploadIndicator } from "#app/features/videos/components/global-upload-indicator";
 
 import { AppSidebar } from "./app-sidebar";
 import { Header } from "./header";

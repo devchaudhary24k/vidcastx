@@ -3,8 +3,8 @@ import { Folder as FolderIcon, Pin } from "lucide-react";
 
 import type { FolderSummary } from "../types";
 import { tintColor } from "../constants/folder-color-presets";
+import { folderVisibilityMeta } from "../constants/folder-visibility-meta";
 import { FolderActionsMenu } from "./folder-actions-menu";
-import { folderVisibilityMeta } from "./folder-visibility-badge";
 import { MediaCardShell } from "./media-card-shell";
 
 interface FolderCardProps {

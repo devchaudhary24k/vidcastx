@@ -1,6 +1,5 @@
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "@tanstack/react-router";
-import { emailSignUp } from "#app/utils/provider-signin";
 import { z } from "zod";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -8,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidc
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 import { cn } from "@vidcastx/ui/lib/utils";
+
+import { emailSignUp } from "#app/utils/provider-signin";
 
 const signupSchema = z
   .object({

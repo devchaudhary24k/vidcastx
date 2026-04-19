@@ -22,8 +22,8 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
 
     if (hover && preview) {
       node.currentTime = 0;
-      void node.play().catch((err: unknown) => {
-        console.warn("video preview failed to play", err);
+      void node.play().catch((error: unknown) => {
+        console.warn("video preview failed to play", error);
       });
     } else {
       node.pause();
@@ -34,7 +34,7 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
 
   const handlePointerEnter = () => {
     // Guard against coarse-pointer (touch) devices
-    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches) return;
+    if (globalThis.matchMedia("(hover: none)").matches) return;
     setHover(true);
   };
 

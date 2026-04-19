@@ -1,9 +1,10 @@
 import { useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { PageHeader } from "#app/components/page-header";
 import { FolderPlus, Plus, Upload } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
+
+import { PageHeader } from "#app/components/page-header";
 
 import type { FolderSummary, VideoSummary } from "../types";
 import type { CreateFolderInput } from "../validator/folder-schema";
@@ -51,7 +52,9 @@ export function FolderBrowser({ parentId }: FolderBrowserProps) {
 
   const handleDeleteFolder = useCallback(
     (folder: FolderSummary) => {
-      const ok = window.confirm(`Delete "${folder.name}"? Subfolders will be removed; videos inside move to the root.`);
+      const ok = globalThis.confirm(
+        `Delete "${folder.name}"? Subfolders will be removed; videos inside move to the root.`,
+      );
       if (!ok) return;
       deleteFolder.mutate({ id: folder.id });
     },

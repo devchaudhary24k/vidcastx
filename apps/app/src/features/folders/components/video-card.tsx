@@ -11,13 +11,14 @@ interface VideoCardProps {
   onTogglePin: (video: VideoSummary) => void;
 }
 
+const pad2 = (n: number) => n.toString().padStart(2, "0");
+
 function formatDuration(seconds: number | null): string | null {
   if (!seconds || seconds <= 0) return null;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  return h > 0 ? `${h}:${pad2(m)}:${pad2(s)}` : `${m}:${pad2(s)}`;
 }
 
 function formatRelative(iso: string | Date): string {
@@ -37,7 +38,7 @@ function VisibilityIcon({ visibility }: { visibility: VideoVisibility }) {
 
 function hashHue(id: string): number {
   let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + (id.codePointAt(i) ?? 0)) >>> 0;
   return h % 360;
 }
 

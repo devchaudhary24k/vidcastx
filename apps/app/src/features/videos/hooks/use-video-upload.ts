@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import client from "#app/lib/api";
 import { uppy } from "#app/lib/uppy-client";
 
@@ -40,9 +41,9 @@ export const useVideoUpload = () => {
       });
 
       return videoId;
-    } catch (err) {
-      console.error(err);
-      throw err;
+    } catch (error) {
+      console.error(error);
+      throw error;
     } finally {
       setIsCreatingDraft(false);
     }

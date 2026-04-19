@@ -1,6 +1,9 @@
 import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
+import regexpPlugin from "eslint-plugin-regexp";
 import turboPlugin from "eslint-plugin-turbo";
+import unicornPlugin from "eslint-plugin-unicorn";
+import unusedImports from "eslint-plugin-unused-imports";
 import { globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
@@ -57,9 +60,27 @@ export const config = [
         "error",
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
-      "@typescript-eslint/no-unused-vars": [
+      "@typescript-eslint/no-import-type-side-effects": "error",
+      "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+      "@typescript-eslint/method-signature-style": ["error", "property"],
+      // Delegate to unused-imports — autofixes dead imports on --fix.
+      "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
+
+  /* ─── Unused imports / vars (autofixable) ──────────── */
+  {
+    plugins: { "unused-imports": unusedImports },
+    rules: {
+      "unused-imports/no-unused-imports": "error",
+      "unused-imports/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+        {
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+        },
       ],
     },
   },
@@ -86,6 +107,28 @@ export const config = [
       "no-debugger": "error",
       eqeqeq: ["error", "always"],
       "prefer-const": "error",
+    },
+  },
+
+  /* ─── Regexp safety ────────────────────────────────── */
+  regexpPlugin.configs["flat/recommended"],
+
+  /* ─── Unicorn (curated) ────────────────────────────── */
+  unicornPlugin.configs.recommended,
+  {
+    rules: {
+      // Noisy, aesthetic, or conflicts with repo conventions.
+      "unicorn/prevent-abbreviations": "off", // `props`, `env`, `ref`, `db`, `api` are fine
+      "unicorn/no-null": "off", // null ≠ undefined; we distinguish intentionally
+      "unicorn/no-array-reduce": "off", // reduce is fine when expressive
+      "unicorn/no-useless-undefined": "off", // react-form/zod apis often want explicit undefined
+      "unicorn/filename-case": "off", // file-conventions.md already governs kebab-case
+      "unicorn/prefer-top-level-await": "off", // not every entrypoint supports top-level await
+      "unicorn/no-nested-ternary": "off", // prettier handles this; rule disagrees with formatter
+      // Catches genuine misuse of `await`-less async
+      "unicorn/no-await-expression-member": "off", // `(await x).y` is fine and common
+      "unicorn/no-process-exit": "off", // workers/scripts legitimately exit
+      "unicorn/prefer-global-this": "off", // breaks `typeof window` SSR guards
     },
   },
 

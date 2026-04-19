@@ -21,7 +21,7 @@ export class MachineClient {
     const now = Date.now();
 
     // CACHE HIT: Token is valid for at least 60 more seconds
-    if (this.accessToken && now < this.tokenExpirationTime - 60000) {
+    if (this.accessToken && now < this.tokenExpirationTime - 60_000) {
       return this.accessToken;
     }
 

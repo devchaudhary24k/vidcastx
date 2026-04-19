@@ -39,13 +39,14 @@ interface VideoCardVideo {
   previewUrl?: string | null;
 }
 
+const pad2 = (n: number) => n.toString().padStart(2, "0");
+
 function formatDuration(seconds: number | null | undefined) {
   if (!seconds || seconds <= 0) return null;
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+  return h > 0 ? `${h}:${pad2(m)}:${pad2(s)}` : `${m}:${pad2(s)}`;
 }
 
 function formatRelative(date: string | Date) {
@@ -53,8 +54,8 @@ function formatRelative(date: string | Date) {
   const diff = (Date.now() - d.getTime()) / 1000;
   if (diff < 60) return "just now";
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+  if (diff < 86_400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604_800) return `${Math.floor(diff / 86_400)}d ago`;
   return d.toLocaleDateString();
 }
 

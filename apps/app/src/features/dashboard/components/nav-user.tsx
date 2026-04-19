@@ -1,6 +1,4 @@
 import { useRouter } from "@tanstack/react-router";
-import { auth } from "#app/lib/auth";
-import { useTheme } from "#app/lib/use-theme";
 import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Monitor, Moon, Sparkles, Sun } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@vidcastx/ui/components/avatar";
@@ -15,6 +13,9 @@ import {
 } from "@vidcastx/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
 import { ToggleGroup, ToggleGroupItem } from "@vidcastx/ui/components/toggle-group";
+
+import { auth } from "#app/lib/auth";
+import { useTheme } from "#app/lib/use-theme";
 
 export function NavUser({
   user,

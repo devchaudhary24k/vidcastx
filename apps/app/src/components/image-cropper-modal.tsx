@@ -140,11 +140,13 @@ function rotateSize(width: number, height: number, rotation: number) {
   };
 }
 
+const DEFAULT_FLIP = { horizontal: false, vertical: false };
+
 async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
   rotation = 0,
-  flip = { horizontal: false, vertical: false },
+  flip: { horizontal: boolean; vertical: boolean } = DEFAULT_FLIP,
 ): Promise<string | null> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");

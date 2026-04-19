@@ -1,5 +1,5 @@
-import fs from "fs";
-import { pipeline } from "stream/promises";
+import fs from "node:fs";
+import { pipeline } from "node:stream/promises";
 import type { CompletedPart } from "@aws-sdk/client-s3";
 import {
   AbortMultipartUploadCommand,

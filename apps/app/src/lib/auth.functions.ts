@@ -1,7 +1,8 @@
 import type { Organization } from "@vidcastx/auth";
-import type { AuthSession } from "#app/lib/auth";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
+
+import type { AuthSession } from "#app/lib/auth";
 import { tryCatch } from "#app/utils/try-catch";
 
 function getApiUrl() {

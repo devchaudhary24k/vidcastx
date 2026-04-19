@@ -52,12 +52,12 @@ export async function probeVideo(filePath: string): Promise<ProbeResult> {
 
         const height = videoStream?.height ?? 1080;
         const durationRaw = videoStream?.duration ?? meta.format?.duration ?? "0";
-        const duration = parseFloat(durationRaw);
+        const duration = Number.parseFloat(durationRaw);
 
         const rFrameRate = videoStream?.r_frame_rate ?? "30/1";
         const [numStr, denStr] = rFrameRate.split("/");
-        const num = parseInt(numStr ?? "30", 10);
-        const den = parseInt(denStr ?? "1", 10);
+        const num = Number.parseInt(numStr ?? "30", 10);
+        const den = Number.parseInt(denStr ?? "1", 10);
         const fps = Math.round(num / den) || 30;
 
         resolve({ height, duration, fps, hasAudio });

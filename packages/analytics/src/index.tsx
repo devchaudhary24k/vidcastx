@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { env } from "./env";
 import { GoogleAnalytics } from "./google";

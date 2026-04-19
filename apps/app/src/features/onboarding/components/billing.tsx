@@ -1,12 +1,13 @@
 import React from "react";
 import { useForm } from "@tanstack/react-form";
-import { updateBilling } from "#app/features/onboarding/api/update-billing";
 import { ArrowRight, Lock } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
+
+import { updateBilling } from "#app/features/onboarding/api/update-billing";
 
 import { billingSchema } from "../validators/schema";
 

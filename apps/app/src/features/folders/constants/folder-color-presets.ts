@@ -28,7 +28,7 @@ export const DEFAULT_FOLDER_COLOR: string = FOLDER_COLOR_PRESETS[0];
  * can render a subtle tint. Bails out to the raw color if parsing fails.
  */
 export function tintColor(hex: string, alphaByte = 0x14): string {
-  if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return hex;
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
   const alpha = alphaByte.toString(16).padStart(2, "0");
   return `${hex}${alpha}`;
 }

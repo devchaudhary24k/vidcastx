@@ -14,6 +14,13 @@ export default [
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       eqeqeq: "off",
+      // Accessibility is owned by shadcn upstream — consumers own per-usage a11y.
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      "jsx-a11y/anchor-has-content": "off",
+      // Shadcn's sidebar uses document.cookie by design.
+      "unicorn/no-document-cookie": "off",
     },
   },
 ];

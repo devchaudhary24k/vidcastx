@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "@tanstack/react-router";
-import { auth } from "#app/lib/auth";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -18,6 +17,8 @@ import {
 } from "@vidcastx/ui/components/dialog";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
+
+import { auth } from "#app/lib/auth";
 
 const createOrgSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const FolderVisibilitySchema = z.enum(["private", "public"]);
-export const FolderColorSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Pick a valid color");
+export const FolderColorSchema = z.string().regex(/^#[0-9a-f]{6}$/i, "Pick a valid color");
 
 export const CreateFolderSchema = z.object({
   name: z.string().trim().min(1, "Folder name is required").max(60, "Folder name must be 60 characters or less"),

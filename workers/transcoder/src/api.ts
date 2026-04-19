@@ -27,8 +27,8 @@ export async function notifyApiStatus(
     });
 
     console.log(`[Worker API] Successfully marked video ${videoId} as ${status}`);
-  } catch (err) {
-    console.error(`[Worker API] Network error notifying API for video ${videoId}:`, err);
-    throw err; // Throw so BullMQ knows the job ultimately failed to report back
+  } catch (error) {
+    console.error(`[Worker API] Network error notifying API for video ${videoId}:`, error);
+    throw error; // Throw so BullMQ knows the job ultimately failed to report back
   }
 }

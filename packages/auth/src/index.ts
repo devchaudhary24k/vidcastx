@@ -121,8 +121,7 @@ export function initAuth(options: InitAuthOptions) {
       },
       set: async (key, value, ttl) => {
         // `ttl` is in seconds. `"EX"` tells ioredis to apply it as a TTL.
-        if (ttl) await redis.set(key, value, "EX", ttl);
-        else await redis.set(key, value);
+        await (ttl ? redis.set(key, value, "EX", ttl) : redis.set(key, value));
       },
       delete: async (key) => {
         await redis.del(key);
