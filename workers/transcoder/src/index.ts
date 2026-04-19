@@ -3,14 +3,15 @@ import fsp from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { TranscodeJobData } from "@vidcastx/queue/types";
-import { Job, Worker } from "bullmq";
+import type { Job } from "bullmq";
+import { Worker } from "bullmq";
 
 import { QUEUES } from "@vidcastx/queue/types";
 import { redis } from "@vidcastx/redis";
 import { downloadToPath, uploadFile } from "@vidcastx/storage";
 
 import { notifyApiStatus } from "./api";
-import { runFFmpegTranscode } from "./ffmpeg-cmd";
+import { generateHoverPreview, generatePoster, runFFmpegTranscode } from "./ffmpeg";
 
 console.log("Native HLS Transcoder Worker Started. Listening for jobs...");
 
@@ -38,13 +39,13 @@ const transcoderWorker = new Worker<TranscodeJobData>(
 
       // Transcode (Adaptive Bitrate HLS)
       console.log(`[Job ${job.id}] Transcoding to HLS via FFmpeg...`);
-      await runFFmpegTranscode({
+      const probe = await runFFmpegTranscode({
         inputPath,
         outputDir,
-        onProgress: async (percent) => {
+        onProgress: (percent) => {
           // Scale FFmpeg progress (0-100) to the middle chunk of the worker progress (10-90%)
           const overallProgress = 10 + Math.floor(percent * 0.8);
-          await job.updateProgress(overallProgress);
+          void job.updateProgress(overallProgress);
         },
       });
 
@@ -66,21 +67,53 @@ const transcoderWorker = new Worker<TranscodeJobData>(
         const uploadProgress = 90 * Math.floor(uploadedCount / outputFiles.length);
         await job.updateProgress(uploadProgress);
       }
+      // Generate poster + hover preview in parallel
+      console.log(`[Job ${job.id}] Generating poster + hover preview...`);
+      const posterPath = path.join(jobWorkspace, "poster.jpg");
+      const previewPath = path.join(jobWorkspace, "preview.webm");
+      const thumbnailKey = `thumbnails/${orgId}/${videoId}.jpg`;
+      const previewKey = `previews/${orgId}/${videoId}.webm`;
+
+      let uploadedThumbnailKey: string | undefined;
+      let uploadedPreviewKey: string | undefined;
+
+      try {
+        await Promise.all([generatePoster(inputPath, posterPath), generateHoverPreview(inputPath, previewPath)]);
+
+        await uploadFile(thumbnailKey, fs.createReadStream(posterPath), "image/jpeg");
+        uploadedThumbnailKey = thumbnailKey;
+
+        await uploadFile(previewKey, fs.createReadStream(previewPath), "video/webm");
+        uploadedPreviewKey = previewKey;
+      } catch (error) {
+        // Poster/preview failure should not fail the main transcode
+        console.error(`[Job ${job.id}] Poster/preview generation failed:`, error);
+      }
+
       console.log(`[Job ${job.id}] 💾 Notifying API of completion...`);
       const masterPlaylistKey = `processed/${orgId}/${videoId}/master.m3u8`;
 
-      await notifyApiStatus(videoId, "ready", { playbackUrl: masterPlaylistKey });
+      await notifyApiStatus(videoId, "ready", {
+        playbackKey: masterPlaylistKey,
+        thumbnailKey: uploadedThumbnailKey,
+        previewKey: uploadedPreviewKey,
+        duration: Math.round(probe.duration),
+        resolution: `${probe.height}p`,
+      });
 
       await job.updateProgress(100);
       return { status: "success", playbackUrl: masterPlaylistKey };
-    } catch (err: any) {
-      console.error(`\n[Job ${job.id}] Failed:`, err.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`\n[Job ${job.id}] Failed:`, message);
 
-      await notifyApiStatus(videoId, "failed", { errorReason: err.message });
+      await notifyApiStatus(videoId, "failed", { errorReason: message });
 
-      throw err;
+      throw error;
     } finally {
-      await fsp.rm(jobWorkspace, { recursive: true, force: true }).catch(() => {});
+      await fsp.rm(jobWorkspace, { recursive: true, force: true }).catch((error: unknown) => {
+        console.error(`[Job ${job.id}] Cleanup failed:`, error);
+      });
       console.log(`[Job ${job.id}] Cleaned up local workspace.`);
     }
   },

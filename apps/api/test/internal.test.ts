@@ -1,7 +1,8 @@
+import { treaty } from "@elysiajs/eden";
 import { describe, expect, it, mock } from "bun:test";
 
 // Mock DB and storage before importing the controller
-mock.module("@vidcastx/database/client", () => ({
+void mock.module("@vidcastx/database/client", () => ({
   db: {
     update: () => ({
       set: () => ({
@@ -20,23 +21,23 @@ const drizzleStubs = {
   inArray: (col: unknown, vals: unknown[]) => ({ col, vals }),
 };
 
-mock.module("@vidcastx/database", () => ({
+void mock.module("@vidcastx/database", () => ({
   ...drizzleStubs,
   alias: () => ({}),
   sql: {},
 }));
 
-mock.module("drizzle-orm", () => drizzleStubs);
+void mock.module("drizzle-orm", () => drizzleStubs);
 
-mock.module("drizzle-orm/sql", () => ({
+void mock.module("drizzle-orm/sql", () => ({
   sql: {},
 }));
 
-mock.module("drizzle-orm/pg-core", () => ({
+void mock.module("drizzle-orm/pg-core", () => ({
   alias: () => ({}),
 }));
 
-mock.module("@vidcastx/database/schema/video-schema", () => ({
+void mock.module("@vidcastx/database/schema/video-schema", () => ({
   videos: {
     id: "id",
     status: "status",
@@ -45,7 +46,7 @@ mock.module("@vidcastx/database/schema/video-schema", () => ({
   },
 }));
 
-mock.module("@vidcastx/storage", () => ({
+void mock.module("@vidcastx/storage", () => ({
   initMultipartUpload: () => Promise.resolve("mock-upload-id"),
   signMultipartPart: () => Promise.resolve("https://s3.example.com/signed-url"),
   completeMultipartUpload: () => Promise.resolve(),
@@ -53,7 +54,7 @@ mock.module("@vidcastx/storage", () => ({
   abortMultipartUpload: () => Promise.resolve(),
 }));
 
-mock.module("@vidcastx/database/utils/id", () => ({
+void mock.module("@vidcastx/database/utils/id", () => ({
   generateId: (prefix: string) => `${prefix}_testgenerated123`,
 }));
 
@@ -61,7 +62,7 @@ mock.module("@vidcastx/database/utils/id", () => ({
 const TEST_JWT_SECRET = "test-jwt-secret-for-testing-only-32chars!";
 const TEST_TRANSCODER_SECRET = "test-transcoder-secret";
 
-mock.module("../src/env", () => ({
+void mock.module("../src/env", () => ({
   env: {
     JWT_SECRET: TEST_JWT_SECRET,
     TRANSCODER_SECRET: TEST_TRANSCODER_SECRET,
@@ -72,177 +73,127 @@ mock.module("../src/env", () => ({
 
 // Import after mocks
 const { default: internalController } = await import("../src/modules/internal");
+const api = treaty(internalController);
 
-function req(path: string, init?: RequestInit) {
-  return new Request(`http://localhost${path}`, init);
-}
-
-function jsonPost(path: string, body: Record<string, unknown>, headers?: Record<string, string>) {
-  return req(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...headers },
-    body: JSON.stringify(body),
+async function getValidToken(): Promise<string> {
+  const { data } = await api.internal.token.post({
+    clientId: "worker-transcoder",
+    clientSecret: TEST_TRANSCODER_SECRET,
   });
-}
-
-function jsonPatch(path: string, body: Record<string, unknown>, headers?: Record<string, string>) {
-  return req(path, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...headers },
-    body: JSON.stringify(body),
-  });
+  if (!data?.access_token) throw new Error("failed to obtain test token");
+  return data.access_token;
 }
 
 describe("Internal Controller — M2M Authentication", () => {
   describe("POST /internal/token", () => {
     it("grants token with valid credentials", async () => {
-      const res = await internalController.handle(
-        jsonPost("/internal/token", {
-          clientId: "worker-transcoder",
-          clientSecret: TEST_TRANSCODER_SECRET,
-        }),
-      );
+      const { data, status } = await api.internal.token.post({
+        clientId: "worker-transcoder",
+        clientSecret: TEST_TRANSCODER_SECRET,
+      });
 
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data.access_token).toBeDefined();
-      expect(data.token_type).toBe("Bearer");
-      expect(data.expires_in).toBe(3600);
+      expect(status).toBe(200);
+      expect(data?.access_token).toBeDefined();
+      expect(data?.token_type).toBe("Bearer");
+      expect(data?.expires_in).toBe(3600);
     });
 
     it("rejects invalid client secret", async () => {
-      const res = await internalController.handle(
-        jsonPost("/internal/token", {
-          clientId: "worker-transcoder",
-          clientSecret: "wrong-secret",
-        }),
-      );
+      const { data, status } = await api.internal.token.post({
+        clientId: "worker-transcoder",
+        clientSecret: "wrong-secret",
+      });
 
-      expect(res.status).toBe(401);
-      const data = await res.json();
-      expect(data.error).toBe("Invalid client credentials");
+      expect(status).toBe(401);
+      expect(data).toBeNull();
     });
 
     it("rejects unknown client ID", async () => {
-      const res = await internalController.handle(
-        jsonPost("/internal/token", {
-          clientId: "unknown-worker",
-          clientSecret: "some-secret",
-        }),
-      );
+      const { status } = await api.internal.token.post({
+        clientId: "unknown-worker",
+        clientSecret: "some-secret",
+      });
 
-      expect(res.status).toBe(401);
+      expect(status).toBe(401);
     });
 
     it("rejects empty credentials", async () => {
-      const res = await internalController.handle(
-        jsonPost("/internal/token", {
-          clientId: "",
-          clientSecret: "",
-        }),
-      );
+      const { status } = await api.internal.token.post({
+        clientId: "",
+        clientSecret: "",
+      });
 
       // Elysia returns 422 for TypeBox validation failures (minLength: 1)
-      expect(res.status).toBe(422);
+      expect(status).toBe(422);
     });
   });
 
   describe("PATCH /internal/videos/:id/status", () => {
-    async function getValidToken(): Promise<string> {
-      const res = await internalController.handle(
-        jsonPost("/internal/token", {
-          clientId: "worker-transcoder",
-          clientSecret: TEST_TRANSCODER_SECRET,
-        }),
-      );
-      const data = await res.json();
-      return data.access_token;
-    }
-
     it("updates video status with valid token", async () => {
       const token = await getValidToken();
 
-      const res = await internalController.handle(
-        jsonPatch(
-          "/internal/videos/vid_test123/status",
-          { status: "processing" },
-          { Authorization: `Bearer ${token}` },
-        ),
-      );
+      const { data, status } = await api.internal
+        .videos({ id: "vid_test123" })
+        .status.patch({ status: "processing" }, { headers: { Authorization: `Bearer ${token}` } });
 
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data.success).toBe(true);
+      expect(status).toBe(200);
+      expect(data?.success).toBe(true);
     });
 
     it("marks video as ready with playback URL", async () => {
       const token = await getValidToken();
 
-      const res = await internalController.handle(
-        jsonPatch(
-          "/internal/videos/vid_test123/status",
-          {
-            status: "ready",
-            playbackUrl: "processed/org_123/vid_test123/master.m3u8",
-          },
-          { Authorization: `Bearer ${token}` },
-        ),
+      const { status } = await api.internal.videos({ id: "vid_test123" }).status.patch(
+        {
+          status: "ready",
+          playbackKey: "processed/org_123/vid_test123/master.m3u8",
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      expect(res.status).toBe(200);
+      expect(status).toBe(200);
     });
 
     it("marks video as failed with error reason", async () => {
       const token = await getValidToken();
 
-      const res = await internalController.handle(
-        jsonPatch(
-          "/internal/videos/vid_test123/status",
-          {
-            status: "failed",
-            errorReason: "FFmpeg encoding failed",
-          },
-          { Authorization: `Bearer ${token}` },
-        ),
+      const { status } = await api.internal.videos({ id: "vid_test123" }).status.patch(
+        {
+          status: "failed",
+          errorReason: "FFmpeg encoding failed",
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      expect(res.status).toBe(200);
+      expect(status).toBe(200);
     });
 
     it("rejects invalid status value", async () => {
       const token = await getValidToken();
 
-      const res = await internalController.handle(
-        jsonPatch(
-          "/internal/videos/vid_test123/status",
-          { status: "nonexistent" },
-          { Authorization: `Bearer ${token}` },
-        ),
+      const { status } = await api.internal.videos({ id: "vid_test123" }).status.patch(
+        // @ts-expect-error — intentionally sending invalid status to test 422 path
+        { status: "nonexistent" },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       // Elysia returns 422 for TypeBox validation failures
-      expect(res.status).toBe(422);
+      expect(status).toBe(422);
     });
 
     it("rejects request without bearer token", async () => {
-      const res = await internalController.handle(
-        jsonPatch("/internal/videos/vid_test123/status", { status: "processing" }),
-      );
+      const { status } = await api.internal.videos({ id: "vid_test123" }).status.patch({ status: "processing" });
 
       // Should fail auth — either 401 or 403
-      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(status).toBeGreaterThanOrEqual(400);
     });
 
     it("rejects request with invalid token", async () => {
-      const res = await internalController.handle(
-        jsonPatch(
-          "/internal/videos/vid_test123/status",
-          { status: "processing" },
-          { Authorization: "Bearer fake-jwt-token" },
-        ),
-      );
+      const { status } = await api.internal
+        .videos({ id: "vid_test123" })
+        .status.patch({ status: "processing" }, { headers: { Authorization: "Bearer fake-jwt-token" } });
 
-      expect(res.status).toBeGreaterThanOrEqual(400);
+      expect(status).toBeGreaterThanOrEqual(400);
     });
   });
 });

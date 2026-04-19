@@ -121,8 +121,7 @@ export function initAuth(options: InitAuthOptions) {
       },
       set: async (key, value, ttl) => {
         // `ttl` is in seconds. `"EX"` tells ioredis to apply it as a TTL.
-        if (ttl) await redis.set(key, value, "EX", ttl);
-        else await redis.set(key, value);
+        await (ttl ? redis.set(key, value, "EX", ttl) : redis.set(key, value));
       },
       delete: async (key) => {
         await redis.del(key);
@@ -153,11 +152,12 @@ export function initAuth(options: InitAuthOptions) {
       requireEmailVerification: true,
       minPasswordLength: 8,
       maxPasswordLength: 32,
+      // eslint-disable-next-line @typescript-eslint/require-await -- BetterAuth expects async signature even without awaited work
       sendResetPassword: async ({ user, url }) => {
         // TODO: wire up a real transactional email provider (Resend/Postmark).
         // For now we log so local dev can copy the URL out of stdout.
-        console.log("Send password reset email to:", user.email);
-        console.log("Password reset URL:", url);
+        console.warn("Send password reset email to:", user.email);
+        console.warn("Password reset URL:", url);
       },
     },
 
@@ -167,10 +167,11 @@ export function initAuth(options: InitAuthOptions) {
       sendOnSignUp: true,
       sendOnSignIn: true,
       expiresIn: 60, // seconds
+      // eslint-disable-next-line @typescript-eslint/require-await -- BetterAuth expects async signature even without awaited work
       sendVerificationEmail: async ({ user, url }) => {
         // TODO: wire up a real transactional email provider (Resend/Postmark).
-        console.log("Send verification email to:", user.email);
-        console.log("Verification URL:", url);
+        console.warn("Send verification email to:", user.email);
+        console.warn("Verification URL:", url);
       },
     },
 
@@ -393,7 +394,7 @@ export function initAuth(options: InitAuthOptions) {
               }
             }
 
-            if (ctx?.context?.session?.user.id) {
+            if (ctx?.context.session?.user.id) {
               const [userData] = await db
                 .select({ deletedAt: userTable.deletedAt })
                 .from(userTable)
@@ -454,8 +455,8 @@ export function initAuth(options: InitAuthOptions) {
       disabled: true,
       disableColors: false,
       level: "warn",
-      log: (level, message, ...args) => {
-        console.log(`[${level}] ${message}`, ...args);
+      log: (level, message, ...args: unknown[]) => {
+        console.warn(`[${level}] ${message}`, ...args);
       },
     },
 
@@ -522,6 +523,7 @@ export function initAuth(options: InitAuthOptions) {
     ...authOptions,
 
     plugins: [
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- plugins is always defined per BetterAuth types, but kept defensive
       ...(authOptions.plugins ?? []),
 
       customSession(async ({ user, session }) => {

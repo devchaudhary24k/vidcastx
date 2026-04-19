@@ -1,1 +1,48 @@
-npx lint-staged
+# ─── Pre-commit: lint + format staged files + migration gate ────
+
+echo ""
+echo "→ Pre-commit checks"
+echo ""
+
+# Migration gate: if schema files are staged but no migration file is staged,
+# block. Matches .claude/hooks/block-missing-migration.sh (protects humans too).
+staged="$(git diff --cached --name-only --diff-filter=d)"
+
+if [ -n "$staged" ]; then
+  schema_changed=0
+  migration_added=0
+  while IFS= read -r f; do
+    case "$f" in
+      packages/database/src/schema/*) schema_changed=1 ;;
+      packages/database/src/migrations/*|packages/database/migrations/*) migration_added=1 ;;
+    esac
+  done <<< "$staged"
+
+  if [ "$schema_changed" -eq 1 ] && [ "$migration_added" -eq 0 ]; then
+    echo "✖ Schema changed but no migration staged."
+    echo ""
+    echo "   Staged schema files:"
+    echo "$staged" | grep '^packages/database/src/schema/' | sed 's/^/     • /'
+    echo ""
+    echo "   Run:  pnpm run db:migrate -- --name=\"<snake_case_name>\""
+    echo "   Then git add the generated migration and re-commit."
+    echo ""
+    exit 1
+  fi
+fi
+
+# Lint-staged: eslint --fix + prettier --write on staged files only.
+echo "  • lint-staged"
+echo ""
+
+if ! npx lint-staged; then
+  echo ""
+  echo "✖ Pre-commit failed — fix issues above and re-stage."
+  echo "  Bypass (not recommended): git commit --no-verify"
+  echo ""
+  exit 1
+fi
+
+echo ""
+echo "✓ Staged files clean"
+echo ""

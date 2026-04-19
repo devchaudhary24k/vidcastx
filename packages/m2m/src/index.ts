@@ -5,7 +5,7 @@ export class MachineClient {
 
   // Internal Cache State
   private accessToken: string | null = null;
-  private tokenExpirationTime: number = 0;
+  private tokenExpirationTime = 0;
 
   constructor(config: { apiUrl: string; clientId: string; clientSecret: string }) {
     this.apiUrl = config.apiUrl;
@@ -21,12 +21,12 @@ export class MachineClient {
     const now = Date.now();
 
     // CACHE HIT: Token is valid for at least 60 more seconds
-    if (this.accessToken && now < this.tokenExpirationTime - 60000) {
+    if (this.accessToken && now < this.tokenExpirationTime - 60_000) {
       return this.accessToken;
     }
 
     // CACHE MISS: Fetch new token
-    console.log(`[${this.clientId}] Requesting new M2M Access Token...`);
+    console.warn(`[${this.clientId}] Requesting new M2M Access Token...`);
 
     const response = await fetch(`${this.apiUrl}/api/internal/token`, {
       method: "POST",
@@ -42,11 +42,11 @@ export class MachineClient {
       throw new Error(`Failed to authenticate ${this.clientId}: ${response.status} ${errText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { access_token: string; expires_in: number };
     this.accessToken = data.access_token;
     this.tokenExpirationTime = now + data.expires_in * 1000;
 
-    return this.accessToken!;
+    return this.accessToken;
   }
 
   /**
@@ -60,11 +60,9 @@ export class MachineClient {
     const token = await this.getAccessToken();
 
     // Merge the Authorization header with any other headers passed in
-    const headers = {
-      "Content-Type": "application/json",
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    };
+    const headers = new Headers(options.headers);
+    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    headers.set("Authorization", `Bearer ${token}`);
 
     const response = await fetch(`${this.apiUrl}${endpoint}`, {
       ...options,

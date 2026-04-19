@@ -53,7 +53,7 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef }:
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
+    const file = e.dataTransfer.files[0];
     if (file) {
       handleFile(file);
     }
@@ -86,9 +86,9 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef }:
           : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/25",
         previewUrl ? "border-border bg-background p-0" : "",
       )}
-      onDragOver={!previewUrl ? onDragOver : undefined}
-      onDragLeave={!previewUrl ? onDragLeave : undefined}
-      onDrop={!previewUrl ? onDrop : undefined}
+      onDragOver={previewUrl ? undefined : onDragOver}
+      onDragLeave={previewUrl ? undefined : onDragLeave}
+      onDrop={previewUrl ? undefined : onDrop}
     >
       <CardContent className="p-0">
         <form.Field name="file">
@@ -97,7 +97,25 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef }:
             return (
               <Field data-invalid={isInvalid} className="space-y-0">
                 <div className="w-full">
-                  {!previewUrl ? (
+                  {previewUrl ? (
+                    <div className="relative aspect-video w-full bg-black">
+                      <video src={previewUrl} controls className="h-full w-full object-contain" />
+                      <div className="absolute top-0 right-0 left-0 bg-gradient-to-b from-black/50 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
+                        <div className="flex justify-end">
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="h-8 gap-2"
+                            onClick={clearFile}
+                          >
+                            <X className="h-4 w-4" />
+                            Replace Video
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
                     <div
                       className="flex cursor-pointer flex-col items-center justify-center py-16 text-center"
                       onClick={() => fileInputRef.current?.click()}
@@ -116,24 +134,6 @@ export function VideoDropzone({ form, previewUrl, setPreviewUrl, fileInputRef }:
                       <p className="text-muted-foreground mt-2 max-w-xs text-sm">
                         Support for MP4, MOV, and WebM files up to 5GB
                       </p>
-                    </div>
-                  ) : (
-                    <div className="relative aspect-video w-full bg-black">
-                      <video src={previewUrl} controls className="h-full w-full object-contain" />
-                      <div className="absolute top-0 right-0 left-0 bg-gradient-to-b from-black/50 to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
-                        <div className="flex justify-end">
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="h-8 gap-2"
-                            onClick={clearFile}
-                          >
-                            <X className="h-4 w-4" />
-                            Replace Video
-                          </Button>
-                        </div>
-                      </div>
                     </div>
                   )}
                   <Input

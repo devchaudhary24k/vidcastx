@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
-import { AvatarUploader } from "#app/components/avatar-uploader";
-import { updateUser } from "#app/features/onboarding/api/update-user";
-import { useUser } from "#app/lib/use-user";
 import { ArrowRight } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidcastx/ui/components/card";
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
+
+import { AvatarUploader } from "#app/components/avatar-uploader";
+import { updateUser } from "#app/features/onboarding/api/update-user";
+import { useUser } from "#app/lib/use-user";
 
 import { basicInfoSchema } from "../validators/schema";
 
@@ -21,8 +22,8 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
 
   const form = useForm({
     defaultValues: {
-      firstName: session?.user?.firstName || "",
-      lastName: session?.user?.lastName || "",
+      firstName: session?.user.firstName ?? "",
+      lastName: session?.user.lastName ?? "",
       recoveryEmail: "",
       avatarUrl: "",
     },
@@ -53,7 +54,7 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then(() => {});
+            void form.handleSubmit();
           }}
           className="space-y-6"
         >
@@ -81,7 +82,9 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="John"
                       aria-invalid={isInvalid}
                     />
@@ -102,7 +105,9 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="Doe"
                       aria-invalid={isInvalid}
                     />
@@ -125,7 +130,9 @@ export const Step1BasicInfo: React.FC<StepProps> = ({ onComplete }) => {
                     type="email"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="john.doe@backup.com"
                     aria-invalid={isInvalid}
                   />

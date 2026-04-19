@@ -1,3 +1,6 @@
+import { Fragment } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,21 +38,51 @@ const sampleNotifications = [
   },
 ];
 
+const LABEL_OVERRIDES: Record<string, string> = {
+  api: "API",
+  "api-keys": "API Keys",
+};
+
+function humanize(segment: string): string {
+  if (LABEL_OVERRIDES[segment]) return LABEL_OVERRIDES[segment];
+  return segment
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function useBreadcrumbs() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const segments = pathname.split("/").filter(Boolean);
+  return segments.map((segment, i) => ({
+    href: "/" + segments.slice(0, i + 1).join("/"),
+    label: humanize(segment),
+    isLast: i === segments.length - 1,
+  }));
+}
+
 export function Header() {
+  const crumbs = useBreadcrumbs();
+
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+    <header className="mx-2 flex h-16 shrink-0 items-center justify-between gap-2 border-b px-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
       <div className="flex items-center gap-2">
         <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Separator orientation="vertical" className="mr-2 data-vertical:h-4 data-vertical:self-center" />
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">Building Your Application</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-            </BreadcrumbItem>
+            {crumbs.map((crumb, i) => (
+              <Fragment key={crumb.href}>
+                {i > 0 && <BreadcrumbSeparator />}
+                <BreadcrumbItem>
+                  {crumb.isLast ? (
+                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink render={<Link to={crumb.href} />}>{crumb.label}</BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+              </Fragment>
+            ))}
           </BreadcrumbList>
         </Breadcrumb>
       </div>

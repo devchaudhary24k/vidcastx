@@ -32,7 +32,9 @@ export function VideoDetails({ form }: VideoDetailsProps) {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     aria-invalid={isInvalid}
                     placeholder="e.g. My Awesome Project Walkthrough"
                     className="pl-9"
@@ -57,7 +59,9 @@ export function VideoDetails({ form }: VideoDetailsProps) {
                     name={field.name}
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     aria-invalid={isInvalid}
                     placeholder="Tell viewers what your video is about..."
                     className="min-h-[150px] resize-y pl-9"

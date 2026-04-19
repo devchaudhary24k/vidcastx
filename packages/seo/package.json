@@ -23,7 +23,7 @@
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/prettier": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
-    "eslint": "^10.0.2"
+    "eslint": "^9.39.4"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.10",

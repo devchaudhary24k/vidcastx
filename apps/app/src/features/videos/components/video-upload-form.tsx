@@ -32,7 +32,7 @@ export function VideoUploadForm() {
     });
 
     if (videoId) {
-      router.navigate({ to: "/dashboard/projects" });
+      void router.navigate({ to: "/dashboard/projects" });
     }
   });
 
@@ -98,7 +98,9 @@ export function VideoUploadForm() {
                 variant="outline"
                 size="lg"
                 className="w-full"
-                onClick={() => router.history.back()}
+                onClick={() => {
+                  router.history.back();
+                }}
                 disabled={isUploading}
               >
                 Cancel

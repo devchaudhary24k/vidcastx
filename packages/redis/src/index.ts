@@ -2,7 +2,7 @@ import { Redis } from "ioredis";
 
 import { env } from "./env";
 
-const globalForRedis = global as unknown as { redis: Redis | undefined };
+const globalForRedis = globalThis as unknown as { redis: Redis | undefined };
 
 const createRedisClient = () => {
   const client = new Redis({

@@ -21,11 +21,9 @@ export function NavSecondary({
     <SidebarMenu className={className}>
       {items.map((item) => (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild size="sm" className={cn(isCollapsed && "justify-center")}>
-            <a href={item.url}>
-              <item.icon className="size-4" />
-              <span>{item.title}</span>
-            </a>
+          <SidebarMenuButton render={<a href={item.url} />} size="sm" className={cn(isCollapsed && "justify-center")}>
+            <item.icon className="size-4" />
+            <span>{item.title}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Library (Node/Bun, no DOM)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    /* ─── Library defaults ───────────────────────────── */
+    "lib": ["ES2023"],
+    "types": ["node"]
+  }
+}

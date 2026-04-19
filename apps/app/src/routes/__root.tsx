@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import TanStackQueryProvider from "../integrations/tanstack-query/root-provider";
+import { useTheme } from "../lib/use-theme";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
@@ -18,7 +19,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: "utf-8",
+        charSet: "utf8",
       },
       {
         name: "viewport",
@@ -48,7 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="font-sans [overflow-wrap:anywhere] antialiased selection:bg-[rgba(79,184,178,0.24)]">
         <TanStackQueryProvider>
           {children}
-          <Toaster richColors position="bottom-right" />
+          <AppToaster />
           <TanStackDevtools
             config={{
               position: "bottom-right",
@@ -66,4 +67,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
+}
+
+function AppToaster() {
+  const { mode } = useTheme();
+  const resolved = mode === "auto" ? "system" : mode;
+  return <Toaster richColors position="bottom-right" theme={resolved} />;
 }

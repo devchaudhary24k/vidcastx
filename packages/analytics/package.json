@@ -23,7 +23,8 @@
     "@types/react-dom": "^19.2.3",
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/prettier": "workspace:*",
-    "@vidcastx/typescript-config": "workspace:*"
+    "@vidcastx/typescript-config": "workspace:*",
+    "eslint": "^9.39.4"
   },
   "dependencies": {
     "@next/third-parties": "^16.1.6",

@@ -22,7 +22,7 @@
     "@vidcastx/prettier": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
     "dotenv-cli": "^11.0.0",
-    "eslint": "^10.0.2"
+    "eslint": "^9.39.4"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.5.3",

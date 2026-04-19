@@ -13,13 +13,13 @@ import {
 } from "@vidcastx/ui/components/dropdown-menu";
 import { cn } from "@vidcastx/ui/lib/utils";
 
-type Notification = {
+interface Notification {
   id: string;
   avatar: string;
   fallback: string;
   text: string;
   time: string;
-};
+}
 
 export function NotificationsPopover({
   notifications,
@@ -30,10 +30,17 @@ export function NotificationsPopover({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className={cn("rounded-full", className)} aria-label="Open notifications">
-          <BellIcon className="size-5" />
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("rounded-full", className)}
+            aria-label="Open notifications"
+          />
+        }
+      >
+        <BellIcon className="size-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" className="my-6 w-80">
         <DropdownMenuGroup>

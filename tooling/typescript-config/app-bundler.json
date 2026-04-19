@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "App (Vite/Bundler)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    /* ─── Modules (bundler) ──────────────────────────── */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+
+    /* ─── Emit ───────────────────────────────────────── */
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+
+    /* ─── React / DOM ────────────────────────────────── */
+    "jsx": "react-jsx",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+
+    /* ─── Extra bundler-era safety ───────────────────── */
+    "noUncheckedSideEffectImports": true
+  }
+}

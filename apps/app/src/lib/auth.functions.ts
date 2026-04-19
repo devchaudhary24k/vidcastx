@@ -1,10 +1,13 @@
-import type { AuthSession } from "#app/lib/auth";
+import type { Organization } from "@vidcastx/auth";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
+
+import type { AuthSession } from "#app/lib/auth";
+import { env } from "#app/env";
 import { tryCatch } from "#app/utils/try-catch";
 
 function getApiUrl() {
-  return process.env.API_URL || "http://localhost:4001";
+  return env.API_URL;
 }
 
 function getAuthHeaders(): Record<string, string> {
@@ -29,10 +32,10 @@ export const getSession = createServerFn({ method: "GET" }).handler(async (): Pr
 
   if (err || !res.ok) return null;
 
-  const data = await res.json();
+  const data = (await res.json()) as AuthSession | null;
   if (!data?.session) return null;
 
-  return data as AuthSession;
+  return data;
 });
 
 export const ensureSession = createServerFn({ method: "GET" }).handler(async (): Promise<AuthSession> => {
@@ -43,14 +46,14 @@ export const ensureSession = createServerFn({ method: "GET" }).handler(async ():
     }),
   );
 
-  const data = err ? null : res.ok ? await res.json() : null;
+  const data: AuthSession | null = err ? null : res.ok ? ((await res.json()) as AuthSession | null) : null;
 
   if (!data?.session) throw new Error("Unauthorized");
 
-  return data as AuthSession;
+  return data;
 });
 
-export const getOrganizations = createServerFn({ method: "GET" }).handler(async () => {
+export const getOrganizations = createServerFn({ method: "GET" }).handler(async (): Promise<Organization[]> => {
   const [res, err] = await tryCatch(
     fetch(`${getApiUrl()}/api/auth/organization/list`, {
       method: "GET",
@@ -60,7 +63,6 @@ export const getOrganizations = createServerFn({ method: "GET" }).handler(async 
 
   if (err || !res.ok) return [];
 
-  const data = await res.json();
-  // Filter out deleted organizations
-  return (data ?? []).filter((org: { deletedAt: string | null }) => org.deletedAt === null);
+  const data = (await res.json()) as (Organization & { deletedAt?: string | null })[] | null;
+  return (data ?? []).filter((org) => !org.deletedAt);
 });

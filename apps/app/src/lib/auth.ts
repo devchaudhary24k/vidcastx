@@ -1,7 +1,8 @@
 import type { Auth } from "@vidcastx/auth";
-import { env } from "#app/env";
 import { inferAdditionalFields, inferOrgAdditionalFields, organizationClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+
+import { env } from "#app/env";
 
 export const auth = createAuthClient({
   baseURL: env.VITE_API_URL,

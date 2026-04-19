@@ -1,20 +1,12 @@
-//  @ts-check
+// @ts-check
+import { config as vidcastxApp } from "@vidcastx/eslint-config/tanstack-app";
 
-import { tanstackConfig } from "@tanstack/eslint-config";
-
+/** @type {import("eslint").Linter.Config} */
 export default [
-  ...tanstackConfig,
+  /* ─── Vidcastx strict layer (extends base tseslint strictTypeChecked) ─ */
+  ...vidcastxApp,
+
   {
-    rules: {
-      "import/no-cycle": "off",
-      "import/order": "off",
-      "sort-imports": "off",
-      "@typescript-eslint/array-type": "off",
-      "@typescript-eslint/require-await": "off",
-      "pnpm/json-enforce-catalog": "off",
-    },
-  },
-  {
-    ignores: ["eslint.config.js", "prettier.config.js"],
+    ignores: ["eslint.config.js", "prettier.config.js", "src/routeTree.gen.ts", ".output/**", ".vinxi/**"],
   },
 ];

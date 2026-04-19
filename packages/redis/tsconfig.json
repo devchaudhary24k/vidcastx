@@ -1,7 +1,6 @@
 {
-  "extends": "@vidcastx/typescript-config/nextjs.json",
+  "extends": "@vidcastx/typescript-config/library.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@vidcastx/redis/*": ["./src/*"]
     }

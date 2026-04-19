@@ -63,7 +63,15 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
           )}
         </div>
 
-        <input type="file" accept="image/*" ref={fileInputRef} onChange={onFileChange} className="hidden" />
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={(e) => {
+            void onFileChange(e);
+          }}
+          className="hidden"
+        />
       </div>
 
       <ImageCropperModal
@@ -82,7 +90,13 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 function readFile(file: File): Promise<string> {
   return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.addEventListener("load", () => resolve(reader.result as string), false);
+    reader.addEventListener(
+      "load",
+      () => {
+        resolve(reader.result as string);
+      },
+      false,
+    );
     reader.readAsDataURL(file);
   });
 }

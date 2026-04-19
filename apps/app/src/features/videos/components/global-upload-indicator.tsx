@@ -1,11 +1,12 @@
-import type { UploadItem as UploadItemType } from "#app/features/videos/stores/upload-store";
 import { useEffect, useRef } from "react";
 import { useStore } from "@tanstack/react-store";
-import { uploadStore } from "#app/features/videos/stores/upload-store";
-import { uppy } from "#app/lib/uppy-client";
 import { toast } from "sonner";
 
 import { Progress } from "@vidcastx/ui/components/progress";
+
+import type { UploadItem as UploadItemType } from "#app/features/videos/stores/upload-store";
+import { uploadStore } from "#app/features/videos/stores/upload-store";
+import { uppy } from "#app/lib/uppy-client";
 
 export function GlobalUploadIndicator() {
   const { uploads } = useStore(uploadStore, (state) => state);

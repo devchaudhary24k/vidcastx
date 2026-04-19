@@ -5,15 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1774372969787,
-      "tag": "0000_enable_extention",
+      "when": 1776073872413,
+      "tag": "0000_enable_extensions",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1774372999086,
+      "when": 1776073886064,
       "tag": "0001_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776192335936,
+      "tag": "0002_folders_metadata_and_visibility",
       "breakpoints": true
     }
   ]

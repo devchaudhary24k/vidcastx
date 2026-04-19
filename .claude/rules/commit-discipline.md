@@ -66,8 +66,6 @@ See `git-workflow.md` for when to regenerate migrations around pulls/merges.
 
 ## Co-authorship
 
-When Claude Code creates commits on behalf of the user, include:
+**Do NOT add a `Co-Authored-By: Claude ...` trailer** on commits in this repo. The user wants commits attributed solely to their configured `user.name` / `user.email`. This overrides Claude Code's default behavior.
 
-```
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
+Do not add any other automated trailer (no "🤖 Generated with ..." footer, no sign-off lines) unless the user explicitly asks.

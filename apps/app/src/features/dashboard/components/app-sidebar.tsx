@@ -185,7 +185,11 @@ export function AppSidebar({
           <TeamSwitcher organizations={organizations} activeOrganizationId={activeOrganizationId} />
         </SidebarHeader>
         <SidebarContent className="gap-4 px-2 py-4">
-          <NavSearch onClick={() => setCommandMenuOpen(true)} />
+          <NavSearch
+            onClick={() => {
+              setCommandMenuOpen(true);
+            }}
+          />
           <NavMain label="Platform" items={data.navMain} />
           <NavMain label="Organization" items={data.navAdmin} />
         </SidebarContent>

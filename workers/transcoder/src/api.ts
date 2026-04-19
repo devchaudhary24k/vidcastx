@@ -11,7 +11,14 @@ const m2mClient = new MachineClient({
 export async function notifyApiStatus(
   videoId: string,
   status: "processing" | "ready" | "failed",
-  data?: { playbackUrl?: string; errorReason?: string },
+  data?: {
+    errorReason?: string;
+    thumbnailKey?: string;
+    previewKey?: string;
+    playbackKey?: string;
+    duration?: number;
+    resolution?: string;
+  },
 ) {
   try {
     await m2mClient.request(`/api/internal/videos/${videoId}/status`, {
@@ -20,8 +27,8 @@ export async function notifyApiStatus(
     });
 
     console.log(`[Worker API] Successfully marked video ${videoId} as ${status}`);
-  } catch (err) {
-    console.error(`[Worker API] Network error notifying API for video ${videoId}:`, err);
-    throw err; // Throw so BullMQ knows the job ultimately failed to report back
+  } catch (error) {
+    console.error(`[Worker API] Network error notifying API for video ${videoId}:`, error);
+    throw error; // Throw so BullMQ knows the job ultimately failed to report back
   }
 }

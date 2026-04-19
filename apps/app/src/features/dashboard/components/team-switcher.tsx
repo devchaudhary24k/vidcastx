@@ -1,5 +1,4 @@
 import { useRouter } from "@tanstack/react-router";
-import { auth } from "#app/lib/auth";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,6 +14,8 @@ import {
 } from "@vidcastx/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@vidcastx/ui/components/sidebar";
 
+import { auth } from "#app/lib/auth";
+
 import type { Organization } from "./types";
 import { CreateOrganizationDialog } from "./create-organization-dialog";
 import { Logo } from "./logo";
@@ -29,7 +30,7 @@ export function TeamSwitcher({
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  const activeOrganization = organizations.find((org) => org.id === activeOrganizationId) || organizations[0];
+  const activeOrganization = organizations.find((org) => org.id === activeOrganizationId) ?? organizations[0];
 
   const handleSwitchOrganization = async (org: Organization) => {
     if (org.id === activeOrganizationId) return;
@@ -39,7 +40,7 @@ export function TeamSwitcher({
       fetchOptions: {
         onSuccess() {
           toast.success(`Switching to ${org.name}...`);
-          router.invalidate();
+          void router.invalidate();
         },
         onError() {
           toast.error("Failed to switch organization");
@@ -54,23 +55,25 @@ export function TeamSwitcher({
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="bg-background text-foreground flex aspect-square size-8 items-center justify-center">
-                {activeOrganization.logo ? (
-                  <img src={activeOrganization.logo} alt={activeOrganization.name} className="size-4" />
-                ) : (
-                  <Logo className="size-4" />
-                )}
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{activeOrganization.name}</span>
-                <span className="truncate text-xs">Organization</span>
-              </div>
-            </SidebarMenuButton>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              />
+            }
+          >
+            <div className="bg-background text-foreground flex aspect-square size-8 items-center justify-center">
+              {activeOrganization.logo ? (
+                <img src={activeOrganization.logo} alt={activeOrganization.name} className="size-4" />
+              ) : (
+                <Logo className="size-4" />
+              )}
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">{activeOrganization.name}</span>
+              <span className="truncate text-xs">Organization</span>
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="mb-4 w-(--anchor-width) min-w-56"
@@ -82,7 +85,13 @@ export function TeamSwitcher({
               <DropdownMenuLabel className="text-muted-foreground text-xs">Organizations</DropdownMenuLabel>
             </DropdownMenuGroup>
             {organizations.map((org, index) => (
-              <DropdownMenuItem key={org.id} onClick={() => handleSwitchOrganization(org)} className="gap-2 p-2">
+              <DropdownMenuItem
+                key={org.id}
+                onClick={() => {
+                  void handleSwitchOrganization(org);
+                }}
+                className="gap-2 p-2"
+              >
                 <div className="flex size-6 items-center justify-center border">
                   {org.logo ? (
                     <img src={org.logo} alt={org.name} className="size-4 shrink-0" />
@@ -96,7 +105,12 @@ export function TeamSwitcher({
             ))}
             <DropdownMenuSeparator />
             <CreateOrganizationDialog>
-              <DropdownMenuItem className="gap-2 p-2" onSelect={(e) => e.preventDefault()}>
+              <DropdownMenuItem
+                className="gap-2 p-2"
+                onSelect={(e) => {
+                  e.preventDefault();
+                }}
+              >
                 <div className="bg-background flex size-6 items-center justify-center border">
                   <Plus className="size-4" />
                 </div>

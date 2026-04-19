@@ -4,10 +4,10 @@ import Uppy from "@uppy/core";
 
 import { uploadActions } from "../features/videos/stores/upload-store";
 
-type UppyMeta = {
+interface UppyMeta {
   videoId: string;
   [key: string]: unknown; // Uppy requires an index signature for other dynamic meta it might add
-};
+}
 
 export const uppy = new Uppy<UppyMeta>({
   autoProceed: true,
@@ -55,10 +55,12 @@ uppy.use(AwsS3, {
 
   completeMultipartUpload: async (file, { uploadId, parts }) => {
     const videoId = file.meta.videoId as string;
-    const formattedPart = parts.map((part) => ({
-      PartNumber: part.PartNumber!,
-      ETag: part.ETag!,
-    }));
+    const formattedPart = parts
+      .filter((p): p is { PartNumber: number; ETag: string } => p.PartNumber !== undefined && p.ETag !== undefined)
+      .map((part) => ({
+        PartNumber: part.PartNumber,
+        ETag: part.ETag,
+      }));
 
     await client.api.v1.videos({ id: videoId }).multipart.complete.post({
       uploadId,

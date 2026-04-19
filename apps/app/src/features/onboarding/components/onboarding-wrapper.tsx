@@ -24,25 +24,28 @@ export const OnboardingWrapper: React.FC = () => {
       setCurrentStep((prev) => prev + 1);
     } else {
       // Onboarding complete — invalidate router to re-check session, then redirect
-      router.invalidate().then(() => {
-        router.navigate({ to: "/dashboard" });
-      });
+      void router.invalidate().then(() => router.navigate({ to: "/dashboard" }));
     }
   };
 
   const renderStepComponent = () => {
     switch (currentStep) {
-      case 1:
+      case 1: {
         return <Step1BasicInfo onComplete={handleNext} />;
-      case 2:
+      }
+      case 2: {
         return <Step2Organization onComplete={handleNext} />;
+      }
       // Step 3 is skipped
-      case 4:
+      case 4: {
         return <Step4Billing onComplete={handleNext} />;
-      case 5:
+      }
+      case 5: {
         return <Step5InviteMembers onComplete={handleNext} />;
-      default:
+      }
+      default: {
         return null;
+      }
     }
   };
 

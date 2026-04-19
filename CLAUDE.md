@@ -28,12 +28,14 @@ pnpm check-types          # TypeScript type checking across all workspaces
 ### Linting & Formatting
 
 ```bash
-pnpm lint                 # Lint all packages
+pnpm lint                 # Lint all packages (ESLint 9 flat config, type-aware)
 pnpm lint:fix             # Auto-fix lint issues
-pnpm format               # Check formatting
+pnpm format               # Check formatting (Prettier 3)
 pnpm format:fix           # Auto-fix formatting
 pnpm lint:ws              # Check workspace consistency with sherif
 ```
+
+Config lives in `tooling/eslint-config/`, `tooling/typescript-config/`, `tooling/prettier/`. Before modifying any of those, read `.claude/rules/tooling.md` — several flags are explicitly off for documented reasons (e.g. `exactOptionalPropertyTypes`, `noPropertyAccessFromIndexSignature`).
 
 ### Database
 
@@ -63,7 +65,7 @@ docker compose up -d      # Start PostgreSQL, Redis, MinIO locally
 - **`packages/storage`** — AWS S3 abstraction layer.
 - **`packages/redis`** — Shared ioredis client.
 - **`packages/ui`** — Shadcn/Radix component library and the single source of truth for theme tokens.
-- **`tooling/`** — Shared ESLint, Prettier, and TypeScript configurations.
+- **`tooling/`** — Shared ESLint (flat v9), Prettier 3, TypeScript configs. See `.claude/rules/tooling.md` for the full posture (TS strict flags, wired ESLint plugins, Prettier options, Husky hooks, lint-staged).
 
 ### API Design (Elysia)
 
@@ -103,12 +105,15 @@ Each app uses `@t3-oss/env-core` for Zod-validated environment variables defined
 
 ## Code Style Guidelines
 
-From `.github/copilot-instructions.md`:
+Canonical style rules live in `.claude/rules/code-style.md` + `typesafety.md` + `error-handling.md`. Lint enforces most automatically (`unused-imports` autofix, type-aware strict rules, prettier on save).
 
-- Avoid deeply nested code — break into smaller functions
-- Opening braces on the same line
-- Catch specific errors, not generic ones
-- Log error messages and stack traces
+Quick reminders:
+
+- Avoid deeply nested code — break into named helpers.
+- Catch specific error types, never generic `Error`. Log message + stack.
+- No `any`, no non-null assertions, no unchecked casts (see `typesafety.md`).
+- No `enum` / `namespace` — `erasableSyntaxOnly` rejects them. Use `as const` objects or union types.
+- Use `#app/*` subpath imports in `apps/app`, never `process.env.X` directly (always via `env.ts`).
 
 ## API Best Practices (Elysia)
 
@@ -212,3 +217,28 @@ Recent improvements to `apps/api` aligned with Elysia skill best practices:
 - **Simplicity First** — make every change as simple as possible. Touch the minimum code needed.
 - **No Laziness** — find root causes. No temporary fixes. Senior-engineer standards.
 - **Minimal Impact** — changes should only touch what's necessary. Don't introduce regressions on the way to a fix.
+
+## Commits
+
+Commits use the user's configured `user.name` / `user.email`. **Never add a `Co-Authored-By: Claude` trailer, "🤖 Generated with ..." footer, or any other automated attribution** in commit messages or PR bodies. See `.claude/rules/commit-discipline.md`.
+
+## Rules index
+
+Read the relevant rule before acting in that domain:
+
+- `tooling.md` — TS/ESLint/Prettier/Husky posture, which flags are off + why
+- `api.md` — Elysia conventions
+- `frontend.md` — TanStack Start (apps/app) conventions, backend-package boundary
+- `features.md` — `apps/app/src/features/<name>/` structure + barrels
+- `file-conventions.md` — kebab-case filenames, where to put new files
+- `typesafety.md` — no `any`, no casts, no non-null assertions
+- `error-handling.md` — narrow catches, log stack + message, never swallow
+- `env-safety.md` — all env vars go through `env.ts`, never read `.env` directly
+- `database.md` — Drizzle schema + migrations (never `db:push`)
+- `dependencies.md` — never install without explicit user approval
+- `git-workflow.md` — fresh base, merge main on long branches, confirm destructives
+- `commit-discipline.md` — Conventional Commits, one logical change per commit
+- `pre-change-verification.md` — read before edit, trace callers before refactor
+- `response-hygiene.md` — never expose internal fields via API responses
+- `shadcn.md` — never edit `packages/ui/src/components/**`, fix at use-site
+- `code-style.md` — style reminders (most enforced by ESLint)

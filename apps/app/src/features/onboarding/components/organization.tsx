@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { useForm, useStore } from "@tanstack/react-form";
-import { AvatarUploader } from "#app/components/avatar-uploader";
-import { createOrganization } from "#app/features/onboarding/api/create-organization";
 import { ArrowRight, Fingerprint } from "lucide-react";
 
 import { Button } from "@vidcastx/ui/components/button";
@@ -9,10 +7,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@vidc
 import { Field, FieldDescription, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 
+import { AvatarUploader } from "#app/components/avatar-uploader";
+import { createOrganization } from "#app/features/onboarding/api/create-organization";
+
 import { organizationSchema } from "../validators/schema";
 
 interface StepProps {
   onComplete: () => void;
+}
+
+function getInitials(name: string) {
+  if (!name) return "OR";
+  const parts = name.trim().split(" ").filter(Boolean);
+  if (parts.length >= 2) {
+    const first = parts[0]?.[0] ?? "";
+    const second = parts[1]?.[0] ?? "";
+    return (first + second).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
 }
 
 export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
@@ -36,22 +48,11 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
     if (orgName) {
       const slug = orgName
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+        .replaceAll(/[^a-z0-9]+/g, "-")
+        .replaceAll(/^-+|-+$/g, "");
       form.setFieldValue("orgIdentifier", slug);
     }
   }, [orgName, form]);
-
-  const getInitials = (name: string) => {
-    if (!name) return "OR";
-    const parts = name.trim().split(" ").filter(Boolean);
-    if (parts.length >= 2) {
-      const first = parts[0]?.[0] ?? "";
-      const second = parts[1]?.[0] ?? "";
-      return (first + second).toUpperCase();
-    }
-    return name.slice(0, 2).toUpperCase();
-  };
 
   return (
     <Card className="mx-auto max-w-lg">
@@ -64,7 +65,7 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit().then(() => {});
+            void form.handleSubmit();
           }}
           className="space-y-6"
         >
@@ -95,7 +96,9 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="Acme Inc."
                     aria-invalid={isInvalid}
                   />
@@ -121,7 +124,9 @@ export const Step2Organization: React.FC<StepProps> = ({ onComplete }) => {
                       className="pl-9"
                       value={field.state.value}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                      }}
                       placeholder="acme-inc"
                       aria-invalid={isInvalid}
                     />

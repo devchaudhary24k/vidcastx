@@ -1,1 +1,68 @@
-npm run build
+# ─── Pre-push: whole-repo type + lint gate + push-safety guard ──
+# Blocks force-push and direct push to main/dev. Runs type-check and lint
+# even if first fails (full error picture).
+
+# Args piped to pre-push: <remote_name> <remote_url>
+# Stdin: <local_ref> <local_sha> <remote_ref> <remote_sha>  (per line)
+remote_name="${1:-origin}"
+push_lines="$(cat)"
+
+echo ""
+echo "→ Push-safety checks"
+echo ""
+
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$local_ref" ] && continue
+
+  branch="${remote_ref#refs/heads/}"
+
+  # Block push to main / dev / master / develop.
+  case "$branch" in
+    main|master|dev|develop)
+      echo "✖ Refusing to push directly to '$branch' on '$remote_name'."
+      echo "  Open a PR from a feature branch instead."
+      echo "  Bypass (not recommended): git push --no-verify"
+      echo ""
+      exit 1
+      ;;
+  esac
+
+  # Detect force-push: remote non-zero AND remote_sha is not an ancestor of local_sha.
+  # zero_sha = new branch / delete; skip.
+  zero="0000000000000000000000000000000000000000"
+  if [ "$remote_sha" != "$zero" ] && [ "$local_sha" != "$zero" ]; then
+    if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+      echo "✖ Force-push detected on '$branch'."
+      echo "  Rewriting pushed history breaks collaborators."
+      echo "  If you truly need this, confirm with the team and use --force-with-lease."
+      echo ""
+      exit 1
+    fi
+  fi
+done <<< "$push_lines"
+
+echo "  • check-types + lint"
+echo ""
+
+failed=0
+
+if ! pnpm check-types; then
+  failed=1
+fi
+
+echo ""
+
+if ! pnpm lint; then
+  failed=1
+fi
+
+echo ""
+if [ "$failed" -eq 1 ]; then
+  echo "✖ Pre-push failed — fix issues above before pushing."
+  echo "  Bypass (not recommended): git push --no-verify"
+  echo ""
+  exit 1
+fi
+
+echo "✓ All checks passed"
+echo ""

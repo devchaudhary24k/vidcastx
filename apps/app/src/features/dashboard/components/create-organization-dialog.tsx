@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "@tanstack/react-router";
-import { auth } from "#app/lib/auth";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -19,6 +18,8 @@ import {
 import { Field, FieldError, FieldLabel } from "@vidcastx/ui/components/field";
 import { Input } from "@vidcastx/ui/components/input";
 
+import { auth } from "#app/lib/auth";
+
 const createOrgSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   slug: z
@@ -27,7 +28,7 @@ const createOrgSchema = z.object({
     .regex(/^[a-z0-9-]+$/, "Only lowercase letters, numbers, and dashes"),
 });
 
-export function CreateOrganizationDialog({ children }: { children: React.ReactNode }) {
+export function CreateOrganizationDialog({ children }: { children: React.ReactElement }) {
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
 
@@ -46,7 +47,7 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactNo
         toast.success("Organization created successfully");
         setOpen(false);
         form.reset();
-        router.invalidate();
+        void router.invalidate();
       } catch (error) {
         toast.error("Failed to create organization");
         console.error("Failed to create organization:", error);
@@ -56,13 +57,13 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactNo
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger render={children} />
       <DialogContent className="sm:max-w-[425px]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit();
+            void form.handleSubmit();
           }}
         >
           <DialogHeader>
@@ -78,7 +79,9 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactNo
                     id={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="Acme Corp"
                   />
                   <FieldError errors={field.state.meta.errors} />
@@ -93,7 +96,9 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactNo
                     id={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
                     placeholder="acme-corp"
                   />
                   <FieldError errors={field.state.meta.errors} />
@@ -102,7 +107,13 @@ export function CreateOrganizationDialog({ children }: { children: React.ReactNo
             </form.Field>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
               Cancel
             </Button>
             <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>

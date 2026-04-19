@@ -16,21 +16,17 @@ interface M2MPayload {
  * Limits to 10 requests per minute per IP
  */
 class RateLimiter {
-  private readonly attempts: Map<string, number[]> = new Map();
+  private readonly attempts = new Map<string, number[]>();
   private readonly limit = 10;
   private readonly windowMs = 60_000; // 1 minute
 
   isAllowed(ip: string): boolean {
     const now = Date.now();
-
-    if (!this.attempts.has(ip)) {
-      this.attempts.set(ip, []);
-    }
-
-    const timestamps = this.attempts.get(ip)!;
+    const timestamps = this.attempts.get(ip) ?? [];
     const recent = timestamps.filter((t) => now - t < this.windowMs);
 
     if (recent.length >= this.limit) {
+      this.attempts.set(ip, recent);
       return false;
     }
 
@@ -86,7 +82,7 @@ export default new Elysia({
         return status(401, { error: "Invalid client credentials" });
       }
 
-      console.log(`[M2M] Granting token to: ${body.clientId}`);
+      console.warn(`[M2M] Granting token to: ${body.clientId}`);
 
       const token = await m2mJwt.sign({
         role: "internal-worker",
@@ -136,10 +132,18 @@ export default new Elysia({
   .patch(
     "/videos/:id/status",
     async ({ params, body, machine }) => {
-      console.log(`[M2M] Status update from ${machine} for video ${params.id}`);
+      console.warn(`[M2M] Status update from ${machine} for video ${params.id}`);
+      if (body.thumbnailKey || body.previewKey || body.playbackKey) {
+        await VideoService.addProcessingAssets(params.id, {
+          thumbnailKey: body.thumbnailKey,
+          previewKey: body.previewKey,
+          playbackKey: body.playbackKey,
+        });
+      }
       return VideoService.updateProcessingStatus(params.id, body.status, {
-        playbackUrl: body.playbackUrl,
         errorReason: body.errorReason,
+        duration: body.duration,
+        resolution: body.resolution,
       });
     },
     {

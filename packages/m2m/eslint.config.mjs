@@ -1,4 +1,3 @@
-import { config } from "@vidcastx/eslint-config/react-internal";
-
 /** @type {import("eslint").Linter.Config} */
-export default config;
+
+export { config as default } from "@vidcastx/eslint-config/library";
