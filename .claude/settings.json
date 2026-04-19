@@ -22,6 +22,33 @@
       "Bash(node -e *)",
       "Bash(npx tsc --noEmit*)"
     ],
+    "ask": [
+      "Bash(gh pr merge*)",
+      "Bash(gh pr close*)",
+      "Bash(gh release create*)",
+      "Bash(gh release delete*)",
+      "Bash(gh workflow disable*)",
+      "Bash(gh workflow delete*)",
+
+      "Bash(git push --force-with-lease*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git clean -fd*)",
+      "Bash(git branch -D*)",
+      "Bash(git cherry-pick*)",
+      "Bash(git revert*)",
+      "Bash(git rebase*)",
+
+      "Bash(pnpm db:migrate*)",
+
+      "Bash(docker compose down -v*)",
+      "Bash(docker compose rm*)",
+      "Bash(docker system prune*)",
+      "Bash(docker volume prune*)",
+      "Bash(docker volume rm*)",
+
+      "Bash(chmod -R*)"
+    ],
     "deny": [
       "Bash(rm -rf /*)",
       "Bash(rm -rf ~*)",
@@ -45,10 +72,6 @@
       "Bash(git commit --no-verify*)",
       "Bash(git commit *-n *)",
       "Bash(git commit -n)",
-      "Bash(git reset --hard*)",
-      "Bash(git clean -f*)",
-      "Bash(git clean -fd*)",
-      "Bash(git branch -D*)",
       "Bash(git checkout -- .*)",
       "Bash(git checkout .)",
       "Bash(git restore .)",
@@ -82,19 +105,9 @@
       "Bash(yarn global add*)",
       "Bash(npm config set *_authToken*)",
 
-      "Bash(gh pr merge*)",
-      "Bash(gh pr close*)",
-      "Bash(gh release delete*)",
-      "Bash(gh workflow disable*)",
-      "Bash(gh workflow delete*)",
       "Bash(gh auth logout*)",
 
-      "Bash(docker system prune*)",
-      "Bash(docker volume prune*)",
-      "Bash(docker volume rm*)",
-
-      "Bash(sudo *)",
-      "Bash(chmod -R*)"
+      "Bash(sudo *)"
     ]
   },
   "hooks": {
