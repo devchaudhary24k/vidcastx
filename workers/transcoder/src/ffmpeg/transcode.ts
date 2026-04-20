@@ -6,7 +6,7 @@ import { AVMEDIA_TYPE_AUDIO, AVMEDIA_TYPE_VIDEO, FF_ENCODER_AAC, FF_ENCODER_LIBX
 
 import type { StreamVariant } from "./variants";
 import { env } from "../env";
-import { probeVideo } from "./probe";
+import { probeBitrate, probeVideo } from "./probe";
 import { buildStreamVariants } from "./variants";
 
 interface TranscodeOptions {
@@ -50,8 +50,12 @@ export async function runFFmpegTranscode({
   );
   console.log(`[libav] Using Video Encoder: ${VIDEO_ENCODER}`);
 
-  const variants = buildStreamVariants(inputHeight, inputFps);
-  console.log(`[libav] Generating ${variants.length} HLS variants:`, variants.map((v) => v.name).join(", "));
+  const probeStart = Date.now();
+  const probeKbps = await probeBitrate(inputPath, totalDuration, inputFps);
+  console.log(`[libav] Per-title probe: ${probeKbps}kbps (${Date.now() - probeStart}ms)`);
+
+  const variants = buildStreamVariants(inputHeight, inputFps, probeKbps);
+  console.log(`[libav] Ladder (${variants.length} rungs):`, variants.map((v) => `${v.name}@${v.bitrate}k`).join(", "));
 
   const demuxer = await Demuxer.open(inputPath);
 

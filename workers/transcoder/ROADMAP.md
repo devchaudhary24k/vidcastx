@@ -586,9 +586,10 @@ Small-to-moderate. Rough estimate:
 
 ### §1 Per-Title Encoding — cheap-probe tier
 
-- [ ] Add CRF-probe step (`libx264 -preset ultrafast -crf 23 -an -f null -`) returning avg bitrate
-- [ ] Replace hardcoded `BASE_RESOLUTIONS` in `variants.ts` with ladder scaled from probe result
-- [ ] Drop rungs within 70% of the rung above
+- [x] Add CRF-probe step (`libx264 -preset ultrafast -crf 23 -an`) returning avg bitrate. **Implemented as 4-sample weighted scheme** (head 30s + 3×15s at 25%/55%/85%) instead of a single full-video pass — probes representatively in ~bounded wall time regardless of source length. See `probeBitrate` in `workers/transcoder/src/ffmpeg/probe.ts`.
+- [x] Replace hardcoded `BASE_RESOLUTIONS` in `variants.ts` with ladder scaled from probe result. Multipliers: 1080p = probe × 1.10, 720p × 0.55, 480p × 0.25. Ceilings preserved as safety caps; 300 kbps floor.
+- [x] Drop rungs within 70% of the rung above.
+- [ ] Field validation: ship to real jobs; log probe vs ladder output across ~20 real videos; tune multipliers if systematically off.
 
 ### §2 Resumable Jobs via Segment-Level Checkpointing
 
