@@ -6,7 +6,7 @@
     "db:migrate": "cd ../../packages/database && pnpm with-env drizzle-kit migrate",
     "db:generate": "cd ../../packages/database && pnpm with-env drizzle-kit generate",
     "db:push": "cd ../../packages/database && pnpm with-env drizzle-kit push",
-    "db:studio": "cd ../../packages/database && pnpm with-env drizzle-kit studio",
+    "db:studio": "cd ../../packages/database && pnpm with-env drizzle-kit studio --host=0.0.0.0",
     "with-env": "dotenv -e ../../.env --"
   },
   "devDependencies": {
