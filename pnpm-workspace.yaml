@@ -17,6 +17,8 @@ onlyBuiltDependencies:
   - sharp
   - unrs-resolver
   - lightningcss
+  - node-av
+  - "@seydx/node-av-linux-x64"
 
 overrides:
   "@types/minimatch": 5.1.2

@@ -6,12 +6,16 @@ import type { TranscodeJobData } from "@vidcastx/queue/types";
 import type { Job } from "bullmq";
 import { Worker } from "bullmq";
 
+import { registerWorkerShutdown } from "@vidcastx/queue/shutdown";
 import { QUEUES } from "@vidcastx/queue/types";
 import { redis } from "@vidcastx/redis";
 import { downloadToPath, uploadFile } from "@vidcastx/storage";
 
 import { notifyApiStatus } from "./api";
 import { generateHoverPreview, generatePoster, runFFmpegTranscode } from "./ffmpeg";
+import { installLibavLogFilter } from "./libav-log";
+
+installLibavLogFilter();
 
 console.log("Native HLS Transcoder Worker Started. Listening for jobs...");
 
@@ -120,13 +124,32 @@ const transcoderWorker = new Worker<TranscodeJobData>(
   {
     connection: redis,
     concurrency: 1,
+    // Transcode jobs can run for minutes. Default 30s lock makes BullMQ flag the
+    // job as stalled while the libav pipeline is crunching frames.
+    lockDuration: 10 * 60 * 1000,
+    lockRenewTime: 2 * 60 * 1000,
+    stalledInterval: 60 * 1000,
   },
 );
 
+transcoderWorker.on("active", (job) => {
+  console.log(`[Worker] Job ${job.id} picked up`);
+});
+
 transcoderWorker.on("failed", (job, err) => {
-  console.log(`Job ${job?.id} completely failed after retries. Error: ${err.message}`);
+  console.error(`[Worker] Job ${job?.id} failed after retries:`, err.message);
 });
 
 transcoderWorker.on("completed", (job) => {
-  console.log(`Job ${job.id} has completed successfully!`);
+  console.log(`[Worker] Job ${job.id} completed`);
 });
+
+transcoderWorker.on("stalled", (jobId) => {
+  console.warn(`[Worker] Job ${jobId} reported stalled`);
+});
+
+transcoderWorker.on("error", (err) => {
+  console.error(`[Worker] Error:`, err);
+});
+
+registerWorkerShutdown(transcoderWorker, "transcoder");

@@ -1,4 +1,5 @@
-import { spawn } from "node:child_process";
+import { Demuxer } from "node-av/api";
+import { AVMEDIA_TYPE_AUDIO, AVMEDIA_TYPE_VIDEO } from "node-av/constants";
 
 export interface ProbeResult {
   duration: number;
@@ -7,63 +8,28 @@ export interface ProbeResult {
   hasAudio: boolean;
 }
 
-interface FfprobeStream {
-  codec_type?: string;
-  height?: number;
-  duration?: string;
-  r_frame_rate?: string;
-}
-
-interface FfprobeOutput {
-  streams?: FfprobeStream[];
-  format?: { duration?: string };
-}
-
 /**
- * Extracts metadata from a video file using ffprobe.
+ * Extracts metadata from a video file using libavformat directly.
+ * Replaces the previous `spawn("ffprobe", ...)` approach.
  */
 export async function probeVideo(filePath: string): Promise<ProbeResult> {
-  return new Promise((resolve, reject) => {
-    const ffprobe = spawn("ffprobe", [
-      "-v",
-      "error",
-      "-show_entries",
-      "stream=codec_type,height,duration,r_frame_rate:format=duration",
-      "-of",
-      "json",
-      filePath,
-    ]);
+  const demuxer = await Demuxer.open(filePath);
 
-    let output = "";
-    ffprobe.stdout.on("data", (data: Buffer) => (output += data.toString()));
+  try {
+    const videoStream = demuxer.findBestStream(AVMEDIA_TYPE_VIDEO);
+    const audioStream = demuxer.findBestStream(AVMEDIA_TYPE_AUDIO);
 
-    ffprobe.on("close", (code) => {
-      if (code !== 0) {
-        reject(new Error("ffprobe failed to read video metadata"));
-        return;
-      }
+    const height = videoStream?.codecpar.height ?? 1080;
 
-      try {
-        const meta = JSON.parse(output) as FfprobeOutput;
-        const streams = meta.streams ?? [];
+    const duration = Math.max(demuxer.duration, 0);
 
-        const videoStream = streams.find((s) => s.codec_type === "video");
-        const hasAudio = streams.some((s) => s.codec_type === "audio");
+    const rate = videoStream?.avgFrameRate ?? videoStream?.rFrameRate;
+    const num = rate?.num ?? 30;
+    const den = rate?.den ?? 1;
+    const fps = den > 0 ? Math.round(num / den) || 30 : 30;
 
-        const height = videoStream?.height ?? 1080;
-        const durationRaw = videoStream?.duration ?? meta.format?.duration ?? "0";
-        const duration = Number.parseFloat(durationRaw);
-
-        const rFrameRate = videoStream?.r_frame_rate ?? "30/1";
-        const [numStr, denStr] = rFrameRate.split("/");
-        const num = Number.parseInt(numStr ?? "30", 10);
-        const den = Number.parseInt(denStr ?? "1", 10);
-        const fps = Math.round(num / den) || 30;
-
-        resolve({ height, duration, fps, hasAudio });
-      } catch {
-        reject(new Error("Failed to parse ffprobe output."));
-      }
-    });
-  });
+    return { height, duration, fps, hasAudio: !!audioStream };
+  } finally {
+    await demuxer.close();
+  }
 }
