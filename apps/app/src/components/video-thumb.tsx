@@ -9,9 +9,10 @@ interface VideoThumbProps {
   title: string;
   status?: string;
   duration?: string | null;
+  overlay?: React.ReactNode;
 }
 
-export function VideoThumb({ poster, preview, title, status, duration }: VideoThumbProps) {
+export function VideoThumb({ poster, preview, title, status, duration, overlay }: VideoThumbProps) {
   const [hover, setHover] = useState(false);
   const [previewReady, setPreviewReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -33,7 +34,6 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
   }, [hover, preview]);
 
   const handlePointerEnter = () => {
-    // Guard against coarse-pointer (touch) devices
     if (globalThis.matchMedia("(hover: none)").matches) return;
     setHover(true);
   };
@@ -102,6 +102,8 @@ export function VideoThumb({ poster, preview, title, status, duration }: VideoTh
           {status}
         </span>
       )}
+
+      {overlay}
     </div>
   );
 }
