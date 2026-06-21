@@ -1,8 +1,12 @@
-import { spawn } from "node:child_process";
+import fsp from "node:fs/promises";
 import path from "node:path";
+import type { FFEncoderCodec } from "node-av/constants";
+import { Decoder, Demuxer, Encoder, FilterComplexAPI, Muxer } from "node-av/api";
+import { AVMEDIA_TYPE_AUDIO, AVMEDIA_TYPE_VIDEO, FF_ENCODER_AAC, FF_ENCODER_LIBX264 } from "node-av/constants";
 
+import type { StreamVariant } from "./variants";
 import { env } from "../env";
-import { probeVideo } from "./probe";
+import { probeBitrate, probeVideo } from "./probe";
 import { buildStreamVariants } from "./variants";
 
 interface TranscodeOptions {
@@ -11,19 +15,28 @@ interface TranscodeOptions {
   onProgress?: (percent: number) => void;
 }
 
-/**
- * Hardware Acceleration Toggle
- * Set HW_ENCODER in your .env file to utilize GPU encoding:
- * - 'h264_nvenc' for NVIDIA GPUs (Production/AWS)
- * - 'h264_videotoolbox' for Apple Silicon (Mac M1/M2/M3)
- * - 'h264_amf' for AMD GPUs
- * Defaults to 'libx264' (CPU) if no hardware encoder is specified.
- */
-const VIDEO_ENCODER = env.HW_ENCODER || "libx264";
+const VIDEO_ENCODER = (env.HW_ENCODER ?? FF_ENCODER_LIBX264) as FFEncoderCodec;
+
+const VIDEO_IN = "0:v";
+const AUDIO_IN = "0:a";
+const videoOutLabel = (name: string) => `v_${name}`;
+const audioOutLabel = (name: string) => `a_${name}`;
+
+interface RungContext {
+  variant: StreamVariant;
+  videoEncoder: Encoder;
+  audioEncoder?: Encoder;
+  muxer: Muxer;
+  videoStreamIndex: number;
+  audioStreamIndex?: number;
+}
 
 /**
- * Orchestrates the FFmpeg process to transcode an input video into an Adaptive Bitrate (ABR) HLS stream.
- * Automatically generates a master playlist linking multiple resolutions and framerates.
+ * Orchestrates an ABR HLS transcode via libavformat/libavcodec directly.
+ *
+ * Single demuxer + single decoder feeds an N-way `split` filter graph, with
+ * each branch scaling + encoding to its own HLS muxer. Replaces the previous
+ * per-rung demuxer fan-out that caused h264 decoder races + log spam.
  */
 export async function runFFmpegTranscode({
   inputPath,
@@ -33,106 +46,217 @@ export async function runFFmpegTranscode({
   const { duration: totalDuration, height: inputHeight, fps: inputFps, hasAudio } = await probeVideo(inputPath);
 
   console.log(
-    `[FFmpeg] Probed video: ${inputHeight}p @ ${inputFps}fps, Duration: ${totalDuration}s, Audio: ${hasAudio}`,
+    `[libav] Probed video: ${inputHeight}p @ ${inputFps}fps, Duration: ${totalDuration}s, Audio: ${hasAudio}`,
   );
-  console.log(`[FFmpeg] Using Video Encoder: ${VIDEO_ENCODER}`);
+  console.log(`[libav] Using Video Encoder: ${VIDEO_ENCODER}`);
 
-  const streamVariants = buildStreamVariants(inputHeight, inputFps);
-  console.log(
-    `[FFmpeg] Generating ${streamVariants.length} HLS variants:`,
-    streamVariants.map((v) => v.name).join(", "),
-  );
+  const probeStart = Date.now();
+  const probeKbps = await probeBitrate(inputPath, totalDuration, inputFps);
+  console.log(`[libav] Per-title probe: ${probeKbps}kbps (${Date.now() - probeStart}ms)`);
 
-  const args = ["-i", inputPath, "-y"];
-  let varStreamMap = "";
+  const variants = buildStreamVariants(inputHeight, inputFps, probeKbps);
+  console.log(`[libav] Ladder (${variants.length} rungs):`, variants.map((v) => `${v.name}@${v.bitrate}k`).join(", "));
 
-  for (const [idx, variant] of streamVariants.entries()) {
-    args.push("-map", "0:v:0");
-    if (hasAudio) {
-      args.push("-map", "0:a:0");
-    }
+  const demuxer = await Demuxer.open(inputPath);
 
-    args.push(
-      `-c:v:${idx}`,
-      VIDEO_ENCODER,
-      `-b:v:${idx}`,
-      `${variant.bitrate}k`,
-      `-maxrate:v:${idx}`,
-      `${Math.round(variant.bitrate * 1.05)}k`,
-      `-bufsize:v:${idx}`,
-      `${Math.round(variant.bitrate * 1.5)}k`,
-      `-filter:v:${idx}`,
-      `scale=-2:${variant.height}`,
-      `-r:v:${idx}`,
-      `${variant.fps}`,
-      `-preset`,
-      "fast",
+  try {
+    const videoStream = demuxer.findBestStream(AVMEDIA_TYPE_VIDEO);
+    if (!videoStream) throw new Error("transcode: no video stream in source");
+
+    const audioStream = hasAudio ? demuxer.findBestStream(AVMEDIA_TYPE_AUDIO) : undefined;
+
+    const videoDecoder = await Decoder.create(videoStream);
+    const audioDecoder = audioStream ? await Decoder.create(audioStream) : undefined;
+
+    const videoComplex = FilterComplexAPI.create(buildVideoGraph(variants), {
+      inputs: [{ label: VIDEO_IN }],
+      outputs: variants.map((v) => ({ label: videoOutLabel(v.name), mediaType: AVMEDIA_TYPE_VIDEO })),
+    });
+
+    const audioComplex = audioDecoder
+      ? FilterComplexAPI.create(buildAudioGraph(variants), {
+          inputs: [{ label: AUDIO_IN }],
+          outputs: variants.map((v) => ({ label: audioOutLabel(v.name), mediaType: AVMEDIA_TYPE_AUDIO })),
+        })
+      : undefined;
+
+    const rungs = await Promise.all(
+      variants.map((variant) => openRung({ variant, outputDir, hasAudio, audioDecoder })),
     );
 
-    if (VIDEO_ENCODER === "libx264") {
-      args.push(`-crf`, "23");
+    try {
+      const estimatedTotalFrames = Math.max(1, Math.round(totalDuration * inputFps));
+      let framesDone = 0;
+      const reportProgress = () => {
+        if (!onProgress) return;
+        const pct = Math.min(99, Math.round((framesDone / estimatedTotalFrames) * 100));
+        onProgress(pct);
+      };
+
+      const videoTask = async () => {
+        for await (const frame of videoDecoder.frames(demuxer.packets(videoStream.index))) {
+          if (!frame) break;
+          await videoComplex.process(VIDEO_IN, frame);
+          await drainAndEncode(videoComplex, rungs, "video");
+          framesDone++;
+          if (framesDone % 10 === 0) reportProgress();
+        }
+        await videoComplex.flush(VIDEO_IN);
+        await drainAndEncode(videoComplex, rungs, "video");
+        // Send EOF to each encoder and write trailing packets (B-frame reorder tail)
+        for (const rung of rungs) {
+          const tail = await rung.videoEncoder.encodeAll(null);
+          for (const pkt of tail) {
+            await rung.muxer.writePacket(pkt, rung.videoStreamIndex);
+          }
+        }
+      };
+
+      const audioTask = async () => {
+        if (!audioDecoder || !audioStream || !audioComplex) return;
+        for await (const frame of audioDecoder.frames(demuxer.packets(audioStream.index))) {
+          if (!frame) break;
+          await audioComplex.process(AUDIO_IN, frame);
+          await drainAndEncode(audioComplex, rungs, "audio");
+        }
+        await audioComplex.flush(AUDIO_IN);
+        await drainAndEncode(audioComplex, rungs, "audio");
+        // Send EOF to each AAC encoder so the last 1024-sample partial frame is
+        // drained rather than discarded ("N frames left in the queue on closing").
+        for (const rung of rungs) {
+          if (!rung.audioEncoder || rung.audioStreamIndex === undefined) continue;
+          const tail = await rung.audioEncoder.encodeAll(null);
+          for (const pkt of tail) {
+            await rung.muxer.writePacket(pkt, rung.audioStreamIndex);
+          }
+        }
+      };
+
+      await Promise.all([videoTask(), audioTask()]);
+
+      // close muxers (writes trailers)
+      await Promise.all(rungs.map((r) => r.muxer.close()));
+      onProgress?.(99);
+    } finally {
+      for (const rung of rungs) {
+        rung.videoEncoder.close();
+        rung.audioEncoder?.close();
+      }
+      videoComplex.close();
+      audioComplex?.close();
+      videoDecoder.close();
+      audioDecoder?.close();
     }
 
-    if (hasAudio) {
-      args.push(`-c:a:${idx}`, "aac", `-b:a:${idx}`, "128k", `-ac:${idx}`, "2");
+    await writeMasterPlaylist(outputDir, variants);
+    onProgress?.(100);
+    return { duration: totalDuration, height: inputHeight, fps: inputFps };
+  } finally {
+    await demuxer.close();
+  }
+}
+
+function buildVideoGraph(variants: StreamVariant[]): string {
+  const splitLabels = variants.map((v) => `[s_${v.name}]`).join("");
+  const splitStage = `[${VIDEO_IN}]split=${variants.length}${splitLabels}`;
+  const scaleStages = variants.map(
+    (v) => `[s_${v.name}]scale=-2:${v.height},fps=${v.fps},format=yuv420p[${videoOutLabel(v.name)}]`,
+  );
+  return [splitStage, ...scaleStages].join(";");
+}
+
+function buildAudioGraph(variants: StreamVariant[]): string {
+  const splitLabels = variants.map((v) => `[${audioOutLabel(v.name)}]`).join("");
+  return `[${AUDIO_IN}]asplit=${variants.length}${splitLabels}`;
+}
+
+async function openRung({
+  variant,
+  outputDir,
+  hasAudio,
+  audioDecoder,
+}: {
+  variant: StreamVariant;
+  outputDir: string;
+  hasAudio: boolean;
+  audioDecoder: Decoder | undefined;
+}): Promise<RungContext> {
+  const bitrateK = variant.bitrate;
+  const videoEncoder = await Encoder.create(VIDEO_ENCODER, {
+    bitrate: `${bitrateK}k`,
+    maxRate: `${Math.round(bitrateK * 1.05)}k`,
+    bufSize: `${Math.round(bitrateK * 1.5)}k`,
+    gopSize: variant.fps * 2,
+    options: VIDEO_ENCODER === FF_ENCODER_LIBX264 ? { preset: "fast", crf: "23" } : { preset: "fast" },
+  });
+
+  const audioEncoder =
+    hasAudio && audioDecoder
+      ? await Encoder.create(FF_ENCODER_AAC, { decoder: audioDecoder, bitrate: "128k" })
+      : undefined;
+
+  const playlistPath = path.join(outputDir, `${variant.name}_playlist.m3u8`);
+  const segmentPattern = path.join(outputDir, `${variant.name}_segment%03d.ts`);
+
+  const muxer = await Muxer.open(playlistPath, {
+    format: "hls",
+    options: {
+      hls_time: "6",
+      hls_playlist_type: "vod",
+      hls_segment_filename: segmentPattern,
+      hls_flags: "independent_segments",
+    },
+  });
+
+  const videoStreamIndex = muxer.addStream(videoEncoder);
+  const audioStreamIndex = audioEncoder ? muxer.addStream(audioEncoder) : undefined;
+
+  return { variant, videoEncoder, audioEncoder, muxer, videoStreamIndex, audioStreamIndex };
+}
+
+async function drainAndEncode(complex: FilterComplexAPI, rungs: RungContext[], kind: "video" | "audio"): Promise<void> {
+  for (const rung of rungs) {
+    const label = kind === "video" ? videoOutLabel(rung.variant.name) : audioOutLabel(rung.variant.name);
+    const encoder = kind === "video" ? rung.videoEncoder : rung.audioEncoder;
+    const streamIndex = kind === "video" ? rung.videoStreamIndex : rung.audioStreamIndex;
+    if (!encoder || streamIndex === undefined) continue;
+
+    for (;;) {
+      const out = await complex.receive(label);
+      if (out === null) break; // EAGAIN
+      if (out === undefined) break; // EOF
+      const packets = await encoder.encodeAll(out);
+      for (const pkt of packets) {
+        await rung.muxer.writePacket(pkt, streamIndex);
+      }
     }
 
-    const audioMap = hasAudio ? `,a:${idx}` : "";
-    varStreamMap += `v:${idx}${audioMap},name:${variant.name} `;
+    // also drain any encoder packets that accumulated from previous frames
+    for (;;) {
+      const pkt = await encoder.receive();
+      if (pkt === null) break; // EAGAIN
+      if (pkt === undefined) break; // EOF
+      await rung.muxer.writePacket(pkt, streamIndex);
+    }
+  }
+}
+
+async function writeMasterPlaylist(outputDir: string, variants: StreamVariant[]): Promise<void> {
+  const lines: string[] = ["#EXTM3U", "#EXT-X-VERSION:6"];
+
+  for (const v of variants) {
+    const bandwidth = v.bitrate * 1000;
+    const resolution = `${approxWidthFor(v.height)}x${v.height}`;
+    lines.push(
+      `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${resolution},NAME="${v.name}",FRAME-RATE=${v.fps}`,
+      `${v.name}_playlist.m3u8`,
+    );
   }
 
-  args.push(
-    "-f",
-    "hls",
-    "-hls_time",
-    "6",
-    "-hls_playlist_type",
-    "vod",
-    "-hls_segment_filename",
-    path.join(outputDir, "%v_segment%03d.ts"),
-    "-master_pl_name",
-    "master.m3u8",
-    "-var_stream_map",
-    varStreamMap.trim(),
-    path.join(outputDir, "%v_playlist.m3u8"),
-  );
+  await fsp.writeFile(path.join(outputDir, "master.m3u8"), lines.join("\n") + "\n", "utf8");
+}
 
-  return new Promise((resolve, reject) => {
-    const ffmpeg = spawn("ffmpeg", args);
-
-    ffmpeg.stderr.on("data", (data: Buffer) => {
-      const output = data.toString();
-
-      if (output.includes("frame=") || output.includes("time=")) {
-        process.stdout.write(`\r[FFmpeg Engine] ${output.trim()}`);
-      }
-
-      const timeMatch = /time=(\d{2}):(\d{2}):(\d{2}\.\d+)/.exec(output);
-      if (timeMatch?.[1] && timeMatch[2] && timeMatch[3] && totalDuration > 0 && onProgress) {
-        const hours = Number.parseInt(timeMatch[1], 10);
-        const minutes = Number.parseInt(timeMatch[2], 10);
-        const seconds = Number.parseFloat(timeMatch[3]);
-
-        const currentTime = hours * 3600 + minutes * 60 + seconds;
-        let percent = Math.round((currentTime / totalDuration) * 100);
-        percent = Math.min(percent, 99);
-
-        onProgress(percent);
-      }
-    });
-
-    ffmpeg.on("close", (code) => {
-      process.stdout.write("\n");
-      if (code === 0) {
-        if (onProgress) onProgress(100);
-        resolve({ duration: totalDuration, height: inputHeight, fps: inputFps });
-      } else {
-        reject(new Error(`FFmpeg exited with error code ${code}`));
-      }
-    });
-
-    ffmpeg.on("error", (err) => {
-      reject(err);
-    });
-  });
+function approxWidthFor(height: number): number {
+  const width = Math.round((height * 16) / 9);
+  return width % 2 === 0 ? width : width + 1;
 }

@@ -1,249 +1,257 @@
-# VidcastX - Architecture & Project Scope
+# VidcastX — Product Idea & Vision
 
-VidcastX is an enterprise-grade, B2B video hosting, streaming, and AI-processing platform. Unlike consumer-oriented platforms, VidcastX is designed specifically for creators, businesses, and developers to host, transcode, analyze, and distribute their video content globally via embeddable players and robust APIs.
+> The video infrastructure your product deserves — hosted, streamed, transcribed, translated, distributed, and measured — under one API and one UI, built for teams that ship.
 
-This document outlines the core feature set, the monorepo structure, the microservices architecture, and the database relationships driving the platform.
+## 1. What is VidcastX?
 
-## 1. Core Platform Features
+VidcastX is a B2B video platform that bundles **hosting, adaptive streaming, AI post-processing, live broadcasting, multi-platform distribution, and analytics** into a single organization-scoped workspace. It is engineered as API-first infrastructure (Elysia on Bun) with a batteries-included creator studio on top (TanStack Start + shadcn), so the same product serves both **end-user creators** through the web app and **developer teams** embedding video into their own SaaS via the typed API and the `@vidcastx/player` embeddable NPM package.
 
-VidcastX provides a comprehensive suite of tools spanning the entire video lifecycle, from ingestion to analytics and playback.
+Unlike consumer destinations (YouTube, Vimeo) that own the audience, VidcastX stays white-label: every video lives under your org, plays via your embed, and is measured by your analytics. Unlike pure developer APIs (Mux, api.video, Cloudflare Stream) that stop at playback URLs, VidcastX ships the full content lifecycle — transcripts, chapters, summaries, dubbing, semantic embeddings, folders, distribution to YouTube/Twitch/TikTok/Facebook, live RTMP with auto-VOD, and usage-based billing — out of the box.
 
-### Video Hosting & Playback
+## 2. Who is it for?
 
-- **Secure Direct Uploads:** Client-to-cloud uploads via presigned URLs, bypassing the main API to ensure infinite scalability for massive files.
+| Segment                                                                             | Why VidcastX                                                                                                                 |
+| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Independent creators & educators** going direct-to-audience                       | Own the player, own the analytics, own the subscriber list; escape YouTube's discovery roulette and arbitrary demonetization |
+| **Course platforms / ed-tech**                                                      | Auto-transcripts, chapters, searchable transcripts via vector embeddings, multilingual dubbing, per-seat usage billing       |
+| **SaaS products embedding video** (support, onboarding, async demos, product tours) | Drop-in typed API + NPM player, signed playback URLs, embed-domain stats, webhook-driven workflows                           |
+| **Media companies & agencies**                                                      | Multi-brand orgs, RBAC, cross-post to YouTube/Twitch/TikTok/Facebook from one upload, VOD-from-live recording                |
+| **Internal comms / L&D teams**                                                      | Private-by-default visibility, folder hierarchy, heatmap analytics, soft-delete audit trail, org-scoped RBAC                 |
+| **Podcasters going visual**                                                         | RTMP live, auto-VOD, transcript → SEO description pipeline, hover-preview clips ready for social                             |
+| **DevRel & marketing teams**                                                        | Embed tracking by domain, CTA/engagement heatmaps, auto-chapters from recorded talks                                         |
 
-- **Adaptive Bitrate Streaming (HLS):** Automated FFmpeg transcoding into multiple resolutions (1080p, 720p, 480p) to guarantee smooth playback across varying network conditions.
+The common thread: teams that have outgrown an embed code but don't want to assemble Mux + Deepgram + ElevenLabs + Stripe + Zapier + Restream themselves.
 
-- **Drop-in NPM Video Player:** A highly customizable, embeddable video player package (`@vidcastx/player`). Serving as the sole frontend for video consumption, it seamlessly handles adaptive streaming while acting as the data collection engine for all platform analytics.
+## 3. Core capabilities (shipped + designed)
 
-- **Content Organization:** Deep hierarchical folder structures and granular visibility controls (Public, Private, Unlisted).
+Every capability below has schema + API scaffolding in the repo today; the build-status column separates what plays end-to-end from what is awaiting endpoint/UI wire-up.
 
-- **Smart Thumbnails:** Automated extraction of optimized keyframes for video previews.
+### 3.1 Upload & hosting
 
-### AI-Powered Automation
+- Resumable S3 multipart uploads via Uppy — survives disconnects, browser closes, flaky mobile networks
+- Video state machine: `draft → uploaded → queued → dispatched → processing → ready → failed`
+- Soft-delete with `trash` + `restore` — nothing is hard-deleted without an audit trail
+- Hierarchical folder tree (self-referential `parentId`) with per-folder color, pinning, default-visibility, and private/public folder visibility
+- Scheduled publishing (set a publish date, video flips to public automatically)
+- Visibility: public / private / unlisted
 
-- **Precision Transcription:** Integration with OpenAI Whisper for highly accurate, noise-resistant speech-to-text generation.
+**Status:** shipped end-to-end (upload → DB → transcode enqueue).
 
-- **Intelligent Metadata:** LLM-driven generation of SEO-optimized titles, descriptions, and interactive video chapters based on transcript context.
+### 3.2 Adaptive streaming
 
-- **Multilingual Dubbing:** Voice cloning and translation via ElevenLabs to automatically localize content for global audiences while maintaining original vocal emotion.
+- HLS ABR output (dynamic rung set: 480p / 720p / 1080p, capped to source resolution)
+- Pluggable encoders: libx264 default; h264_nvenc / h264_videotoolbox / h264_qsv wired; AV1 on the roadmap
+- Per-video poster JPEG + short WebM hover-preview clip (YouTube-style grid hover)
+- Signed playback URLs only — raw S3 keys never leak through the API (`t.Pick` allowlisted responses)
+- `@vidcastx/player` drop-in NPM embeddable player — renders HLS + streams back telemetry events over the same session
 
-- **Semantic Search:** Generation of vector embeddings for transcripts, enabling users to search for specific spoken concepts _inside_ their video library.
+**Status:** transcoder mid-refactor from subprocess FFmpeg to in-process `node-av` libav bindings (branch `feat/transcoder-libav`); core transcode + poster + preview all produce correct output and land in S3.
 
-### Enterprise Analytics & Telemetry
+### 3.3 AI post-processing
 
-- **Granular Session Tracking:** High-resolution tracking of device types, geographic regions, buffering events, quality drops, and exact watch percentages automatically collected by the NPM player.
+- **Transcripts** — auto-generated (Whisper), multilingual, word-level timings, confidence scoring, provider-agnostic
+- **Vector embeddings** per transcript segment (1536-dim pgvector) — "find the moment I talked about X" semantic search
+- **Chapters** — LLM-generated or manual, with timestamps, thumbnails, descriptions, re-orderable
+- **Summaries** — short / medium / long variants per language, plus key points, topics, SEO-ready descriptions
+- **Dubbing** — ElevenLabs-class voice synthesis per target language, preserves original tone and pacing
+- **Clean mode** — filler-word removal (designed)
+- **Metadata generation** — SEO titles, tags, cover suggestions
+- Per-job cost tracking: tokens used, provider, execution time, cents — rolls into the billing subsystem
 
-- **Audience Insights:** Video heatmaps detailing re-watches and viewer drop-off points.
+**Status:** schema complete; `ai_job` queue type defined; endpoints + UI pending.
 
-- **Distribution Metrics:** Embed domain tracking to help businesses measure ROI and engagement on external websites.
+### 3.4 Analytics (hollywood-grade)
 
-### Live Streaming (RTMP)
+- **Daily aggregates** — views, watch time, avg % watched, likes, shares, bounces, finishes
+- **Heatmaps** — per-segment engagement showing which 5-second windows get rewatched and where drop-offs cluster
+- **Session-level telemetry** — device, browser, OS, geo, fullscreen / PiP usage, subtitle toggles, buffering events, quality switches, bitrate
+- **Event stream** — play, pause, seek, error, quality_change, buffer_start, buffer_end, rate_change
+- **Dimensional slicing** — by device type, traffic source (direct / search / external / embedded / social), referrer domain, country
+- **Embed stats** — which external domains render the iframe, per-embed engagement
+- **Channel subscribers, search queries, realtime concurrent-viewer counts**
 
-- **Broadcast Ingestion:** Secure RTMP channel and stream key generation.
+All telemetry is harvested automatically by `@vidcastx/player` — no customer instrumentation needed.
 
-- **Auto-VOD:** Automatic conversion and saving of finished live streams into Video on Demand (VOD) assets.
+**Status:** schema + event shapes defined; ingestion endpoints and dashboards pending.
 
-### B2B Workspace & Billing
+### 3.5 Live streaming
 
-- **Organization Management:** Role-Based Access Control (Owner, Admin, Member) with sophisticated soft-delete mechanisms.
+- RTMP ingest per channel with rotatable stream keys
+- Session tracking with peak concurrent viewers and broadcast duration
+- **Auto-VOD** — every finished live session produces a recording video row that threads straight into the VOD pipeline (transcode → transcribe → chapter → summarize → distribute)
+- Webhooks fire on live start / end / recording ready
 
-- **Usage-Based Billing:** Aggregation of encoding minutes, AI tokens, storage GB, and bandwidth GB for seamless Stripe metering.
+**Status:** schema complete; ingest infrastructure pending.
 
-- **Developer Extensibility:** Dedicated webhook dispatcher to notify external client systems of processing lifecycle events.
+### 3.6 Multi-platform distribution
 
-## 2. Monorepo Structure Overview
+- OAuth integrations with **YouTube, Twitch, TikTok, Facebook** (refresh + access token lifecycle managed)
+- One-click cross-post: upload once → publish to N platforms in parallel
+- Per-platform dispatch log: `pending / processing / success / failed` with external IDs, external URLs, and error payloads for debugging
 
-The repository is structured as a Turbo-driven monorepo containing user-facing frontends (`apps`), the core backend (`api`), containerized background processors (`workers`), and shared internal libraries (`packages`).
+**Status:** schema + token storage designed; dispatcher pending.
 
-    ├── apps/
-    │   ├── dashboard/       # Next.js Creator Studio & Admin Panel
-    │   ├── marketing/       # Next.js Landing Page & Documentation
-    │   └── api/             # Core Hono/Express API
-    ├── workers/             # Dockerized Node.js/Python Background Services
-    │   ├── transcoder/      # Raw FFmpeg CLI: Video/Audio encoding
-    │   ├── thumbnailer/     # Raw FFmpeg CLI: Frame extraction
-    │   ├── transcriber/     # OpenAI Whisper: Highly accurate STT
-    │   ├── ai-processor/    # LLMs: Chapters, Summaries, SEO
-    │   ├── dubbing/         # ElevenLabs: Voice cloning & translation
-    │   └── notifications/   # Webhooks & Email dispatcher
-    └── packages/            # Shared internal libraries
-        ├── player/          # Embeddable NPM Video Player (React/Web Component)
-        ├── database/        # Drizzle ORM schemas & migrations
-        ├── auth/            # Better-Auth configuration
-        ├── ui/              # Shadcn/Tailwind components
-        ├── storage/         # AWS S3 / Cloudflare R2 wrappers
-        ├── redis/           # BullMQ/Redis client
-        └── env/             # Zod environment validation
+### 3.7 Auth, orgs, RBAC
 
-## 3. Frontends & Client Packages
+- Better Auth: email / password + GitHub + Discord OAuth (more providers wirable)
+- Organizations as the unit of isolation — every resource is org-scoped
+- Owner / Admin / Member roles with invitation flow
+- Redis-backed sessions with IP + user-agent tracking
 
-### `@vidcastx/player` (Embeddable NPM Package)
+**Status:** shipped.
 
-The official, universally compatible video player designed to be installed via NPM and embedded on any external website or web application.
+### 3.8 Billing & metered usage
 
-- **Responsibilities:**
-  - Rendering the HLS video streams securely based on environment variables and API keys.
+- Per-org tracking across **six metered dimensions**: encoding minutes, storage GB, AI tokens, bandwidth GB, live-streaming minutes, API requests
+- Daily rollups with per-metric cost attribution (`usage_record` → `usage_summary`)
+- Stripe subscription integration: customer, subscription, price, plan, trial + cancellation state
+- Invoices, payment methods, credits, promo codes — all schema-ready with soft-delete
 
-  - Silently capturing complex telemetry (buffering rates, seek events, fullscreen toggles, watch duration).
+**Status:** schema complete; Stripe metered sync + customer dashboard pending.
+
+### 3.9 Extensibility & developer surface
+
+- **Webhooks** per org for lifecycle events — customers plug VidcastX into Zapier, n8n, internal pipelines
+- **Fully typed API** via Eden Treaty — SaaS customers embed upload + playback + analytics reads in their own apps with end-to-end TypeScript types
+- **OpenAPI** auto-generated docs
+- **M2M JWT** for worker-to-API communication (rate-limited `/internal/token` endpoint)
+- **`@vidcastx/player`** NPM package — universally compatible React + Web Component player that doubles as the telemetry collector
 
-  - Transmitting heartbeat and interaction payloads back to the `apps/api` to generate heatmaps and session logs.
+## 4. Tech stack highlights
 
-### `apps/dashboard` (Creator Studio)
+| Layer    | Tech                                                                                                                   |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Frontend | TanStack Start (Vite + SSR), React 19, TanStack Router/Query/Form, Zod, shadcn + Tailwind v4, Uppy, zustand, nuqs      |
+| API      | Elysia on Bun, TypeBox schemas, Better Auth, Eden Treaty typed client, OpenAPI                                         |
+| DB       | PostgreSQL + pgvector, Drizzle ORM + Drizzle Kit                                                                       |
+| Queues   | BullMQ + Redis                                                                                                         |
+| Storage  | S3-compatible (MinIO dev, AWS / Cloudflare R2 / Hetzner prod), multipart resume                                        |
+| Workers  | Node transcoder moving in-process to libav via `node-av` (MIT, prebuilt binaries, no system FFmpeg needed)             |
+| AI       | Whisper (STT), LLM (chapters / summaries / SEO), ElevenLabs-class (dubbing), pgvector (semantic search)                |
+| CDN      | Cloudflare / CloudFront fronting the public delivery bucket                                                            |
+| Tooling  | Turbo, pnpm workspaces, ESLint 9 flat + type-aware strict, Prettier 3, Husky + lint-staged, sherif, `@t3-oss/env-core` |
 
-The primary administrative interface for workspace owners and members to manage their video library.
+Architectural signatures worth calling out:
 
-- **Key Components:**
-  - Drag-and-drop Uppy file uploads with chunking support.
+- **Organization-scoped everything** — no resource exists without an `orgId`
+- **Soft-delete everywhere** — videos, folders, assets, transcripts, chapters, channels, webhooks, integrations, subscriptions
+- **State machines over flags** — explicit `status` enums with well-defined transitions and failure states
+- **Allowlist response schemas** — API responses `Pick` fields explicitly; storage keys and internal JSONB blobs never leak
+- **The API never touches video bytes** — upload is client-to-S3, transcoding is worker-side, the API only orchestrates
+
+## 5. Competitive landscape
+
+VidcastX doesn't fit neatly into one bucket — it spans three markets that rarely overlap in one product. That's both the differentiator and the scope risk.
+
+### 5.1 Developer video APIs (direct API competitors)
+
+| Competitor                                         | Strength                                                   | Where VidcastX differs                                                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Mux**                                            | Gold-standard streaming reliability, excellent QoS metrics | Pure infrastructure — no AI transcripts, no chapters, no distribution, no creator UI. VidcastX bundles the full lifecycle. |
+| **Cloudflare Stream**                              | Cheap bandwidth, global edge                               | Zero AI, basic analytics, no live-to-VOD polish, no multi-platform distribution                                            |
+| **api.video**                                      | Solid API, fair pricing                                    | Similar breadth to Stream; lacks the creator studio layer + AI automation                                                  |
+| **Bunny Stream**                                   | Aggressive pricing                                         | Minimal feature set; playback only                                                                                         |
+| **AWS IVS / MediaConvert / MediaLive / Elemental** | Enterprise-grade, AWS-integrated                           | Assembly required — customers still build the control plane VidcastX ships out of the box                                  |
+| **Gumlet**                                         | Self-host + API hybrid                                     | Narrower AI surface, weaker analytics depth                                                                                |
+| **VdoCipher**                                      | DRM / piracy protection                                    | Niche focus on DRM; VidcastX has broader lifecycle                                                                         |
 
-  - Media management interface interacting with the hierarchical `folder` structure.
-
-  - Analytics dashboards visualizing views, watch time, and heatmaps.
-
-  - AI Tooling interface for requesting translations or editing generated chapters.
-
-### `apps/marketing`
-
-SEO-optimized public-facing website.
-
-- **Key Components:** Pricing pages, developer API documentation, and feature showcases.
-
-### `apps/api` (Main Backend)
-
-The fast, lightweight core API. **By design, this service never processes video files directly.**
-
-- **Responsibilities:**
-  - Handling authentication and session management via the `@workspace/auth` package.
-
-  - Processing CRUD operations for the Dashboard (fetching libraries, updating metadata).
-
-  - Generating AWS S3 Presigned URLs for secure client-side uploads.
-
-  - Writing to the `ai_job` table and dispatching events to Redis/SQS message brokers.
-
-  - Ingesting high-volume telemetry via the `embed_stats` and `player_event` endpoints from the NPM player.
-
-## 4. The Worker Fleet (`workers/`)
-
-To ensure high availability and prevent the core API from stalling, all heavy computation is offloaded to dedicated workers. **All workers are designed to be fully Dockerized** to run securely and scale horizontally in environments like ECS or Kubernetes.
-
-### `worker-transcoder` (Video Encoding)
-
-- **Execution:** Utilizes Node.js `child_process.spawn()` to execute **raw FFmpeg CLI** commands directly, avoiding fragile Node-FFmpeg abstraction layers.
-
-- **Trigger:** Listens to the `video.uploaded` message queue.
-
-- **Process:**
-  1. Downloads the raw source file from the secure ingestion bucket.
-
-  2. Transcodes the file into adaptive bitrate HLS streams (`.m3u8` playlists).
-
-  3. Extracts the master audio track into a lossless format for the transcriber.
-
-  4. Uploads processed chunks to the public delivery bucket.
-
-  5. Updates the `asset` and `video` database tables (setting `status: 'ready'`).
-
-### `worker-thumbnailer` (Image Extraction)
-
-- **Execution:** Raw FFmpeg CLI.
-
-- **Trigger:** Runs in parallel with the `worker-transcoder`.
-
-- **Process:** Seeks through the video timeline to extract 3-5 optimized JPEG frames. Saves references in the database as `asset_type: 'thumbnail'`.
-
-### `worker-transcriber` (Speech-to-Text)
-
-- **Execution:** OpenAI Whisper API (or equivalent highly-precise model).
-
-- **Trigger:** Triggered upon successful extraction of the audio track by the transcoder.
-
-- **Process:** Feeds the isolated audio to the model to generate exact word-level timings and sentences.
-
-- **Database Updates:** Populates the `transcript` table, setting `is_auto_generated: true` and storing the `word_timings` JSON.
-
-### `worker-ai-processor` (The Intelligence)
-
-- **Execution:** Large Language Models (e.g., GPT-4o).
-
-- **Trigger:** Runs sequentially after `worker-transcriber` completes.
-
-- **Process:** Analyzes the raw transcript text.
-
-- **Outputs:**
-  - **Chapters:** Identifies logical topic transitions and writes to the `video_chapter` table.
-
-  - **Summaries:** Generates multi-length summaries and SEO metadata, saving to the `video_summary` table.
-
-  - **Embeddings:** Generates vector embeddings for semantic search capabilities, saving to the `transcript_embedding` table.
-
-### `worker-dubbing` (Voice Cloning & Translation)
-
-- **Execution:** ElevenLabs API.
-
-- **Trigger:** Triggered manually by a user request or automatically via the `ai_job` table (`type: 'dub'`).
-
-- **Process:**
-  1. Analyzes the isolated audio and original transcript.
-
-  2. Maps original voice characteristics, tone, and pacing.
-
-  3. Generates translated voiceovers matching the original emotional delivery.
-
-  4. Uploads the new audio tracks as alternative language `assets`.
-
-### `worker-notifications` (Event Dispatcher)
-
-- **Execution:** Node.js Webhook & Email Dispatcher.
-
-- **Trigger:** Listens for completed or failed jobs across the system.
-
-- **Process:** Dispatches transactional emails to users and sends JSON payloads to customer endpoints stored in the `webhook` table.
-
-## 5. Database Schema & Architecture Mapping
-
-The system architecture is tightly coupled to the Drizzle PostgreSQL schema. Key mappings include:
-
-### Video & Content Management
-
-- **`video` & `asset`**: The core entities. The `video` table holds metadata and state, while the `asset` table holds the actual CDN links to HLS playlists, thumbnails, and audio tracks.
-
-- **`folder`**: Supports a parent/child tree hierarchy allowing users to organize thousands of videos cleanly.
-
-### Artificial Intelligence (`ai-schema` & `transcript-schema`)
-
-- **`ai_job`**: Tracks the status of asynchronous tasks (`transcribe`, `translate`, `dub`, `generate_metadata`), logging tokens used and precise costs.
-
-- **`transcript` & `video_chapter`**: Stores the structured output of the AI workers.
-
-- **`transcript_embedding`**: Utilizes `pgvector` (1536 dimensions) to allow semantic querying.
-
-### Analytics & Telemetry (`analytics-schema`)
-
-- **`view_session` & `player_event`**: Granular telemetry tracking device types, geographic regions, buffering events, and interaction history automatically fed by the `@vidcastx/player` NPM package.
-
-- **`embed_stats`**: Tracks which external domains (`embed_domain`) are rendering the iframe player.
-
-- **`video_heatmap`**: Tracks re-watches and drop-off points over the video timeline.
-
-### Live Streaming (`live-schema`)
-
-- **`channel` & `stream`**: Manages RTMP ingest endpoints, records peak viewers, and tracks live broadcast duration.
-
-### Organization & Billing (`auth-schema` & `billing-schema`)
-
-- **`organization`, `member`, `invitation`**: Managed via Better-Auth, utilizing a strict soft-delete pattern to maintain data integrity.
-
-- **`usage_record` & `usage_summary`**: Aggregates API requests, encoding minutes, bandwidth, and AI tokens. This table feeds directly into billing meters via the `subscription` and `invoice` tables.
-
-## 6. Infrastructure & Deployment Lifecycle
-
-1. **Upload Phase:** The client requests a presigned URL from the API, then uploads directly to the S3 ingestion bucket. Upon completion, the client notifies the API.
-
-2. **Message Broker:** The API pushes a processing job payload to Redis (BullMQ).
-
-3. **Containerized Processing:** Docker containers running the worker services pick up the jobs, utilizing raw `ffmpeg` installed within the container image for media manipulation.
-
-4. **Delivery:** Processed HLS chunks are moved to a public output S3 bucket, fronted by a global CDN (e.g., Cloudflare or Cloudfront) for low-latency playback.
-
-5. **Telemetry Loop:** The `@vidcastx/player` NPM package embedded on external sites continuously sends lightweight heartbeat events and player interaction data back to the `apps/api` to update the analytics tables in real-time.
+**Wedge vs this tier:** VidcastX ships the creator studio, AI pipeline, distribution, live, and billing on top of the same API — **one vendor instead of five**.
+
+### 5.2 Creator-facing hosting (UX competitors)
+
+| Competitor                                | Strength                                                          | Where VidcastX differs                                         |
+| ----------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Vimeo (Pro / OTT)**                     | Strong player, embed customization                                | Closed ecosystem, expensive at scale, slow AI feature shipping |
+| **Wistia**                                | Best-in-class for B2B marketing video (CTAs, forms, integrations) | Narrow marketing focus; weak on AI, dubbing, distribution      |
+| **Loom**                                  | Instant async-video messaging                                     | Not a hosting platform — ephemeral use case                    |
+| **Vidyard**                               | Sales-enablement video                                            | Narrow niche like Loom / Wistia                                |
+| **Uscreen / Dacast / Kajabi / Thinkific** | Course + membership video                                         | Closed, opinionated UIs; no API-first story                    |
+| **Brightcove / JW Player**                | Enterprise broadcaster tooling                                    | Enterprise sales cycle, legacy UX, per-seat pricing            |
+| **Panopto**                               | Internal corporate video                                          | Enterprise / campus focus, no creator story                    |
+
+**Wedge vs this tier:** API-first + white-label + typed SDK — a customer can build their own Wistia / Vimeo on top of us in weeks, not months.
+
+### 5.3 AI-video tooling (AI competitors)
+
+| Competitor                           | Strength                                   | Where VidcastX differs                                                                 |
+| ------------------------------------ | ------------------------------------------ | -------------------------------------------------------------------------------------- |
+| **Descript**                         | Text-based video editing, podcast workflow | Desktop-first editing tool, not infrastructure                                         |
+| **Opus Clip / Vizard / Munch**       | Auto-short-form clipping for social        | Single-purpose; VidcastX can host + analyze + distribute the clips these tools produce |
+| **Riverside / Podcastle / Zencastr** | Remote recording with local-first quality  | Recording tools, not hosting or delivery                                               |
+| **Rev / Deepgram / AssemblyAI**      | Best-of-breed STT                          | Transcript-only; no video context, no storage, no player                               |
+| **ElevenLabs**                       | Best-of-breed voice AI                     | Dubbing only; VidcastX wraps it into an end-to-end translated-video workflow           |
+| **HeyGen / Synthesia**               | AI avatars, synthetic video                | Focused on generation, not the long-tail of hosting + analytics + distribution         |
+
+**Wedge vs this tier:** these tools become **features inside VidcastX** rather than standalone products — transcripts + dubbing + chapters + embeddings come free as a byproduct of hosting with us.
+
+### 5.4 Live streaming (live competitors)
+
+| Competitor                  | Strength                      | Where VidcastX differs                                           |
+| --------------------------- | ----------------------------- | ---------------------------------------------------------------- |
+| **Restream / StreamYard**   | Multi-platform live simulcast | Broadcasting-only, no VOD / analytics / AI after the stream ends |
+| **Agora / LiveKit / 100ms** | Low-latency WebRTC infra      | Real-time infra, not a product; assembly required                |
+| **Mux Live / IVS**          | Live infrastructure           | Live only, no AI layer above the stream                          |
+| **Twitch / YouTube Live**   | Owned audiences               | Closed platforms; you don't own the stream, chat, or audience    |
+
+**Wedge vs this tier:** a live session **auto-becomes a VOD** in the same library, transcribed, chaptered, and distributable the next day — no re-upload, no re-transcribe.
+
+### 5.5 Summary
+
+No single competitor covers **API + creator UI + AI + live + distribution + usage-billing** under one tenant. Customers today stitch together Mux + Deepgram + ElevenLabs + Stripe + Zapier + Restream + a custom dashboard. **VidcastX's thesis is that the assembly itself is the product gap.**
+
+## 6. Alternatives — what you'd build instead if VidcastX didn't exist
+
+| "I just need to…"                          | Today                                                       | With VidcastX                                            |
+| ------------------------------------------ | ----------------------------------------------------------- | -------------------------------------------------------- |
+| Host + stream video in my SaaS             | Mux + custom player + custom analytics + custom DB mapping  | Typed API + NPM embeddable player + built-in analytics   |
+| Add transcripts & chapters to videos       | Deepgram + OpenAI + custom job queue + storage              | Flip a flag on the video record                          |
+| Auto-publish to YouTube + TikTok           | Zapier chains + OAuth storage + error handling              | Integration toggles per org                              |
+| Meter usage per customer for billing       | Custom events + Stripe metered prices + reconciliation cron | `usage_record` rolls up to `usage_summary` → Stripe      |
+| Run a live show with VOD replay            | Restream + separate VOD host + re-upload + re-transcribe    | Live RTMP → auto-VOD → auto-transcript → auto-distribute |
+| Offer semantic search inside video         | pgvector + custom embedding pipeline + segment indexing     | `transcript_embedding` table, indexed by default         |
+| Translate a library to 10 languages        | Whisper + GPT + ElevenLabs + glue code + ops                | One AI job per target language                           |
+| Measure embed engagement on customer sites | Custom beacon + ETL + warehouse + dashboard                 | `embed_stats` + analytics dashboard out of the box       |
+
+## 7. Build status snapshot (2026-04)
+
+**✅ Shipped**
+
+- Monorepo, tooling, CI, commit / PR hooks
+- Auth + orgs + RBAC + invitations (Better Auth)
+- Resumable multipart upload pipeline (Uppy → S3)
+- Video + folder CRUD API (v1)
+- TanStack Start studio: auth, onboarding, dashboard, videos, folders
+- Transcoder worker producing HLS + poster + hover preview
+- M2M JWT between API and workers
+- Typed API (Eden Treaty) + auto-generated OpenAPI
+
+**🚧 In progress**
+
+- Transcoder: subprocess FFmpeg → in-process `node-av` libav bindings (branch `feat/transcoder-libav`)
+
+**📋 Designed, not yet built** (schemas + types present, endpoints / UI pending)
+
+- `@vidcastx/player` NPM embeddable player package
+- AI job orchestration endpoints (transcription, chapters, summaries, dubbing, metadata)
+- Analytics ingestion + dashboards (heatmaps, realtime, dimensional slicing, embed stats)
+- Live channel management + RTMP ingest infrastructure
+- Distribution integrations (YouTube / Twitch / TikTok / Facebook OAuth + dispatcher)
+- Billing dashboard + Stripe metered sync + invoices / credits UI
+- Webhooks admin UI
+- Marketing site (`apps/marketing`)
+- Transcoder roadmap §1–§8: per-title encoding, segment checkpointing, chunked transcoding, hardware fingerprinting, AV1, convex-hull VMAF, structured job logging + admin UI (see `workers/transcoder/ROADMAP.md`)
+
+## 8. Why now
+
+1. **Creators want escape velocity from YouTube** — discovery is algorithmic, demonetization is arbitrary, audiences are rented. Owning the player + audience + data is the next wave.
+2. **AI video features have commoditized** — Whisper, GPT, ElevenLabs, pgvector are all one API call away, but nobody has assembled them into a cohesive **video-lifecycle product** yet.
+3. **Self-hostable infrastructure is back in fashion** — post–Twitter-API and post–Reddit-API shocks, developers are done betting their product on closed platforms.
+4. **Per-title encoding + AV1 are finally practical** — prebuilt FFmpeg NAPI bindings (`node-av`) make the transcoder stack deployable on any Node / Bun host without system FFmpeg wrangling.
+5. **Bun + TanStack Start + Drizzle + Better Auth** mean the full control plane can be built by a 1–3 person team that would have needed 10 engineers five years ago.
+6. **Usage-based billing is the default SaaS pricing model now** — customers expect metered video minutes the way they expect metered LLM tokens.
+
+## 9. North-star product statement
+
+> **Upload a video. Ship a professional, transcribed, chaptered, semantically searchable, multilingual, multi-platform video experience — with hollywood-grade analytics and usage-based billing — in one API call or one button click.**
+
+That is the product. Everything in this repo is in service of that one sentence.
