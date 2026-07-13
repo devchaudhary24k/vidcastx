@@ -26,7 +26,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@turbo/gen": "^2.8.13",
+    "@turbo/gen": "^2.10.4",
     "@vidcastx/eslint-config": "workspace:*",
     "@vidcastx/prettier": "workspace:*",
     "@vidcastx/typescript-config": "workspace:*",
